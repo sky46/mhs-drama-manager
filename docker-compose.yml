@@ -1,6 +1,8 @@
 # https://hub.docker.com/_/postgres/
 version: '3.9'
 
+# docker-compose up --build, docker-compose down
+  # 3000 frontend, 3001 backend
 services:
 
   db:
@@ -10,9 +12,35 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
+  # localhost:8080 (can access adminer (database))
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/postgres
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
