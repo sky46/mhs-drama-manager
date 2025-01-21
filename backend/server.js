@@ -11,7 +11,7 @@ const pool = new Pool({
 
 app.get('/', async (req, res) => {
     var queryResult = await pool.query('SELECT * FROM test;')
-    res.send(`Hello World! ${JSON.stringify(queryResult.rows)}`)
+    res.send(queryResult.rows)
 
 })
 
