@@ -5,4 +5,10 @@ const { Pool } = require('pg');
 const app = express();
 const port = 3001;
 
-// still needs to be connected, just did the very basics to check if creation of express app worked
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
+app.listen(port, () => {
+    console.log(`Backend listening on port ${port}`)
+})
