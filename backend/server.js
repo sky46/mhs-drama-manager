@@ -5,4 +5,16 @@ const { Pool } = require('pg');
 const app = express();
 const port = 3001;
 
-// still needs to be connected, just did the very basics to check if creation of express app worked
+const pool = new Pool({
+    connectionString: 'postgres://postgres:password@db:5432/postgres'
+})
+
+app.get('/', async (req, res) => {
+    var queryResult = await pool.query('SELECT * FROM test;')
+    res.send(queryResult.rows)
+
+})
+
+app.listen(port, () => {
+    console.log(`Backend listening on port ${port}`)
+})

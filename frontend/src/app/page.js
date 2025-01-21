@@ -1,7 +1,9 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default async function Home() {
+  var response = await fetch('http://backend:3001/')
+  var data = await response.json()
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -13,6 +15,7 @@ export default function Home() {
           height={38}
           priority
         />
+        <p>Data from db: {JSON.stringify(data)}</p>
         <ol>
           <li>
             Get started by editing <code>src/app/page.js</code>.
