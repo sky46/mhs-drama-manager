@@ -1,8 +1,9 @@
 import Image from "next/image";
 import styles from "./page.module.css"; // Access specific styles from the module using styles.ClassName (locally scoped)
+import { API_URL } from "/constants.js";
 
 export default async function Home() {
-  var response = await fetch('http://backend:3001/')
+  var response = await fetch(API_URL)
   var data = await response.json()
   return (
     <div className={styles.page}>
