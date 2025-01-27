@@ -2,10 +2,27 @@
 const express = require('express');
 const { pool } = require('./db');  // Import the database connection
 var cors = require('cors')
+const { google } = require('googleapis');
+const session = require('express-session'); // To maintain user authentication
+const path = require('path');
+
 
 const app = express();
 const port = process.env.PORT;
 app.use(cors())
+
+app.use(session({
+    secret: process.env.SECRET_SESSION_KEY, 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
+
+const oAuth2Client = new google.auth.OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URI,
+);
 
 // Get all rows from users
 app.get('/', async (req, res) => {
