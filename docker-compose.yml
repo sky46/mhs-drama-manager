@@ -13,7 +13,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -50,3 +50,6 @@ services:
       - /app/node_modules
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://backend:3001
+
+volumes:
+  postgres_data:
