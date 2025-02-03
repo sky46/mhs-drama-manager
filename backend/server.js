@@ -5,11 +5,13 @@ var cors = require('cors')
 const { google } = require('googleapis');
 const session = require('express-session'); // To maintain user authentication
 const path = require('path');
-
+require('dotenv').config()
 
 const app = express();
 const port = process.env.PORT;
-app.use(cors())
+app.use(cors({ origin: '*' }));
+
+console.log("Session Secret Key:", process.env.SECRET_SESSION_KEY);
 
 app.use(session({
     secret: process.env.SECRET_SESSION_KEY, 
@@ -63,8 +65,13 @@ app.get('/auth/google/callback', async (req, res) => {
 
 // Get all rows from users
 app.get('/', async (req, res) => {
-    var queryResult = await pool.query('SELECT * FROM users;')
-    res.send(queryResult.rows)
+    try {
+        var queryResult = await pool.query('SELECT * FROM users;');
+        res.json(queryResult.rows);
+    } catch (error) {
+        console.error("Database query error:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
 });
 
 // Post to create new user
