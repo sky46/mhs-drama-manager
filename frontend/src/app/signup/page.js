@@ -2,6 +2,10 @@
 import { useState } from "react";
 import styles from '../styles/signup.module.css';
 
+// ADD HOVER QUESTION MAKR FOR REQUIREEMNTS FOR EACH
+// ADD CHECKING EMAIL EXISTS
+// ADD WRITING IT TO BACKEND DATABASE ROUTE
+
 function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -16,32 +20,39 @@ function Signup() {
         passwordCheck: false
     });
 
+    const [errorMessages, setErrorMessages] = useState ({ // Doing this instead of required field for more customizability
+        name: "",
+        email: "",
+        password: "",
+        passwordCheck: ""
+    });
+
     // Also check for email already existing later
     function validateSubmission() {
-        var errors = {};
+        let newErrors = {};
         let newInvalidFields = { name: false, email: false, password: false, passwordCheck: false };
 
         if (!name) {
-            errors.name = "The name field must be filled in."
+            newErrors.name = "The name field must be filled in.";
             newInvalidFields.name = true;
         }
 
         const emailPatternChecker = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regex -> need characters before @, @, characters after @, ., characters after .
         if (!email || !emailPatternChecker.test(email)) {
-            errors.email = "Invalid email format."
+            newErrors.email = "Invalid email format."
             newInvalidFields.email = true;
         }
 
         const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)$/; //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special)
         if (!password || !passwordCheck || password !== passwordCheck || password < 8 || passwordPatternChecker.test(password)) {
-            errors.password = "Invalid password and/or the passwords do not match."
+            newErrors.password = "Invalid password and/or the passwords do not match."
+            newErrors.passwordCheck = "Invalid password and/or the passwords do not match."
             newInvalidFields.password = true;
             newInvalidFields.passwordCheck = true;
         }
 
         setInvalidFields(newInvalidFields);
-
-        alert("Validation Errors:\n" + Object.entries(errors).map(([key, value]) => `${key}: ${value}`).join("\n"));
+        setErrorMessages(newErrors);
     }
 
     const handleSubmit = (e) => {
@@ -70,6 +81,7 @@ function Signup() {
                         onChange={(e) => setName(e.target.value)}
                         placeholder="i.e. Joe Bob"
                     />
+                    {errorMessages.name && <div className={styles.errorMessage}>{errorMessages.name}</div>}
                 </div>
                 <div>
                     <label className="label">Email</label>
@@ -81,6 +93,7 @@ function Signup() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="i.e. joebob@gmail.com"
                     />
+                    {errorMessages.email && <div className={styles.errorMessage}>{errorMessages.email}</div>}
                 </div>
                 <div>
                     <label className="label">Password</label>
@@ -91,6 +104,7 @@ function Signup() {
                         type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    {errorMessages.password && <div className={styles.errorMessage}>{errorMessages.password}</div>}
                 </div>
                 <div>
                     <label className="label">Re-enter Password</label>
@@ -101,6 +115,7 @@ function Signup() {
                         type={showPassword ? "text" : "password"}
                         onChange={(e) => setPasswordCheck(e.target.value)}
                     />
+                    {errorMessages.passwordCheck && <div className={styles.errorMessage}>{errorMessages.passwordCheck}</div>}
                 </div>
 
                 <div>
