@@ -1,6 +1,6 @@
 --
 -- PostgreSQL database dump
--- Mac: docker compose exec db pg_dump --dbname=postgres://postgres:password@db:5432/postgres > postgres_dump/postgres.sql
+--
 
 -- Dumped from database version 17.2 (Debian 17.2-1.pgdg120+1)
 -- Dumped by pg_dump version 17.2 (Debian 17.2-1.pgdg120+1)
@@ -29,8 +29,9 @@ CREATE TABLE public.users (
     id integer NOT NULL,
     name character varying NOT NULL,
     email character varying NOT NULL,
-    password character varying NOT NULL,
-    created_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    password character(97) NOT NULL,
+    created_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    role smallint NOT NULL
 );
 
 
@@ -69,8 +70,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public."Users
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, name, email, password, created_date) FROM stdin;
-1	lucas	test@gmail.com	testpassword	2025-01-21 18:40:56.441692+00
+COPY public.users (id, name, email, password, created_date, role) FROM stdin;
+1	lucas	test@gmail.com	testpassword                                                                                     	2025-01-21 18:40:56.441692+00	0
 \.
 
 
@@ -78,7 +79,7 @@ COPY public.users (id, name, email, password, created_date) FROM stdin;
 -- Name: Users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Users_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."Users_id_seq"', 6, true);
 
 
 --
@@ -87,6 +88,14 @@ SELECT pg_catalog.setval('public."Users_id_seq"', 1, true);
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "Users_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
