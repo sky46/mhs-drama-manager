@@ -1,5 +1,6 @@
 "use client"; // Need this to be able to use "useState"
 import { useState } from "react";
+import styles from '../styles/signup.module.css';
 
 function Signup() {
     const [name, setName] = useState("");
@@ -8,23 +9,37 @@ function Signup() {
     const [passwordCheck, setPasswordCheck] = useState("");
     const [role, setRole] = useState("student");
     const [showPassword, setShowPassword] = useState(false);
+    const [invalidFields, setInvalidFields] = useState({
+        name: false,
+        email: false,
+        password: false,
+        passwordCheck: false
+    });
 
     // Also check for email already existing later
     function validateSubmission() {
         var errors = {};
+        let newInvalidFields = { name: false, email: false, password: false, passwordCheck: false };
+
         if (!name) {
             errors.name = "The name field must be filled in."
+            newInvalidFields.name = true;
         }
 
         const emailPatternChecker = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regex -> need characters before @, @, characters after @, ., characters after .
         if (!email || !emailPatternChecker.test(email)) {
             errors.email = "Invalid email format."
+            newInvalidFields.email = true;
         }
 
         const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)$/; //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special)
         if (!password || !passwordCheck || password !== passwordCheck || password < 8 || passwordPatternChecker.test(password)) {
             errors.password = "Invalid password and/or the passwords do not match."
+            newInvalidFields.password = true;
+            newInvalidFields.passwordCheck = true;
         }
+
+        setInvalidFields(newInvalidFields);
 
         alert("Validation Errors:\n" + Object.entries(errors).map(([key, value]) => `${key}: ${value}`).join("\n"));
     }
@@ -48,45 +63,43 @@ function Signup() {
                 <div>
                     <label className="label">Name</label>
                     <input
-                        className="input"
+                        className={`${styles.input} ${invalidFields.name ? styles.invalid : ''}`} // Styles = input + either name or invalid
+                        id="name"
                         value={name}
                         type="text"
                         onChange={(e) => setName(e.target.value)}
                         placeholder="i.e. Joe Bob"
-                        required
                     />
                 </div>
                 <div>
                     <label className="label">Email</label>
                     <input
-                        className="input"
+                        className={`${styles.input} ${invalidFields.email ? styles.invalid : ''}`}
+                        id="email"
                         value={email}
                         type="text"
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="i.e. joebob@gmail.com"
-                        required
                     />
                 </div>
                 <div>
                     <label className="label">Password</label>
                     <input
-                        className="input"
+                        className={`${styles.input} ${invalidFields.password ? styles.invalid : ''}`}
                         id="password"
                         value={password}
                         type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                     />
                 </div>
                 <div>
                     <label className="label">Re-enter Password</label>
                     <input
-                        className="input"
+                        className={`${styles.input} ${invalidFields.passwordCheck ? styles.invalid : ''}`}
                         id="passwordcheck"
                         value={passwordCheck}
                         type={showPassword ? "text" : "password"}
                         onChange={(e) => setPasswordCheck(e.target.value)}
-                        required
                     />
                 </div>
 
