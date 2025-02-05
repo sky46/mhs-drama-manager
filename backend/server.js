@@ -83,7 +83,7 @@ app.post('/users/create', async (req, res) => {
         return res.status(400).json({ error: "Missing fields" }); // Missing fields
     }
     if (password !== passwordCheck) {
-        return res.status(400).json({ error: "Passwords do not match" });
+        return res.status(400).json({ error: "Passwords do not match" }); // Maybe redundant? (checked in frontend)
     }
     var roleID;
     if (role === 'teacher') {

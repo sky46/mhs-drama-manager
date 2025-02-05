@@ -9,9 +9,31 @@ function Signup() {
     const [role, setRole] = useState("student");
     const [showPassword, setShowPassword] = useState(false);
 
+    // Also check for email already existing later
+    function validateSubmission() {
+        var errors = {};
+        if (!name) {
+            errors.name = "The name field must be filled in."
+        }
+
+        const emailPatternChecker = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regex -> need characters before @, @, characters after @, ., characters after .
+        if (!email || !emailPatternChecker.test(email)) {
+            errors.email = "Invalid email format."
+        }
+
+        const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)$/; //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special)
+        if (!password || !passwordCheck || password !== passwordCheck || password < 8 || passwordPatternChecker.test(password)) {
+            errors.password = "Invalid password and/or the passwords do not match."
+        }
+
+        alert("Validation Errors:\n" + Object.entries(errors).map(([key, value]) => `${key}: ${value}`).join("\n"));
+    }
+
     const handleSubmit = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent from being submitted right away
         console.log({ name, email, password, passwordCheck, role });
+        validateSubmission();
+
         // MAKE API CALL TO BACKEND TO SAVE
     };
 
