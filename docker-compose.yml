@@ -3,6 +3,8 @@ version: '3.9'
 
 # docker-compose up --build, docker-compose down
   # 3000 frontend, 3001 backend
+# If db updated -> delete /postgres_data and rebuild
+
 services:
 
   db:
