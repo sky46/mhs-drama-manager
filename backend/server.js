@@ -66,7 +66,23 @@ app.post('/users/create', async (req, res) => {
     }
 });
 
-// Post to create new user
+// Post to check user email if already registered
+app.post('/users/email', async (req, res) => {
+    const { email } = req.body;
+    const emailCheckQuery = 'SELECT * FROM users WHERE email = $1';
+    try {
+        const emailCheckResult = await pool.query(emailCheckQuery, [email]);
+        if (emailCheckResult.rows.length > 0) {
+            return res.json({ exists: true }); // Exists field for easier checking
+        } else {
+            return res.json({ exists: false });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: 'Database error', details: error.message });
+    }
+});
+
+// Post to login user
 app.post('/users/login', async (req, res) => {
     const { email, password } = req.body;
 

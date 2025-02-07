@@ -28,7 +28,7 @@ function Signup() {
     });
 
     // Also check for email already existing later
-    function validateSubmission() {
+    const validateSubmission = async() => {
         let newErrors = {};
         let newInvalidFields = { name: false, email: false, password: false, passwordCheck: false };
 
@@ -40,6 +40,19 @@ function Signup() {
         const emailPatternChecker = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regex -> need characters before @, @, characters after @, ., characters after .
         if (!email || !emailPatternChecker.test(email)) {
             newErrors.email = "Invalid email format."
+            newInvalidFields.email = true;
+        }
+
+        const emailCheckResponse = await fetch("http://localhost:3001/users/email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email })
+        });
+        const emailCheckData = await emailCheckResponse.json();
+        if (emailCheckData.exists) {
+            newErrors.email = "Email already in use."
             newInvalidFields.email = true;
         }
 
@@ -66,7 +79,7 @@ function Signup() {
     const registerUser = async (e) => {
         e.preventDefault(); // Prevent from being submitted right away
         console.log({ name, email, password, passwordCheck, role });
-        const valid = validateSubmission();
+        const valid = await validateSubmission();
 
         if (valid) {
             // Backend request with fetch sending post
