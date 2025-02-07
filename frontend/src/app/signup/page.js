@@ -43,8 +43,9 @@ function Signup() {
             newInvalidFields.email = true;
         }
 
-        const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)$/; //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special)
-        if (!password || !passwordCheck || password !== passwordCheck || password < 8 || passwordPatternChecker.test(password)) {
+        //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special, 1 number)
+        const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?=.*\d)/;
+        if (!password || !passwordCheck || password !== passwordCheck || password.length < 8 || !passwordPatternChecker.test(password)) {
             newErrors.password = "Invalid password and/or the passwords do not match."
             newErrors.passwordCheck = "Invalid password and/or the passwords do not match."
             newInvalidFields.password = true;
@@ -54,7 +55,10 @@ function Signup() {
         setInvalidFields(newInvalidFields);
         setErrorMessages(newErrors);
 
-        let valid = Object.values(newInvalidFields).includes(false);
+        console.log(Object.values(newInvalidFields));
+
+        let valid = !Object.values(newInvalidFields).includes(true);
+        console.log(valid);
         return valid
     }
 
@@ -64,7 +68,7 @@ function Signup() {
         const valid = validateSubmission();
 
         if (valid) {
-            console.log("IT WORKED")
+            console.log("IT WORKED");
             // MAKE API CALL TO BACKEND TO SAVE
         }
     };
