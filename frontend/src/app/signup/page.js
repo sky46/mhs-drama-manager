@@ -53,14 +53,20 @@ function Signup() {
 
         setInvalidFields(newInvalidFields);
         setErrorMessages(newErrors);
+
+        let valid = Object.values(newInvalidFields).includes(false);
+        return valid
     }
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent from being submitted right away
         console.log({ name, email, password, passwordCheck, role });
-        validateSubmission();
+        const valid = validateSubmission();
 
-        // MAKE API CALL TO BACKEND TO SAVE
+        if (valid) {
+            console.log("IT WORKED")
+            // MAKE API CALL TO BACKEND TO SAVE
+        }
     };
 
     const togglePasswordVisibility = () => { // Use state to toggle password visibliity instead of getting element by id because not recognized if text is blank (i.e. before password is typed)
