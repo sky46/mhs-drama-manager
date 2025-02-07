@@ -11,6 +11,7 @@ function RootLayout({ children }) {
               <li><Link href="/signup">Sign Up</Link></li>
               <li><Link href="/calendar">Calendar</Link></li>
               <li><Link href="/attendance">Attendance</Link></li>
+              <li><Link href="/profile">Profile</Link></li>
             </ul>
           </nav>
         </header>

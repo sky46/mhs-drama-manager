@@ -1,10 +1,9 @@
 "use client"; // Need this to be able to use "useState"
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
 import styles from '../styles/signup.module.css';
 
 // ADD HOVER QUESTION MAKR FOR REQUIREEMNTS FOR EACH
-// ADD CHECKING EMAIL EXISTS
-// ADD WRITING IT TO BACKEND DATABASE ROUTE
 
 function Signup() {
     const [name, setName] = useState("");
@@ -13,19 +12,28 @@ function Signup() {
     const [passwordCheck, setPasswordCheck] = useState("");
     const [role, setRole] = useState("student");
     const [showPassword, setShowPassword] = useState(false);
+    const [successfulRegistration, setSuccessfulRegistration] = useState(false);
     const [invalidFields, setInvalidFields] = useState({
         name: false,
         email: false,
         password: false,
         passwordCheck: false
     });
-
     const [errorMessages, setErrorMessages] = useState ({ // Doing this instead of required field for more customizability
         name: "",
         email: "",
         password: "",
         passwordCheck: ""
     });
+
+    const router = useRouter();
+    // Need to use effect to mount router cause normally its in components
+    useEffect(() => {
+        console.log("Router instance:", router);
+        if (router && successfulRegistration) {
+            router.push("/profile");
+        }
+    }, [router, successfulRegistration]);
 
     // Also check for email already existing later
     const validateSubmission = async() => {
@@ -96,6 +104,7 @@ function Signup() {
             if (response.ok) {
                 console.log("User created successfully:", data);
                 alert("Signup successful!");
+                setSuccessfulRegistration(true);
             } else {
                 console.error("Signup error:", data.error);
                 alert(data.error);
@@ -109,6 +118,7 @@ function Signup() {
     
     return (
         <div className="form">
+            <button onClick={() => router.push("/profile")}>Go to Profile</button>
             <h1>Sign Up!</h1>
             <form onSubmit={registerUser}>
                 <div>
