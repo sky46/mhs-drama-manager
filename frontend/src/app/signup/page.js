@@ -62,15 +62,32 @@ function Signup() {
         return valid
     }
 
-    const handleSubmit = (e) => {
+    // async to allow promises (smth that will be available in the future -> i.e. the response to send to backend)
+    const registerUser = async (e) => {
         e.preventDefault(); // Prevent from being submitted right away
         console.log({ name, email, password, passwordCheck, role });
         const valid = validateSubmission();
 
         if (valid) {
-            console.log("IT WORKED");
-            // MAKE API CALL TO BACKEND TO SAVE
-        }
+            // Backend request with fetch sending post
+            const response = await fetch("http://localhost:3001/users/create", { 
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json" // Sending json data as expected
+                },
+                body: JSON.stringify({ name, email, password, passwordCheck, role })
+            });
+
+            const data = await response.json();
+        
+            if (response.ok) {
+                console.log("User created successfully:", data);
+                alert("Signup successful!");
+            } else {
+                console.error("Signup error:", data.error);
+                alert(data.error);
+            }
+        };
     };
 
     const togglePasswordVisibility = () => { // Use state to toggle password visibliity instead of getting element by id because not recognized if text is blank (i.e. before password is typed)
@@ -80,7 +97,7 @@ function Signup() {
     return (
         <div className="form">
             <h1>Sign Up!</h1>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={registerUser}>
                 <div>
                     <label className="label">Name</label>
                     <input
