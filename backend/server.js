@@ -11,6 +11,7 @@ const argon2 = require('argon2');
 const app = express();
 const port = process.env.PORT;
 app.use(cors({ origin: '*' }));
+app.use(express.json());
 
 console.log("Session Secret Key:", process.env.SECRET_SESSION_KEY);
 
@@ -104,6 +105,40 @@ app.post('/users/create', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "Database error" }); // Internal error
     }
+});
+
+// Post to create new user
+app.post('/users/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: "Missing fields" }); // Missing fields
+    }
+    
+    const queryText = 'SELECT id, password FROM users WHERE email = $1'
+    const queryParams = [email];
+    var queryResult;
+    try {
+        queryResult = await pool.query(queryText, queryParams);
+    } catch (error) {
+        res.status(500).json({ error: "Database error" }); // Internal error
+    }
+    if (queryResult.rows.length && await argon2.verify(queryResult.rows[0].password, password)) {
+        req.session.regenerate(function (err) {
+            if (err) {
+                next(err);
+            }
+            req.session.user = queryResult.rows[0].id;
+            req.session.save(function (err) {
+                if (err) {
+                    next(err);
+                }
+            });
+        });
+    } else {
+        return res.status(403).json({ error: 'Invalid email and/or password' });
+    }
+    return res.status(200).json({"user": req.session.user});
 });
 
 app.listen(port, () => {
