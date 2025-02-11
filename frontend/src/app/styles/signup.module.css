@@ -7,4 +7,56 @@
     font-size: 12px;
     margin-top: 4px;
     font-style: italic;
+    display: block;
+}
+
+.inputGroup {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+.tooltipContainer {
+    position: relative;
+    display: inline-block;
+}
+.tooltipIcon {
+    cursor: pointer;
+    background: grey;
+    color: white;
+    border: 1px solid black;
+    padding: 2px 6px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.tooltipText {
+    position: absolute;
+    background: grey;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    top: 50%;
+    left: 105%;
+    transform: translateY(-50%); /* Use translate + top to position absolute in middle*/
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+}
+.tooltipText.visible {
+    opacity: 1;
+}
+
+.bulletList {
+    padding-left: 15px;
+    margin: 0;
+}
+
+.bulletPoint {
+    padding: 0;
+    margin: 0;
 }

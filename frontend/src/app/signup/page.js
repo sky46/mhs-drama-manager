@@ -13,6 +13,11 @@ function Signup() {
     const [role, setRole] = useState("student");
     const [showPassword, setShowPassword] = useState(false);
     const [successfulRegistration, setSuccessfulRegistration] = useState(false);
+    const [showTooltip, setShowTooltip] = useState({
+        name: false,
+        email: false,
+        password: false,
+    });
     const [invalidFields, setInvalidFields] = useState({
         name: false,
         email: false,
@@ -121,7 +126,7 @@ function Signup() {
             <button onClick={() => router.push("/profile")}>Go to Profile</button>
             <h1>Sign Up!</h1>
             <form onSubmit={registerUser}>
-                <div>
+                <div className={styles.inputGroup}>
                     <label className="label">Name</label>
                     <input
                         className={`${styles.input} ${invalidFields.name ? styles.invalid : ''}`} // Styles = input + either name or invalid
@@ -131,9 +136,21 @@ function Signup() {
                         onChange={(e) => setName(e.target.value)}
                         placeholder="i.e. Joe Bob"
                     />
+                    <div 
+                        className={styles.tooltipContainer}
+                        onMouseEnter={() => setShowTooltip(prev => ({...prev, name: true}))} // spread rest of data (keep same)
+                        onMouseLeave={() => setShowTooltip(prev => ({...prev, name: false}))}
+                    >
+                        <span className={styles.tooltipIcon}>?</span>
+                        <div className={`${styles.tooltipText} ${showTooltip.name ? styles.visible : ''}`}>
+                            <ul className={styles.bulletList}>
+                                <li className={styles.bulletPoint}>Enter your full name</li>
+                            </ul>
+                        </div>
+                    </div>
                     {errorMessages.name && <div className={styles.errorMessage}>{errorMessages.name}</div>}
                 </div>
-                <div>
+                <div className={styles.inputGroup}>
                     <label className="label">Email</label>
                     <input
                         className={`${styles.input} ${invalidFields.email ? styles.invalid : ''}`}
@@ -143,9 +160,21 @@ function Signup() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="i.e. joebob@gmail.com"
                     />
+                    <div 
+                        className={styles.tooltipContainer}
+                        onMouseEnter={() => setShowTooltip(prev => ({...prev, email: true}))}
+                        onMouseLeave={() => setShowTooltip(prev => ({...prev, email: false}))}
+                    >
+                        <span className={styles.tooltipIcon}>?</span>
+                        <div className={`${styles.tooltipText} ${showTooltip.email ? styles.visible : ''}`}>
+                            <ul className={styles.bulletList}>
+                                <li className={styles.bulletPoint}>Enter any email with a valid address</li>
+                            </ul>
+                        </div>
+                    </div>
                     {errorMessages.email && <div className={styles.errorMessage}>{errorMessages.email}</div>}
                 </div>
-                <div>
+                <div className={styles.inputGroup}>
                     <label className="label">Password</label>
                     <input
                         className={`${styles.input} ${invalidFields.password ? styles.invalid : ''}`}
@@ -154,9 +183,24 @@ function Signup() {
                         type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <div 
+                        className={styles.tooltipContainer}
+                        onMouseEnter={() => setShowTooltip(prev => ({...prev, password: true}))}
+                        onMouseLeave={() => setShowTooltip(prev => ({...prev, password: false}))}
+                    >
+                        <span className={styles.tooltipIcon}>?</span>
+                        <div className={`${styles.tooltipText} ${showTooltip.password ? styles.visible : ''}`}>
+                            <ul className={styles.bulletList}>
+                                <li className={styles.bulletPoint}>Must include a lowercase character</li>
+                                <li className={styles.bulletPoint}>Must include an uppercase character</li>
+                                <li className={styles.bulletPoint}>Must include a special character</li>
+                                <li className={styles.bulletPoint}>Must include a number</li>
+                            </ul>
+                        </div>
+                    </div>
                     {errorMessages.password && <div className={styles.errorMessage}>{errorMessages.password}</div>}
                 </div>
-                <div>
+                <div className={styles.inputGroup}>
                     <label className="label">Re-enter Password</label>
                     <input
                         className={`${styles.input} ${invalidFields.passwordCheck ? styles.invalid : ''}`}
@@ -168,33 +212,30 @@ function Signup() {
                     {errorMessages.passwordCheck && <div className={styles.errorMessage}>{errorMessages.passwordCheck}</div>}
                 </div>
 
-                <div>
+                <div className={styles.inputGroup}>
                     <input type="checkbox" onClick={togglePasswordVisibility} />
                     <label className="label">Show Password</label>
                 </div>
 
-                <div>
-                    <label>Role</label>
-                    <div>
-                        <button
-                        type="button"
-                        onClick={() => setRole('teacher')}
-                        style={{
-                            backgroundColor: role === 'teacher' ? 'lightblue' : '',
-                        }}
-                        >
-                        Teacher
-                        </button>
-                        <button
-                        type="button"
-                        onClick={() => setRole('student')}
-                        style={{
-                            backgroundColor: role === 'student' ? 'lightblue' : '',
-                        }}
-                        >
-                        Student
-                        </button>
-                    </div>
+                <div className={styles.inputGroup}>
+                    <button
+                    type="button"
+                    onClick={() => setRole('teacher')}
+                    style={{
+                        backgroundColor: role === 'teacher' ? 'lightblue' : '',
+                    }}
+                    >
+                    Teacher
+                    </button>
+                    <button
+                    type="button"
+                    onClick={() => setRole('student')}
+                    style={{
+                        backgroundColor: role === 'student' ? 'lightblue' : '',
+                    }}
+                    >
+                    Student
+                    </button>
                 </div>
                 
                 <button className="btn" type="submit">
