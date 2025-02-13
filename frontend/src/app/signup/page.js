@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
 import styles from '../styles/signup.module.css';
 
-// ADD HOVER QUESTION MAKR FOR REQUIREEMNTS FOR EACH
-
 function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -40,7 +38,6 @@ function Signup() {
         }
     }, [router, successfulRegistration]);
 
-    // Also check for email already existing later
     const validateSubmission = async() => {
         let newErrors = {};
         let newInvalidFields = { name: false, email: false, password: false, passwordCheck: false };
@@ -81,17 +78,13 @@ function Signup() {
         setInvalidFields(newInvalidFields);
         setErrorMessages(newErrors);
 
-        console.log(Object.values(newInvalidFields));
-
         let valid = !Object.values(newInvalidFields).includes(true);
-        console.log(valid);
         return valid
     }
 
     // async to allow promises (smth that will be available in the future -> i.e. the response to send to backend)
     const registerUser = async (e) => {
         e.preventDefault(); // Prevent from being submitted right away
-        console.log({ name, email, password, passwordCheck, role });
         const valid = await validateSubmission();
 
         if (valid) {
@@ -123,7 +116,6 @@ function Signup() {
     
     return (
         <div className="form">
-            <button onClick={() => router.push("/profile")}>Go to Profile</button>
             <h1>Sign Up!</h1>
             <form onSubmit={registerUser}>
                 <div className={styles.inputGroup}>

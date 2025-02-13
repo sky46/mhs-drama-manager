@@ -10,9 +10,20 @@ const argon2 = require('argon2');
 
 const app = express();
 const port = process.env.PORT;
-app.use(cors({ origin: '*' }));
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
+
 app.use(express.json());
 app.options('*', cors());
+
+app.use(session({
+    secret: process.env.SECRET_SESSION_KEY, 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } 
+}));
 
 
 app.get('/', async (req, res) => {
@@ -84,37 +95,79 @@ app.post('/users/email', async (req, res) => {
 
 // Post to login user
 app.post('/users/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { nameOrEmail, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Missing fields" }); // Missing fields
+    if (!nameOrEmail || !password) {
+        return res.status(400).json({ error: "Missing fields" });
     }
-    
-    const queryText = 'SELECT id, password FROM users WHERE email = $1'
-    const queryParams = [email];
-    var queryResult;
+
+    const queryText = 'SELECT id, password FROM users WHERE email = $1 OR name = $2'
+    const queryParams = [nameOrEmail, nameOrEmail];
+    let queryResult;
+
     try {
         queryResult = await pool.query(queryText, queryParams);
     } catch (error) {
-        res.status(500).json({ error: "Database error" }); // Internal error
+        return res.status(500).json({ error: "Database error" });
     }
-    if (queryResult.rows.length && await argon2.verify(queryResult.rows[0].password, password)) {
-        req.session.regenerate(function (err) {
+
+    if (queryResult.rows.length) {
+        const user = queryResult.rows[0];
+        const isValidPassword = await argon2.verify(user.password, password);
+        console.log("Stored Password Hash:", user.password);
+        console.log("Entered Password:", password);
+        console.log("Password Verification Result:", isValidPassword);
+
+
+        // Not valid password
+        if (!isValidPassword) {
+            return res.status(403).json({
+                nameOrEmailMatched: true,
+                passwordMatched: false,
+            });
+        }
+
+        // Cookies to stay logged in
+        req.session.regenerate((err) => {
             if (err) {
-                next(err);
+                console.error("Session Regeneration Error:", err);
+                return res.status(500).json({ error: "Session error" });
             }
-            req.session.user = queryResult.rows[0].id;
-            req.session.save(function (err) {
+        
+            req.session.user = user.id;
+            req.session.save((err) => {
                 if (err) {
-                    next(err);
+                    console.error("Session Save Error:", err);
+                    return res.status(500).json({ error: "Session save error" });
                 }
+        
+                return res.status(200).json({
+                    nameOrEmailMatched: true,
+                    passwordMatched: true,
+                    userId: req.session.user
+                });
             });
         });
+        
     } else {
-        return res.status(403).json({ error: 'Invalid email and/or password' });
+        // Not valid email/name
+        return res.status(403).json({ 
+            nameOrEmailMatched: false,
+            passwordMatched: false,
+            error: 'Invalid email/name and/or password'
+        });
     }
-    return res.status(200).json({"user": req.session.user});
 });
+
+// Check if logged in
+app.get('/users/status', (req, res) => {
+    if (req.session && req.session.user) {
+        return res.json({ loggedIn: true, userId: req.session.user });
+    }
+    res.json({ loggedIn: false });
+});
+
+
 
 app.listen(port, () => {
     console.log(`Backend listening on port ${port}`)
