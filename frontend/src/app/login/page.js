@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" 
 import styles from '../styles/login.module.css';
 
-// Login works (ish) but need to fix if not a valid thing entered
-    // Can't figure out how to stay logged in
+// ADD ERROR FOR IF LOGIN FAILS
 
 function Login() {
     const [nameOrEmail, setNameOrEmail] = useState("");

@@ -172,7 +172,7 @@ app.post('/users/logout', async (req, res) => {
             if (err) {
                 next(err);
             }
-            res.status(200);
+            res.status(200).json({message: "Logout succesful"});
         })
     })
 });

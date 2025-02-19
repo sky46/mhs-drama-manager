@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
 import styles from '../styles/signup.module.css';
 
+// ADD LOGGING IN ON SIGNUP
+
 function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");

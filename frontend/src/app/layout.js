@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Logout from './logout';
+import Logout from './components/logout';
 
 function RootLayout({ children }) {
   return (
