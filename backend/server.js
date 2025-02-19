@@ -205,6 +205,26 @@ app.get('/users/status', (req, res) => {
     res.json({ loggedIn: false });
 });
 
+// Route to check if teacher vs student
+app.get('/users/role', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    try {
+        const queryText = 'SELECT role FROM users WHERE id = $1';
+        const queryParams = [req.session.user]
+        const queryResult = await pool.query(queryText, queryParams);
+
+        if (queryResult.rows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const roleID = queryResult.rows[0].role;
+        return res.json({ role: roleID === 0 ? "teacher" : "student" });
+    } catch (error) {
+        return res.status(500).json({ error: "Database error", details: error.message });
+    }
+});
 
 
 app.listen(port, () => {

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 function Profile() {
     // Implement protected page
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [role, setRole] = useState("");
 
     useEffect(() => {
         async function checkLoginStatus() {
@@ -17,8 +18,20 @@ function Profile() {
                 console.error("Error checking login status:", error);
             }
         }
-
         checkLoginStatus();
+
+        async function checkRole() {
+            try {
+                const response = await fetch("http://localhost:3001/users/role", {
+                    credentials: "include",
+                })
+                const data = await response.json();
+                setRole(data.role);
+            } catch (error) {
+                console.error("Error geting role:", error);
+            }
+        }
+        checkRole();
     }, []);
 
     return (
@@ -28,6 +41,7 @@ function Profile() {
             ) : (
                 <div>Please log in.</div>
             )}
+            <div>{role}</div>
         </div>
     );
 }
