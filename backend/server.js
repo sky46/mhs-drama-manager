@@ -7,6 +7,7 @@ const session = require('express-session'); // To maintain user authentication
 const path = require('path');
 require('dotenv').config()
 const argon2 = require('argon2');
+const pgSession = require('connect-pg-simple')(session);
 
 const app = express();
 const port = process.env.PORT;
@@ -16,9 +17,11 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.options('*', cors());
 
 app.use(session({
+    store: new pgSession({
+        pool: pool
+    }),
     secret: process.env.SECRET_SESSION_KEY, 
     resave: false,
     saveUninitialized: true,
