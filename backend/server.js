@@ -69,15 +69,35 @@ app.post('/users/create', async (req, res) => {
         return res.status(500).json({ error: 'Database error', details: error.message });
     }
     
-    const passwordHash = await argon2.hash(password);
-    const queryText = 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *';
-    const queryParams = [name, email, passwordHash, roleID];
     try {
+        const passwordHash = await argon2.hash(password);
+        const queryText = 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role';
+        const queryParams = [name, email, passwordHash, roleID];
         const queryResult = await pool.query(queryText, queryParams);
-        res.status(201).json(queryResult); // POST Created
+        const user = queryResult.rows[0];
+
+        // Login with signup
+        req.session.regenerate((err) => {
+            if (err) {
+                return res.status(500).json({ error: "Session error" });
+            }
+
+            req.session.user = user.id;
+            req.session.save((err) => {
+                if (err) {
+                    return res.status(500).json({ error: "Session save error" });
+                }
+
+                return res.status(200).json({
+                    message: "User created and logged in",
+                });
+            });
+        });
     } catch (error) {
         res.status(500).json({ error: "Database error" }); // Internal error
     }
+
+    
 });
 
 // Post to check user email if already registered

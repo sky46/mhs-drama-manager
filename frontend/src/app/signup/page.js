@@ -96,7 +96,8 @@ function Signup() {
                 headers: {
                     "Content-Type": "application/json" // Sending json data as expected
                 },
-                body: JSON.stringify({ name, email, password, passwordCheck, role })
+                body: JSON.stringify({ name, email, password, passwordCheck, role }),
+                credentials: 'include'
             });
 
             const data = await response.json();
