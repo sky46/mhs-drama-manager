@@ -34,7 +34,7 @@ function Login() {
         let newInvalidFields = { nameOrEmail: false, password: false };
 
         // Check if everything matched up
-        const loginCheckResponse = await fetch("http://localhost:3001/users/login", {
+        const loginCheckResponse = await fetch("http://localhost:3001/users/nameemailpassword", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -59,6 +59,7 @@ function Login() {
         setErrorMessages(newErrors);
 
         let valid = !Object.values(newInvalidFields).includes(true);
+        console.log(valid);
 
         return valid
     }
@@ -68,6 +69,27 @@ function Login() {
         console.log({nameOrEmail, password });
         const valid = await validateSubmission();
         if (valid) {
+            const response = await fetch("http://localhost:3001/users/login", { 
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ nameOrEmail, password }),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+        
+            if (response.ok) {
+                console.log("User created successfully:", data);
+                alert("Signup successful!");
+                setSuccessfulRegistration(true);
+            } else {
+                console.error("Signup error:", data.error);
+                alert(data.error);
+            }
+
+
             console.log("User successfully logged in:");
             alert("Login successful!");
             setSuccessfulLogin(true);

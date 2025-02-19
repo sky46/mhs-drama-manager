@@ -182,6 +182,49 @@ app.post('/users/login', async (req, res) => {
     }
 });
 
+app.post('/users/nameemailpassword', async (req, res) => {
+    const { nameOrEmail, password } = req.body;
+
+    if (!nameOrEmail || !password) {
+        return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const queryText = 'SELECT id, password FROM users WHERE email = $1 OR name = $2';
+    const queryParams = [nameOrEmail, nameOrEmail];
+    let queryResult;
+
+    try {
+        queryResult = await pool.query(queryText, queryParams);
+    } catch (error) {
+        return res.status(500).json({ error: "Database error", details: error.message });
+    }
+
+    if (queryResult.rows.length) {
+        const user = queryResult.rows[0];
+        const isValidPassword = await argon2.verify(user.password, password);
+
+        if (!isValidPassword) {
+            return res.status(403).json({
+                nameOrEmailMatched: true,
+                passwordMatched: false
+            });
+        }
+
+        return res.status(200).json({
+            nameOrEmailMatched: true,
+            passwordMatched: true,
+            userId: user.id
+        });
+
+    } else {
+        return res.status(403).json({ 
+            nameOrEmailMatched: false,
+            passwordMatched: false,
+            error: 'Invalid email/name and/or password'
+        });
+    }
+});
+
 app.post('/users/logout', async (req, res) => {
     req.session.user = null;
     req.session.save((err) => {
