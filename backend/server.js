@@ -162,6 +162,21 @@ app.post('/users/login', async (req, res) => {
     }
 });
 
+app.post('/users/logout', async (req, res) => {
+    req.session.user = null;
+    req.session.save((err) => {
+        if (err) {
+            next(err);
+        }
+        req.session.regenerate((err) => {
+            if (err) {
+                next(err);
+            }
+            res.status(200);
+        })
+    })
+});
+
 // Check if logged in
 app.get('/users/status', (req, res) => {
     if (req.session && req.session.user) {
