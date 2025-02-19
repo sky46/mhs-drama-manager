@@ -40,7 +40,8 @@ function Login() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nameOrEmail, password })
+            body: JSON.stringify({ nameOrEmail, password }),
+            credentials: 'include'
         });
         if (!loginCheckResponse.ok) {
             console.error("Failed to log in: ", loginCheckResponse.statusText);
