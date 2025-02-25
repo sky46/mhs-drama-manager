@@ -10,6 +10,8 @@ function Login() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [successfulLogin, setSuccessfulLogin] = useState(false);
+
+    // IMO these error fields are unnecessary for login as it should just be pass/fail for the whole form
     const [invalidFields, setInvalidFields] = useState({
         nameOrEmail: false,
         password: false,
@@ -27,14 +29,10 @@ function Login() {
             router.push("/profile");
         }
     }, [router, successfulLogin]);
-    
 
-    const validateSubmission = async() => {
-        let newErrors = {};
-        let newInvalidFields = { nameOrEmail: false, password: false };
-
-        // Check if everything matched up
-        const loginCheckResponse = await fetch("http://localhost:3001/users/nameemailpassword", {
+    const loginUser = async (e) => {
+        e.preventDefault();
+        const response = await fetch("http://localhost:3001/users/login", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -42,61 +40,24 @@ function Login() {
             body: JSON.stringify({ nameOrEmail, password }),
             credentials: 'include'
         });
-        if (!loginCheckResponse.ok) {
-            console.error("Failed to log in: ", loginCheckResponse.statusText);
-            return;
-        }
-        const loginCheckData = await loginCheckResponse.json();
-        if (!loginCheckData.nameOrEmailMatched) {
-            newErrors.nameOrEmail = "Submitted information does not exist."
-            newInvalidFields.nameOrEmail = true;
-        }
-        if (!loginCheckData.passwordMatched) {
-            newErrors.password = "Submitted password is incorrect."
-            newInvalidFields.password = true;
-        }
-        setInvalidFields(newInvalidFields);
-        setErrorMessages(newErrors);
-
-        let valid = !Object.values(newInvalidFields).includes(true);
-        console.log(valid);
-
-        return valid
-    }
-
-    const loginUser = async (e) => {
-        e.preventDefault();
-        console.log({nameOrEmail, password });
-        const valid = await validateSubmission();
-        if (valid) {
-            const response = await fetch("http://localhost:3001/users/login", { 
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ nameOrEmail, password }),
-                credentials: 'include'
-            });
-
-            const data = await response.json();
-        
-            if (response.ok) {
-                console.log("User created successfully:", data);
-                alert("Signup successful!");
-                setSuccessfulRegistration(true);
-            } else {
-                console.error("Signup error:", data.error);
-                alert(data.error);
-            }
-
-
-            console.log("User successfully logged in:");
-            alert("Login successful!");
+        if (response.ok) {
             setSuccessfulLogin(true);
-        } else {
-            console.error("Login error");
-        }
+        } else if (response.status === 403) {
+            alert("Incorrect name/email or password.")
 
+            // Separate errors for name/email and password. nameOrEmailMatched also has to be uncommented in backend.
+            // let newErrors = {password: 'Incorrect password'};
+            // let invalidFields = {nameOrEmail: false, password: true}
+            // let responseJson = await response.json()
+            // if (!responseJson.nameOrEmailMatched) {
+            //     newErrors.nameOrEmail = 'Incorrect name/email';
+            //     invalidFields.nameOrEmail = true;
+            // }
+            // setErrorMessages(newErrors)
+            // setInvalidFields(invalidFields)
+        } else {
+            console.error("Login failed: ", response.statusText);
+        }
     };
 
     const togglePasswordVisibility = () => { 
