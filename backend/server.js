@@ -158,6 +158,10 @@ app.post('/users/login', async (req, res) => {
                     console.error("Session Save Error:", err);
                     return res.status(500).json({ error: "Session save error" });
                 }
+
+                return res.status(200).json({
+                    message: 'Logged in',
+                });
             });
         });
         
@@ -166,9 +170,6 @@ app.post('/users/login', async (req, res) => {
             error: 'Incorrect login info',
         });
     }
-    return res.status(200).json({
-        message: 'Logged in',
-    });
 });
 
 app.post('/users/logout', async (req, res) => {

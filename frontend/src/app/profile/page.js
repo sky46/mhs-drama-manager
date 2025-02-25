@@ -36,12 +36,16 @@ function Profile() {
 
     return (
         <div>
+            {/*
             {isLoggedIn ? (
                 <div>You are logged in</div>
             ) : (
                 <div>Please log in.</div>
             )}
             <div>{role}</div>
+            ^^ Commented out right now to just work on QR CODE */}
+
+            <div>HI</div>
         </div>
     );
 }

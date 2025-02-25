@@ -22,7 +22,7 @@ function Login() {
 
     const loginUser = async (e) => {
         e.preventDefault();
-        const response = await fetch("http://localhost:3001/users/login", { 
+        const loginCheckResponse = await fetch("http://localhost:3001/users/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -30,9 +30,11 @@ function Login() {
             body: JSON.stringify({ nameOrEmail, password }),
             credentials: 'include'
         });
-        if (response.ok) {
+        if (loginCheckResponse.ok) {
             setSuccessfulLogin(true);
             setDisplayError(false);
+            const loginCheckData = await loginCheckResponse.json();
+            console.log(loginCheckData);
         } else if (response.status === 403) {
             setDisplayError(true);
             alert("Incorrect name/email or password.")
