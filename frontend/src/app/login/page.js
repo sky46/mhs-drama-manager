@@ -10,17 +10,7 @@ function Login() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [successfulLogin, setSuccessfulLogin] = useState(false);
-
-    // IMO these error fields are unnecessary for login as it should just be pass/fail for the whole form
-    const [invalidFields, setInvalidFields] = useState({
-        nameOrEmail: false,
-        password: false,
-    });
-    const [errorMessages, setErrorMessages] = useState ({
-        nameOrEmail: "",
-        password: "",
-    });
-
+    const [displayError, setDisplayError] = useState(false);
     
     const router = useRouter();
     useEffect(() => {
@@ -42,20 +32,12 @@ function Login() {
         });
         if (response.ok) {
             setSuccessfulLogin(true);
+            setDisplayError(false);
         } else if (response.status === 403) {
+            setDisplayError(true);
             alert("Incorrect name/email or password.")
-
-            // Separate errors for name/email and password. nameOrEmailMatched also has to be uncommented in backend.
-            // let newErrors = {password: 'Incorrect password'};
-            // let invalidFields = {nameOrEmail: false, password: true}
-            // let responseJson = await response.json()
-            // if (!responseJson.nameOrEmailMatched) {
-            //     newErrors.nameOrEmail = 'Incorrect name/email';
-            //     invalidFields.nameOrEmail = true;
-            // }
-            // setErrorMessages(newErrors)
-            // setInvalidFields(invalidFields)
         } else {
+            setDisplayError(true);
             console.error("Login failed: ", response.statusText);
         }
     };
@@ -71,24 +53,22 @@ function Login() {
                 <div className={styles.inputGroup}>
                     <label className="label">Name or Email</label>
                     <input
-                        className={`${styles.input} ${invalidFields.nameOrEmail ? styles.invalid : ''}`} 
+                        className={`${styles.input} ${displayError ? styles.invalid : ''}`} 
                         id="nameOrEmail"
                         value={nameOrEmail}
                         type="text"
                         onChange={(e) => setNameOrEmail(e.target.value)}
                     />
-                    {errorMessages.nameOrEmail && <div className={styles.errorMessage}>{errorMessages.nameOrEmail}</div>}
                 </div>
                 <div className={styles.inputGroup}>
                     <label className="label">Password</label>
                     <input
-                        className={`${styles.input} ${invalidFields.password ? styles.invalid : ''}`}
+                        className={`${styles.input} ${displayError ? styles.invalid : ''}`}
                         id="password"
                         value={password}
-                        type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
+                        type={showPassword ? "text" : "password"} 
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    {errorMessages.password && <div className={styles.errorMessage}>{errorMessages.password}</div>}
                 </div>
 
                 <div className={styles.inputGroup}>

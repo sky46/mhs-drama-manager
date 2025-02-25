@@ -142,7 +142,6 @@ app.post('/users/login', async (req, res) => {
         if (!isValidPassword) {
             return res.status(403).json({
                 error: 'Incorrect login info',
-                // nameOrEmailMatched: true,
             });
         }
 
@@ -165,7 +164,6 @@ app.post('/users/login', async (req, res) => {
     } else {
         return res.status(403).json({ 
             error: 'Incorrect login info',
-            // nameOrEmailMatched: false,
         });
     }
     return res.status(200).json({
