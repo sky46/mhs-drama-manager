@@ -1,6 +1,6 @@
 --
 -- PostgreSQL database dump
--- Mac: docker compose exec db pg_dump --dbname=postgres://postgres:password@db:5432/postgres > postgres_dump/postgres.sql
+--
 
 -- Dumped from database version 17.2 (Debian 17.2-1.pgdg120+1)
 -- Dumped by pg_dump version 17.2 (Debian 17.2-1.pgdg120+1)
@@ -29,8 +29,9 @@ CREATE TABLE public.users (
     id integer NOT NULL,
     name character varying NOT NULL,
     email character varying NOT NULL,
-    password character varying NOT NULL,
-    created_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    password character(97) NOT NULL,
+    created_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    role smallint NOT NULL
 );
 
 
@@ -59,6 +60,19 @@ ALTER SEQUENCE public."Users_id_seq" OWNED BY public.users.id;
 
 
 --
+-- Name: session; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.session (
+    sid character varying NOT NULL,
+    sess json NOT NULL,
+    expire timestamp(6) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.session OWNER TO postgres;
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -66,11 +80,21 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public."Users
 
 
 --
+-- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.session (sid, sess, expire) FROM stdin;
+\.
+
+
+--
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, name, email, password, created_date) FROM stdin;
-1	lucas	test@gmail.com	testpassword	2025-01-21 18:40:56.441692+00
+COPY public.users (id, name, email, password, created_date, role) FROM stdin;
+1	lucas	test@gmail.com	testpassword                                                                                     	2025-01-21 18:40:56.441692+00	0
+7	s	s	$argon2id$v=19$m=65536,t=3,p=4$Rt/lTZYT4+FWCB9dNZ24+A$2kKdBWIUXzc2EF+JcaYXOzB25ha/A2FZ8phpcDvl/2s	2025-02-07 15:40:20.365896+00	1
+8	test	test@test.com	$argon2id$v=19$m=65536,t=3,p=4$uTwqRYjMo5dH95PbIkPJxA$l7QNmuiqM9yttEpJu1L8xALxn/7Pz/S7FgnAqafsNzg	2025-02-19 13:21:31.996186+00	1
 \.
 
 
@@ -78,7 +102,7 @@ COPY public.users (id, name, email, password, created_date) FROM stdin;
 -- Name: Users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Users_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."Users_id_seq"', 8, true);
 
 
 --
@@ -87,6 +111,29 @@ SELECT pg_catalog.setval('public."Users_id_seq"', 1, true);
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "Users_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: session session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: IDX_session_expire; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IDX_session_expire" ON public.session USING btree (expire);
 
 
 --
