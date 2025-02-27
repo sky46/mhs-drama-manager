@@ -1,10 +1,14 @@
 "use client"; 
 import { useState, useEffect } from "react";
 
+import { useQRCode } from 'next-qrcode'; // https://www.npmjs.com/package/next-qrcode -> use SVG to be able to be printed out later on
+import styles from '../styles/profile.module.css';
+
 function Profile() {
     // Implement protected page
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
+    const { SVG } = useQRCode();
 
     useEffect(() => {
         async function checkLoginStatus() {
@@ -45,7 +49,20 @@ function Profile() {
             <div>{role}</div>
             ^^ Commented out right now to just work on QR CODE */}
 
-            <div>HI</div>
+            <div>QR Code</div>
+            <div className={styles.qrCodeAround}>
+                <SVG
+                    text={'https://google.com'} // Change to backend api call later
+                    options={{
+                        margin: 2,
+                        width: 200,
+                        color: {
+                        dark: '#000000',
+                        light: '#ffffff',
+                        },
+                    }}
+                />
+            </div>
         </div>
     );
 }
