@@ -216,6 +216,33 @@ app.get('/users/role', async (req, res) => {
     }
 });
 
+// Route to get productions user is a part of 
+app.get('/productions/:userId', async (req, res) => {
+    const userId = req.params.userId; 
+
+    try {
+        const queryText = `
+            SELECT productions.id, productions.name
+            FROM productions
+            JOIN productions_users ON productions.id = productions_users.production_id
+            WHERE productions_users.user_id = $1
+        ;
+    `    // from productions table, it matches records for productions users id = productions id where it is the desired user id and returns the id and name for the filtered data
+        const queryParams = [userId];
+
+        const result = await pool.query(queryText, queryParams);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'No productions found for this user' });
+        }
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Database query error:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Backend listening on port ${port}`)
