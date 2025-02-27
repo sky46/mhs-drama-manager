@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 
 import styles from '../styles/profile.module.css';
-import Qrcode from '../components/qrcode'
-
+import Production from "../components/production";
 
 function Profile() {
     // Implement protected page
@@ -80,12 +79,12 @@ function Profile() {
                             </ul>
                         )}
                     </div>
+                    <Production name="HI" teachers={["Lucas"]} id={1}></Production>
                 </div>
             ) : (
                 <div>Please log in.</div>
             )}
 
-            <Qrcode link="google.com"></Qrcode>
 
         </div>
     );
