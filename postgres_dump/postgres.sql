@@ -60,6 +60,52 @@ ALTER SEQUENCE public."Users_id_seq" OWNED BY public.users.id;
 
 
 --
+-- Name: productions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.productions (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.productions OWNER TO postgres;
+
+--
+-- Name: productions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.productions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.productions_id_seq OWNER TO postgres;
+
+--
+-- Name: productions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.productions_id_seq OWNED BY public.productions.id;
+
+
+--
+-- Name: productions_users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.productions_users (
+    production_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.productions_users OWNER TO postgres;
+
+--
 -- Name: session; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -73,6 +119,13 @@ CREATE TABLE public.session (
 ALTER TABLE public.session OWNER TO postgres;
 
 --
+-- Name: productions id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.productions ALTER COLUMN id SET DEFAULT nextval('public.productions_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -80,10 +133,31 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public."Users
 
 
 --
+-- Data for Name: productions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.productions (id, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: productions_users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.productions_users (production_id, user_id) FROM stdin;
+\.
+
+
+--
 -- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.session (sid, sess, expire) FROM stdin;
+QKcHQ2L9Vuhld6qlzp2BKZn2d_rsO4D2	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":8}	2025-02-28 15:15:44
+n78wrKpcU-zZP36UYdHzeAh8iaytRpah	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:44
+9lErVCIAdbxNf79AHLy_RIbLC9GckHdU	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:44
+B3A9VUFpCKc9jl0scFEqrkh3Rd6Z9d5t	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:44
+mYNmfgA9a8ITINjcax065EbH6vxCAiuF	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:49
 \.
 
 
@@ -106,11 +180,26 @@ SELECT pg_catalog.setval('public."Users_id_seq"', 8, true);
 
 
 --
+-- Name: productions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.productions_id_seq', 1, false);
+
+
+--
 -- Name: users Users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "Users_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: productions productions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.productions
+    ADD CONSTRAINT productions_pkey PRIMARY KEY (id);
 
 
 --
@@ -134,6 +223,20 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE INDEX "IDX_session_expire" ON public.session USING btree (expire);
+
+
+--
+-- Name: productions_users_production_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX productions_users_production_id ON public.productions_users USING btree (production_id);
+
+
+--
+-- Name: productions_users_user_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX productions_users_user_id ON public.productions_users USING btree (user_id);
 
 
 --
