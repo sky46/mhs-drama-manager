@@ -1,8 +1,9 @@
 'use client';
 import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function Logout() {
-
+    const router = useRouter();
     const logoutUser = async() => {
         fetch('http://localhost:3001/users/logout', {
             method: 'POST',
@@ -14,16 +15,13 @@ export default function Logout() {
             }
             return response.json();
         })
-        .then(data => {
-            console.log(data.message);
-            window.location.reload();
-        })
         .catch(error => console.error(error));
+        router.push("/");
     }
 
     return(
         <div>
-            <button onClick={logoutUser}>logout</button>
+            <button onClick={logoutUser}>Log out</button>
         </div>
     );
 }
