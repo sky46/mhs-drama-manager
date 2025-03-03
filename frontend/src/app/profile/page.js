@@ -39,12 +39,12 @@ function Profile() {
 
         const fetchProductions = async () => {
             try {
-                const userId = 10; // get actual userId later on
-                const res = await fetch(`http://localhost:3001/productions/${userId}`, {
+                const res = await fetch('http://localhost:3001/productions', {
                     method: 'GET',
                     headers: {
                       'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                 });
         
                 if (!res.ok) {
@@ -52,7 +52,7 @@ function Profile() {
                 }
         
                 const data = await res.json();
-                setProductions(data);
+                setProductions(data.productions);
             } catch (error) {
                 console.log(error.message);
             }

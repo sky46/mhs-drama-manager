@@ -217,9 +217,12 @@ app.get('/users/role', async (req, res) => {
 });
 
 // Route to get productions user is a part of 
-app.get('/productions/:userId', async (req, res) => {
-    const userId = req.params.userId; 
-
+app.get('/productions', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    } 
+    
     try {
         const queryText = `
             SELECT productions.id, productions.name
@@ -232,11 +235,7 @@ app.get('/productions/:userId', async (req, res) => {
 
         const result = await pool.query(queryText, queryParams);
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'No productions found for this user' });
-        }
-
-        res.json(result.rows);
+        return res.status(200).json({productions: result.rows});
     } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
