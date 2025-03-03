@@ -72,14 +72,11 @@ function Profile() {
                         {productions.length === 0 ? (
                             <p>No productions found for this user.</p>
                         ) : (
-                            <ul>
-                                {productions.map((production) => (  
-                                    <li key={production.id}>{production.name}</li>
-                                ))}
-                            </ul>
+                            productions.map((production) => (  
+                                <Production key={production.id} name={production.name} id={production.id} teachers={["Lucas"]} ></Production>
+                            ))
                         )}
                     </div>
-                    <Production name="HI" teachers={["Lucas"]} id={1}></Production>
                 </div>
             ) : (
                 <div>Please log in.</div>
