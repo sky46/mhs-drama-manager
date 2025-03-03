@@ -78,7 +78,8 @@ function Profile() {
                                         key={production.id} 
                                         name={production.name} 
                                         id={production.id} 
-                                        teachers={production.teachers} 
+                                        teachers={production.teachers}
+                                        student={production.student} 
                                     />
                                 ))
                         )}

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Logout from './components/logout';
 
+// change layout so that it doesn't have the login and sign up if already signed in
+
 function RootLayout({ children }) {
   return (
     <html lang="en">

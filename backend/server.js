@@ -258,13 +258,30 @@ app.get('/productions', async (req, res) => {
             teachersByProduction[production_id].push({ id: teacher_id, name: teacher_name });
         });
 
-        // Use spread to add etachers to each production
-        const productionsWithTeachers = productions.map(prod => ({
-            ...prod,
-            teachers: teachersByProduction[prod.id] || []  
-        }));
+        const studentQuery = `
+            SELECT users.id AS student_id, users.name AS student_name, productions_users.production_id
+            FROM users
+            JOIN productions_users ON users.id = productions_users.user_id
+            WHERE productions_users.production_id = ANY($1)
+            AND users.role = 1;
+        `   // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
+        const studentResult = await pool.query(studentQuery, [productionIds]);
+        // Reduce accumulates amount of students (applied to each row)
+        const studentCountByProduction = studentResult.rows.reduce((acc, { production_id }) => {
+            if (!acc[production_id]) { // if no value for accumulator yet, make it 0 so not falsy
+                acc[production_id] = 0;
+            }
+            acc[production_id]++;
+            return acc;
+        }, {});
 
-        return res.status(200).json({ productions: productionsWithTeachers });
+        // Use spread to add teachers to each production
+        const productionsWithTeachersAndStudents = productions.map(prod => ({
+            ...prod,
+            teachers: teachersByProduction[prod.id] || [],
+            student: studentCountByProduction[prod.id] || 0
+        }));
+        return res.status(200).json({ productions: productionsWithTeachersAndStudents });
     } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
