@@ -11,7 +11,7 @@ export default function Production({ name, teachers, id }) {
         <div className={styles.cards}>
             <div onClick={() => router.push(`/productions/${id}`)} className={styles.card}>
                 <h2 className={styles.text}>{name}</h2>
-                <p className={styles.text}>Teachers: {teachers.join(', ')}</p>
+                <p className={styles.text}>Teachers: {teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
             </div>
         </div>
     );

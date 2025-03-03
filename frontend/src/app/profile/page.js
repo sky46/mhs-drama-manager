@@ -53,6 +53,7 @@ function Profile() {
         
                 const data = await res.json();
                 setProductions(data.productions);
+                console.log(data.productions);
             } catch (error) {
                 console.log(error.message);
             }
@@ -72,9 +73,14 @@ function Profile() {
                         {productions.length === 0 ? (
                             <p>No productions found for this user.</p>
                         ) : (
-                            productions.map((production) => (  
-                                <Production key={production.id} name={production.name} id={production.id} teachers={["Lucas"]} ></Production>
-                            ))
+                                productions.map((production) => (  
+                                    <Production 
+                                        key={production.id} 
+                                        name={production.name} 
+                                        id={production.id} 
+                                        teachers={production.teachers} 
+                                    />
+                                ))
                         )}
                     </div>
                 </div>

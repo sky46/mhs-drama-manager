@@ -224,18 +224,47 @@ app.get('/productions', async (req, res) => {
     } 
     
     try {
-        const queryText = `
+        const productionsQueryText = `
             SELECT productions.id, productions.name
             FROM productions
             JOIN productions_users ON productions.id = productions_users.production_id
             WHERE productions_users.user_id = $1
-        ;
-    `    // from productions table, it matches records for productions users id = productions id where it is the desired user id and returns the id and name for the filtered data
-        const queryParams = [userId];
+        `   // from productions table, it matches records for productions users id = productions id where it is the desired user id and returns the id and name for the filtered data
+        const productionQueryParams = [userId];
 
-        const result = await pool.query(queryText, queryParams);
+        const productionsResult = await pool.query(productionsQueryText, productionQueryParams);
+        const productions = productionsResult.rows;
 
-        return res.status(200).json({productions: result.rows});
+        const productionIds = productions.map(p => p.id);
+        if (productionIds.length === 0) {
+            return res.status(200).json({ productions: [], teachers: [] });
+        }
+
+        const teachersQuery = `
+            SELECT users.id AS teacher_id, users.name AS teacher_name, productions_users.production_id
+            FROM users
+            JOIN productions_users ON users.id = productions_users.user_id
+            WHERE productions_users.production_id = ANY($1)
+            AND users.role = 0;
+        `   // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
+        const teachersResult = await pool.query(teachersQuery, [productionIds]);
+
+        // Organizing teachers by production
+        const teachersByProduction = {};
+        teachersResult.rows.forEach(({ production_id, teacher_id, teacher_name }) => {
+            if (!teachersByProduction[production_id]) { //not yet existing
+                teachersByProduction[production_id] = [];
+            }
+            teachersByProduction[production_id].push({ id: teacher_id, name: teacher_name });
+        });
+
+        // Use spread to add etachers to each production
+        const productionsWithTeachers = productions.map(prod => ({
+            ...prod,
+            teachers: teachersByProduction[prod.id] || []  
+        }));
+
+        return res.status(200).json({ productions: productionsWithTeachers });
     } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
