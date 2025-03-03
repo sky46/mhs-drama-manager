@@ -242,6 +242,45 @@ app.get('/productions', async (req, res) => {
     }
 });
 
+// Route to get productions user is a part of 
+app.get('/productions/:productionId', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const productionId = req.params.productionId; 
+    
+    try {
+        const productionQueryText = `
+            SELECT name
+            FROM productions
+            WHERE id = $1;
+        `;
+        const productionQueryParams = [productionId];
+        const productionResult = await pool.query(queryText, queryParams);
+        if (productionResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Production not found'})
+        }
+
+        const accessQueryText = `
+            SELECT productions.id
+            FROM productions
+            INNER JOIN productions_users ON productions.id = productions_users.production_id
+            WHERE productions.id = $1 AND productions_users.user_id = $2;
+        `
+        const accessQueryParams = [productionId, userId];
+        const accessResult = await pool.query(queryText, queryParams);
+        if (accessResult.rows.length === 0) {
+            return res.status(401).json({ error: 'User is not a part of production'});
+        }
+
+        return res.status(200).json({production: productionResult.rows[0]});
+    } catch (error) {
+        console.error("Database query error:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Backend listening on port ${port}`)

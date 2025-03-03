@@ -5,6 +5,7 @@ import Qrcode from '../../components/qrcode'
 
 export default function ProductionPage() {
     const { id } = useParams();
+    // fetch /productions/id
 
     return (
         <div>
