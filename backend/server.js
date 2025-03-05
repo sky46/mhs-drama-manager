@@ -303,7 +303,7 @@ app.get('/productions/:productionId', async (req, res) => {
             WHERE id = $1;
         `;
         const productionQueryParams = [productionId];
-        const productionResult = await pool.query(queryText, queryParams);
+        const productionResult = await pool.query(productionQueryText, productionQueryParams);
         if (productionResult.rows.length === 0) {
             return res.status(404).json({ error: 'Production not found'})
         }
@@ -312,15 +312,39 @@ app.get('/productions/:productionId', async (req, res) => {
             SELECT productions.id
             FROM productions
             INNER JOIN productions_users ON productions.id = productions_users.production_id
-            WHERE productions.id = $1 AND productions_users.user_id = $2;
+            WHERE productions_users.production_id = $1 AND productions_users.user_id = $2;
         `
         const accessQueryParams = [productionId, userId];
-        const accessResult = await pool.query(queryText, queryParams);
+        const accessResult = await pool.query(accessQueryText, accessQueryParams);
         if (accessResult.rows.length === 0) {
             return res.status(401).json({ error: 'User is not a part of production'});
         }
 
-        return res.status(200).json({production: productionResult.rows[0]});
+        const teachersQueryText = `
+            SELECT users.id, users.name
+            FROM users
+            INNER JOIN productions_users ON users.id = productions_users.user_id
+            WHERE productions_users.production_id = $1 AND role = 0;
+        `
+        const teachersQueryParams = [productionId];
+        const teachersResult = await pool.query(teachersQueryText, teachersQueryParams);
+
+        const studentCountQueryText = `
+            SELECT COUNT(*)
+            FROM users
+            INNER JOIN productions_users ON users.id = productions_users.user_id
+            WHERE productions_users.production_id = $1 AND role = 1;
+        `
+        const studentCountQueryParams = [productionId];
+        const studentCountResult = await pool.query(studentCountQueryText, studentCountQueryParams);
+        
+        productionData = {
+            production: productionResult.rows[0],
+            teachers: teachersResult.rows,
+            studentCount: studentCountResult.rows[0].studentCount,
+        };
+        console.log(productionData)
+        return res.status(200).json({productionData: productionData});
     } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
