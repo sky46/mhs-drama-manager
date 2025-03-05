@@ -9,7 +9,10 @@ import Production from "../../components/production";
 
 export default function ProductionPage() {
     const { id } = useParams();
-    const [production, setProduction] = useState([]);
+    const [production, setProduction] = useState(null);
+    useEffect(() => {
+        fetchProduction();
+    }, []);
     const fetchProduction = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/${id}`, {
@@ -30,8 +33,9 @@ export default function ProductionPage() {
             console.log(error.message);
         }
     }
-    fetchProduction();
-
+    if (!production) {
+        return <div></div>;
+    }
     return (
         <div>
             <Production 
