@@ -298,7 +298,7 @@ app.get('/productions/:productionId', async (req, res) => {
     
     try {
         const productionQueryText = `
-            SELECT name
+            SELECT id, name
             FROM productions
             WHERE id = $1;
         `;
@@ -324,7 +324,7 @@ app.get('/productions/:productionId', async (req, res) => {
             SELECT users.id, users.name
             FROM users
             INNER JOIN productions_users ON users.id = productions_users.user_id
-            WHERE productions_users.production_id = $1 AND role = 0;
+            WHERE productions_users.production_id = $1 AND users.role = 0;
         `
         const teachersQueryParams = [productionId];
         const teachersResult = await pool.query(teachersQueryText, teachersQueryParams);
@@ -333,15 +333,16 @@ app.get('/productions/:productionId', async (req, res) => {
             SELECT COUNT(*)
             FROM users
             INNER JOIN productions_users ON users.id = productions_users.user_id
-            WHERE productions_users.production_id = $1 AND role = 1;
+            WHERE productions_users.production_id = $1 AND users.role = 1;
         `
         const studentCountQueryParams = [productionId];
         const studentCountResult = await pool.query(studentCountQueryText, studentCountQueryParams);
         
         productionData = {
-            production: productionResult.rows[0],
+            id: productionResult.rows[0].id,
+            name: productionResult.rows[0].name,
             teachers: teachersResult.rows,
-            studentCount: studentCountResult.rows[0].studentCount,
+            studentCount: studentCountResult.rows[0].count,
         };
         console.log(productionData)
         return res.status(200).json({productionData: productionData});
