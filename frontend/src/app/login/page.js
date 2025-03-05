@@ -35,12 +35,12 @@ function Login() {
             setDisplayError(false);
             const loginCheckData = await loginCheckResponse.json();
             console.log(loginCheckData);
-        } else if (response.status === 403) {
+        } else if (loginCheckResponse.status === 403) {
             setDisplayError(true);
             alert("Incorrect name/email or password.")
         } else {
             setDisplayError(true);
-            console.error("Login failed: ", response.statusText);
+            console.error("Login failed: ", loginCheckResponse.statusText);
         }
     };
 
