@@ -1,5 +1,6 @@
 "use client"; 
 import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from 'next/link';
 import Logout from './components/logout';
 import styles from './styles/layout.module.css'
@@ -9,6 +10,7 @@ import styles from './styles/layout.module.css'
 
 function RootLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname();
 
   async function checkLoginStatus() {
     try {
@@ -23,8 +25,8 @@ function RootLayout({ children }) {
   }
 
   useEffect(() => {
-    checkLoginStatus();
-  }, []);
+    checkLoginStatus(); 
+  }, [pathname]);
 
 
   return (
