@@ -352,6 +352,37 @@ app.get('/productions/:productionId', async (req, res) => {
     }
 });
 
+app.get('/productions/:productionId/attendance', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const productionId = req.params.productionId; 
+    const attendanceDate = req.query.attendanceDate;
+
+    const queryText = `
+        SELECT users.name, productions.name, attendance.attendance_date
+        FROM attendance
+        JOIN users ON attendance.user_id = users.id
+        JOIN productions ON attendance.production_id = productions.id
+        WHERE attendance.production_id = $1 AND attendance.attendance_date = $2;
+    `;
+
+    const queryParams = [productionId, attendanceDate];
+
+    try {
+        const result = await pool.query(queryText, queryParams);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'No attendance found' });
+        }
+
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Backend listening on port ${port}`)
