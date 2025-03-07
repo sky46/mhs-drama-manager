@@ -45,7 +45,7 @@ export default function ProductionPage() {
                 teachers={production.teachers}
                 student={production.studentCount} 
             />
-            <Qrcode link="google.com"></Qrcode>
+            <Qrcode link={`http://localhost:3000/productions/${id}/qrcode`}></Qrcode>
         </div>
     );
 }

@@ -6,8 +6,6 @@ import Logout from './components/logout';
 import styles from './styles/layout.module.css'
 
 
-// change layout so that it doesn't have the login and sign up if already signed in
-
 function RootLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
