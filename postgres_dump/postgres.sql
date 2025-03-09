@@ -60,6 +60,19 @@ ALTER SEQUENCE public."Users_id_seq" OWNED BY public.users.id;
 
 
 --
+-- Name: attendance; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.attendance (
+    user_id integer NOT NULL,
+    production_id integer NOT NULL,
+    attendance_date date DEFAULT CURRENT_DATE NOT NULL
+);
+
+
+ALTER TABLE public.attendance OWNER TO postgres;
+
+--
 -- Name: productions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -133,10 +146,21 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public."Users
 
 
 --
+-- Data for Name: attendance; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.attendance (user_id, production_id, attendance_date) FROM stdin;
+1	1	2025-03-07
+\.
+
+
+--
 -- Data for Name: productions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.productions (id, name) FROM stdin;
+1	Test production
+2	second test
 \.
 
 
@@ -145,6 +169,11 @@ COPY public.productions (id, name) FROM stdin;
 --
 
 COPY public.productions_users (production_id, user_id) FROM stdin;
+1	10
+1	9
+2	9
+1	11
+2	11
 \.
 
 
@@ -153,11 +182,8 @@ COPY public.productions_users (production_id, user_id) FROM stdin;
 --
 
 COPY public.session (sid, sess, expire) FROM stdin;
-QKcHQ2L9Vuhld6qlzp2BKZn2d_rsO4D2	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":8}	2025-02-28 15:15:44
-n78wrKpcU-zZP36UYdHzeAh8iaytRpah	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:44
-9lErVCIAdbxNf79AHLy_RIbLC9GckHdU	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:44
-B3A9VUFpCKc9jl0scFEqrkh3Rd6Z9d5t	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:44
-mYNmfgA9a8ITINjcax065EbH6vxCAiuF	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-02-28 15:15:49
+pbC1opsCOlcpmyOKMLtI5-3FNFgyuIJd	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":9}	2025-03-08 17:13:38
+fuTTsPQsugZKWuf8fssAvC1klUkToUtl	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-03-08 16:51:44
 \.
 
 
@@ -169,6 +195,10 @@ COPY public.users (id, name, email, password, created_date, role) FROM stdin;
 1	lucas	test@gmail.com	testpassword                                                                                     	2025-01-21 18:40:56.441692+00	0
 7	s	s	$argon2id$v=19$m=65536,t=3,p=4$Rt/lTZYT4+FWCB9dNZ24+A$2kKdBWIUXzc2EF+JcaYXOzB25ha/A2FZ8phpcDvl/2s	2025-02-07 15:40:20.365896+00	1
 8	test	test@test.com	$argon2id$v=19$m=65536,t=3,p=4$uTwqRYjMo5dH95PbIkPJxA$l7QNmuiqM9yttEpJu1L8xALxn/7Pz/S7FgnAqafsNzg	2025-02-19 13:21:31.996186+00	1
+9	Teacher	teacher@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$WeIG5FHLszymWfnIhsQfBA$HnBD9QR4/eoEtk27yWjeTkLoZytrAwzvtMP5INCSH44	2025-02-27 18:42:51.624184+00	0
+10	Lucas	lucas@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$cKiQ8wl+5F5POyi4lPXunA$4vo2wuJVEmw1zpv4vnhsXEMjdVuxr8CuIP/8bfqnfb4	2025-03-03 17:30:05.206747+00	0
+11	Student	student@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$GsExEH9aFRlwF3L8FCfIIg$lDNdfneBNAQreVNEdph3mCl65c39j+qmow9Vaysuie0	2025-03-03 17:31:47.97819+00	1
+12	a	a@a.com	$argon2id$v=19$m=65536,t=3,p=4$dRTPBDilAtmSlfxGf7w1Ng$4LCoAutqqU8gDneXJNoTqLFZEYS2WQ9ykrHOwokdINk	2025-03-07 16:51:44.003471+00	1
 \.
 
 
@@ -176,14 +206,14 @@ COPY public.users (id, name, email, password, created_date, role) FROM stdin;
 -- Name: Users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Users_id_seq"', 8, true);
+SELECT pg_catalog.setval('public."Users_id_seq"', 12, true);
 
 
 --
 -- Name: productions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.productions_id_seq', 1, false);
+SELECT pg_catalog.setval('public.productions_id_seq', 1, true);
 
 
 --
@@ -192,6 +222,14 @@ SELECT pg_catalog.setval('public.productions_id_seq', 1, false);
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "Users_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: attendance attendance_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT attendance_pkey PRIMARY KEY (user_id, production_id, attendance_date);
 
 
 --
@@ -237,6 +275,22 @@ CREATE INDEX productions_users_production_id ON public.productions_users USING b
 --
 
 CREATE INDEX productions_users_user_id ON public.productions_users USING btree (user_id);
+
+
+--
+-- Name: attendance fk_attendance_production; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT fk_attendance_production FOREIGN KEY (production_id) REFERENCES public.productions(id) ON DELETE CASCADE;
+
+
+--
+-- Name: attendance fk_attendance_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT fk_attendance_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
