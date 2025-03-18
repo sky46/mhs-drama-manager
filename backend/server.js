@@ -311,6 +311,7 @@ app.post('/productions/new', async (req, res) => {
             [name],
         );
         const productionId = createQueryResult.rows[0].id;
+        // TODO: Add ownership of creating teacher too!
         for (const userId of teachers.concat(students)) {
             await pool.query(
                 'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2);',
