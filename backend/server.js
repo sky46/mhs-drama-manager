@@ -293,6 +293,37 @@ app.get('/productions', async (req, res) => {
     }
 });
 
+app.post('/productions/new', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    // Check if user is teacher
+    const role = getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    try {
+        const {name, teachers, students} = req.body;
+        const createQueryResult = await pool.query(
+            'INSERT INTO productions (name) VALUES ($1) RETURNING id;',
+            [name],
+        );
+        const productionId = createQueryResult.rows[0].id;
+        for (const userId of teachers.concat(students)) {
+            await pool.query(
+                'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2);',
+                [productionId, userId,],
+            );
+        }
+        return res.status(201).json({productionId: productionId});
+    } catch (error) {
+        console.error('Database error:', error);
+        return res.status(500).json({error: 'Internal server error', details: error.message,})
+    }
+});
+
 // Route to get productions user is a part of 
 app.get('/productions/:productionId', async (req, res) => {
     const userId = req.session.user;
