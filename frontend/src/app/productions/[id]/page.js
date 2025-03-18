@@ -36,8 +36,12 @@ export default function ProductionPage() {
     if (!production) {
         return <div></div>;
     }
+    const logAttendance = async () => {
+        // api call to log attendance
+    }
     return (
         <div>
+            <button onClick={logAttendance}>Log attendance</button>
             <Production 
                 key={production.id} 
                 name={production.name} 
@@ -45,7 +49,7 @@ export default function ProductionPage() {
                 teachers={production.teachers}
                 student={production.studentCount} 
             />
-            <Qrcode link={`http://localhost:3000/productions/${id}/qrcode`}></Qrcode>
+            <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
         </div>
     );
 }
