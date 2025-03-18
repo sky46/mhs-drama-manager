@@ -28,6 +28,21 @@ app.use(session({
     cookie: { secure: false } 
 }));
 
+async function getUserRole(id) {
+    try {
+        const queryText = 'SELECT role FROM USERS WHERE id = $1;';
+        const queryParams = [id];
+        const queryResult = await pool.query(queryText, queryParams);
+        if (queryResult.rows.length === 0) {
+            return null;
+        } else {
+            return queryResult.rows[0].role;
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+    }
+}
+
 
 app.get('/', async (req, res) => {
     try {
@@ -353,11 +368,24 @@ app.get('/productions/:productionId', async (req, res) => {
 
 app.get('/productions/:productionId/attendance', async (req, res) => {
     const userId = req.session.user;
+    const productionId = req.params.productionId; 
+    const attendanceDate = req.query.attendanceDate;
     if (!userId) {
         return res.status(401).json({ error: "Not logged in" });
     }
-    const productionId = req.params.productionId; 
-    const attendanceDate = req.query.attendanceDate;
+    // Check if user is teacher
+    const role = getUserRole(id);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    // Check if teacher is part of production
+    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2;';
+    const allowedQueryParams = [productionId, userId];
+    const allowedQueryResult = await pool.query(allowedQueryText, allowedQueryParams);
+    if (allowedQueryResult.rows.length === 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
 
     const queryText = `
         SELECT users.name, productions.name, attendance.attendance_date
