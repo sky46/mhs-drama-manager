@@ -403,17 +403,26 @@ app.post('/productions/:productionId/markattended', async (req, res) => {
         return res.status(403).json({ error: "Missing permissions"});
     }
 
+    const checkQuery = `
+        SELECT 1 FROM attendance 
+        WHERE user_id = $1 AND production_id = $2 AND attendance_date = $3
+    `;
+
     const attendanceText = `INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)`;
     const attendanceParams = [userId, productionId, attendanceDate];
-    try {
-        await pool.query(attendanceText, attendanceParams);
-        return res.status(200).json({tracked: true});
-    } catch (err) {
-        if (err.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ error: "Attendance already recorded for today" });
+    
+    const existing = await pool.query(checkQuery, attendanceParams);
+
+    if (existing.rowCount > 0) {
+        return res.status(409).json({ error: "Duplicate attendance" });
+    } else {
+        try {
+            await pool.query(attendanceText, attendanceParams);
+            return res.status(200).json({tracked: true});
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error' });
         }
-        console.error(err);
-        return res.status(500).json({ error: 'Database error' });
     }
 })
 

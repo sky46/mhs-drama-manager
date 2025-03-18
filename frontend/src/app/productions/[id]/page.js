@@ -6,12 +6,14 @@ import Qrcode from '../../components/qrcode'
 import Production from "../../components/production";
 
 // based off page id, link qrcode to localhost:3000/productions/id/qrcode which will show check in button
+// change to if not signed in, route to sign in and then back to this
 
 export default function ProductionPage() {
     const { id } = useParams();
     const [production, setProduction] = useState(null);
     const [role, setRole] = useState("");
     const [attendanceMarked, setAttendanceMarked] = useState(false);
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         fetchProduction();
@@ -60,14 +62,22 @@ export default function ProductionPage() {
                 credentials: 'include',
             });
             const data = await response.json();
-            setAttendanceMarked(data.tracked);
+            if (response.status === 200) {
+                setAttendanceMarked(data.tracked);
+                setMessage("Attendance successfully logged!");
+            } else if (response.status === 409) {
+                setAttendanceMarked(true); 
+                setMessage("Attendance already recorded for today.");
+                console.log(attendanceMarked);
+            }
             console.log("ATTENDANCE MARKED:", attendanceMarked);
         } catch (error) { 
             console.log("Error:", error)
         }
     }
+
     return (
-        <div>
+        <div key={attendanceMarked}>
             {role==="teacher" ? (
                 <div>
                     <Production 
@@ -82,7 +92,7 @@ export default function ProductionPage() {
             ) : (
                 <div>
                     {attendanceMarked ? (
-                        <div>"SUCCESS"</div>
+                        <div>{message}</div>
                     ) : (
                         <button onClick={markAttendance}>Log attendance</button>
                     )}
