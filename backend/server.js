@@ -364,7 +364,7 @@ app.get('/productions/:productionId/attendance', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
     // Check if user is teacher
-    const role = getUserRole(id);
+    const role = getUserRole(userId);
     if (role !== 0) {
         return res.status(403).json({ error: "Missing permissions "});
     }
