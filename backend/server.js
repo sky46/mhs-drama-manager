@@ -344,7 +344,6 @@ app.get('/productions/:productionId', async (req, res) => {
             teachers: teachersResult.rows,
             studentCount: studentCountResult.rows[0].count,
         };
-        console.log(productionData)
         return res.status(200).json({productionData: productionData});
     } catch (error) {
         console.error("Database query error:", error);
