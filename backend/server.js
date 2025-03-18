@@ -388,6 +388,36 @@ app.get('/productions/:productionId', async (req, res) => {
     }
 });
 
+// route to mark somebody as checked in
+app.post('/productions/:productionId/markattended', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+    const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const role = await getUserRole(userId);
+    if (role !== 1) { //need to be student to be in attendance
+        console.log("IDS", userId, role);
+        return res.status(403).json({ error: "Missing permissions"});
+    }
+
+    const attendanceText = `INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)`;
+    const attendanceParams = [userId, productionId, attendanceDate];
+    try {
+        await pool.query(attendanceText, attendanceParams);
+        return res.status(200).json({tracked: true});
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ error: "Attendance already recorded for today" });
+        }
+        console.error(err);
+        return res.status(500).json({ error: 'Database error' });
+    }
+})
+
+// route to check attendance
 app.get('/productions/:productionId/attendance', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
@@ -396,7 +426,7 @@ app.get('/productions/:productionId/attendance', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
     // Check if user is teacher
-    const role = getUserRole(userId);
+    const role = await getUserRole(userId);
     if (role !== 0) {
         return res.status(403).json({ error: "Missing permissions "});
     }

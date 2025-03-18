@@ -11,6 +11,7 @@ export default function ProductionPage() {
     const { id } = useParams();
     const [production, setProduction] = useState(null);
     const [role, setRole] = useState("");
+    const [attendanceMarked, setAttendanceMarked] = useState(false);
 
     useEffect(() => {
         fetchProduction();
@@ -51,8 +52,19 @@ export default function ProductionPage() {
     if (!production) {
         return <div></div>;
     }
-    const logAttendance = async () => {
-        // api call to log attendance
+    const markAttendance = async () => {
+        try {
+            const response = await fetch(`http://localhost:3001/productions/${id}/markattended`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+            });
+            const data = await response.json();
+            setAttendanceMarked(data.tracked);
+            console.log("ATTENDANCE MARKED:", attendanceMarked);
+        } catch (error) { 
+            console.log("Error:", error)
+        }
     }
     return (
         <div>
@@ -68,7 +80,13 @@ export default function ProductionPage() {
                     <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
                 </div>
             ) : (
-                <button onClick={logAttendance}>Log attendance</button>
+                <div>
+                    {attendanceMarked ? (
+                        <div>"SUCCESS"</div>
+                    ) : (
+                        <button onClick={markAttendance}>Log attendance</button>
+                    )}
+                </div>
             )}
         </div>
     );
