@@ -44,16 +44,6 @@ async function getUserRole(id) {
 }
 
 
-app.get('/', async (req, res) => {
-    try {
-        var queryResult = await pool.query('SELECT * FROM users;');
-        res.json(queryResult.rows);
-    } catch (error) {
-        console.error("Database query error:", error);
-        res.status(500).json({ error: "Internal Server Error", details: error.message });
-    }
-});
-
 // Post to create new user
 app.post('/users/create', async (req, res) => {
     const { name, email, password, passwordCheck, role } = req.body;
