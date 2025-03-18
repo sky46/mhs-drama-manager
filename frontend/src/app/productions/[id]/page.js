@@ -10,8 +10,11 @@ import Production from "../../components/production";
 export default function ProductionPage() {
     const { id } = useParams();
     const [production, setProduction] = useState(null);
+    const [role, setRole] = useState("");
+
     useEffect(() => {
         fetchProduction();
+        checkRole();
     }, []);
     const fetchProduction = async () => {
         try {
@@ -33,6 +36,18 @@ export default function ProductionPage() {
             console.log(error.message);
         }
     }
+    const checkRole = async () => {
+        try {
+            const response = await fetch("http://localhost:3001/users/role", {
+                credentials: "include",
+            })
+            const data = await response.json();
+            setRole(data.role);
+        } catch (error) {
+            console.error("Error geting role:", error);
+        }
+    }
+
     if (!production) {
         return <div></div>;
     }
@@ -41,15 +56,20 @@ export default function ProductionPage() {
     }
     return (
         <div>
-            <button onClick={logAttendance}>Log attendance</button>
-            <Production 
-                key={production.id} 
-                name={production.name} 
-                id={production.id} 
-                teachers={production.teachers}
-                student={production.studentCount} 
-            />
-            <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
+            {role==="teacher" ? (
+                <div>
+                    <Production 
+                    key={production.id} 
+                    name={production.name} 
+                    id={production.id} 
+                    teachers={production.teachers}
+                    student={production.studentCount} 
+                    />
+                    <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
+                </div>
+            ) : (
+                <button onClick={logAttendance}>Log attendance</button>
+            )}
         </div>
     );
 }
