@@ -496,6 +496,43 @@ app.get('/productions/:productionId/attendance', async (req, res) => {
     }
 });
 
+app.get('/productions/:productionId/attendance/all', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2;';
+    const allowedQueryParams = [productionId, userId];
+    const allowedQueryResult = await pool.query(allowedQueryText, allowedQueryParams);
+    if (allowedQueryResult.rows.length === 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    const queryAllAttendanceText = `
+        SELECT attendance.attendance_date
+        FROM attendance
+        JOIN users ON attendance.user_id = users.id
+        JOIN productions ON attendance.production_id = productions.id
+        WHERE attendance.production_id = $1 AND attendance.user_id = $2;
+    `
+    const queryAllAttendanceParams = [productionId, userId];
+    try {
+        const result = await pool.query(queryAllAttendanceText, queryAllAttendanceParams);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'No attendance found' });
+        }
+
+        return res.json({ attendance: result.rows });
+    } catch (err) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+
+})
+
 
 app.listen(port, () => {
     console.log(`Backend listening on port ${port}`)

@@ -5,4 +5,6 @@ function Attendance() {
     );
 }
 
+// IS THIS NECESSARY? Maybe Remove
+
 export default Attendance;

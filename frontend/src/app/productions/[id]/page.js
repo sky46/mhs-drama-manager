@@ -14,11 +14,27 @@ export default function ProductionPage() {
     const [role, setRole] = useState("");
     const [attendanceMarked, setAttendanceMarked] = useState(false);
     const [message, setMessage] = useState("");
+    const [attendance, setAttendance] = useState([]);
 
     useEffect(() => {
         fetchProduction();
         checkRole();
+        getAllAttendance();
     }, []);
+
+    const getAllAttendance = async() => { // attendance is 1 day behind, figure out why
+        try {
+            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/all`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+            });
+            const data = await response.json();
+            setAttendance(data.attendance);
+        } catch (error) {
+            console.log("ERROR:", error);
+        }
+    }
     const fetchProduction = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/${id}`, {
@@ -92,10 +108,27 @@ export default function ProductionPage() {
             ) : (
                 <div>
                     {attendanceMarked ? (
-                        <div>{message}</div>
+                        <div>
+                            <div>{message}</div>
+                        </div>
                     ) : (
-                        <button onClick={markAttendance}>Log attendance</button>
+                        <div>
+                            <button onClick={markAttendance}>Log attendance</button>
+                        </div>
                     )}
+                    <div>
+                        <div>Days attended:</div>
+                        <ul>
+                            {attendance.length > 0 ? (
+                                attendance.map((entry, index) => (
+                                    <li key={index}>{new Date(entry.attendance_date).toLocaleDateString()}</li>
+                                ))
+                            ) : (
+                                <p>No attendance records found.</p>
+                            )}
+                        </ul>
+
+                    </div>
                 </div>
             )}
         </div>
