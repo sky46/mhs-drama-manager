@@ -299,7 +299,7 @@ app.post('/productions/new', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
     // Check if user is teacher
-    const role = getUserRole(userId);
+    const role = await getUserRole(userId);
     if (role !== 0) {
         return res.status(403).json({ error: "Missing permissions "});
     }
