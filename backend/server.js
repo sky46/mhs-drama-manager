@@ -325,6 +325,31 @@ app.post('/productions/new', async (req, res) => {
     }
 });
 
+// Available users to add to production when creating, i.e. all users but self
+app.get('/productions/new/availableusers', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    // Check if user is teacher
+    const role = await getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    try {
+        const teachersResult = await pool.query(
+            'SELECT id, name FROM users WHERE role = 0 AND id <> $1;',
+            [userId]
+        );
+        const studentsResult = await pool.query('SELECT id, name FROM users WHERE role = 1;');
+        return res.status(200).json({teachers: teachersResult.rows, students: studentsResult.rows,});
+    } catch (error) {
+        console.error('Database error:', error);
+        return res.status(500).json({error: 'Internal server error', details: error.message,})
+    }
+});
+
 // Route to get productions user is a part of 
 app.get('/productions/:productionId', async (req, res) => {
     const userId = req.session.user;
