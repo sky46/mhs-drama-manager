@@ -162,6 +162,7 @@ COPY public.attendance (user_id, production_id, attendance_date) FROM stdin;
 COPY public.productions (id, name) FROM stdin;
 1	Test production
 2	second test
+6	Testcreate
 \.
 
 
@@ -176,6 +177,11 @@ COPY public.productions_users (production_id, user_id) FROM stdin;
 1	11
 2	11
 1	8
+6	8
+6	9
+6	11
+6	12
+6	7
 \.
 
 
@@ -184,7 +190,8 @@ COPY public.productions_users (production_id, user_id) FROM stdin;
 --
 
 COPY public.session (sid, sess, expire) FROM stdin;
-IHO3DjzpFXovAu3zJBlhSdN7Cjz04BY8	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":8}	2025-03-24 20:58:32
+5fjKU3dXUOpuiyO3UPzo_X59PkXEzkuD	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":8}	2025-03-24 22:15:57
+IHO3DjzpFXovAu3zJBlhSdN7Cjz04BY8	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":8}	2025-03-24 21:01:10
 \.
 
 
@@ -214,7 +221,7 @@ SELECT pg_catalog.setval('public."Users_id_seq"', 12, true);
 -- Name: productions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.productions_id_seq', 1, true);
+SELECT pg_catalog.setval('public.productions_id_seq', 6, true);
 
 
 --
@@ -292,6 +299,22 @@ ALTER TABLE ONLY public.attendance
 
 ALTER TABLE ONLY public.attendance
     ADD CONSTRAINT fk_attendance_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: productions_users productions_users_production_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.productions_users
+    ADD CONSTRAINT productions_users_production_id_fkey FOREIGN KEY (production_id) REFERENCES public.productions(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: productions_users productions_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.productions_users
+    ADD CONSTRAINT productions_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
