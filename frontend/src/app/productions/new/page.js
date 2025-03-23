@@ -1,6 +1,6 @@
 'use client';
-import dynamic from 'next/dynamic';
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import Select from 'react-select';
 
 export default function newProductionPage() {
@@ -9,9 +9,9 @@ export default function newProductionPage() {
     const [studentsOptions, setStudentsOptions] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [students, setStudents] = useState([]);
-    // const Select = dynamic(() => import('react-select'), {
-    //     ssr: false
-    // });
+    const [name, setName] = useState('');
+
+    const router = useRouter();
     const getAvailableUsers = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/new/availableusers`, {
@@ -35,7 +35,20 @@ export default function newProductionPage() {
     }
     const createProduction = async (e) => {
         e.preventDefault();
-        // Api call localhost:3001/productions/new
+        const res = await fetch(`http://localhost:3001/productions/new`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({name: name, teachers: teachers, students: students}),
+        });
+        if (res.ok) {
+            const resData = await res.json();
+            router.push(`/productions/${resData.productionId}`);
+        } else {
+            console.error("Creation failed: ", res.statusText);
+        }
     }
     useEffect(() => {
         setDomLoaded(true);
@@ -45,9 +58,9 @@ export default function newProductionPage() {
         <div>
             {domLoaded && (
                 <form onSubmit={createProduction}>
-                    <input type="text" />
-                    <Select isMulti options={teachersOptions} value={teachers} onChange={(value) => setTeachers(value)} />
-                    <Select isMulti options={studentsOptions} value={students} onChange={(value) => setStudents(value)} />
+                    <input type="text" value={name} onChange={(val) => setName(val.target.value)} />
+                    <Select isMulti options={teachersOptions} value={teachers} onChange={(val) => setTeachers(val)} />
+                    <Select isMulti options={studentsOptions} value={students} onChange={(val) => setStudents(val)} />
                     <button type="submit">Create</button>
                 </form>
             )}
