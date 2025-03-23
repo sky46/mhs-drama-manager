@@ -326,11 +326,11 @@ app.post('/productions/new', async (req, res) => {
             );
         }
         await client.query('COMMIT;');
-        return res.status(201).json({productionId: productionId});
+        res.status(201).json({productionId: productionId});
     } catch (error) {
         await client.query('ROLLBACK;');
         console.error('Database error:', error);
-        return res.status(500).json({error: 'Internal server error', details: error.message,})
+        res.status(500).json({error: 'Internal server error', details: error.message,})
     } finally {
         client.release();
     }
