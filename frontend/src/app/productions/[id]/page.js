@@ -72,7 +72,7 @@ export default function ProductionPage() {
     }
     const markAttendance = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/productions/${id}/markattended`, {
+            const response = await fetch(`http://localhost:3001/productions/${id}/markselfattended`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

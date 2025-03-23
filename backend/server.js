@@ -425,7 +425,7 @@ app.get('/productions/:productionId', async (req, res) => {
 });
 
 // route to mark somebody as checked in
-app.post('/productions/:productionId/markattended', async (req, res) => {
+app.post('/productions/:productionId/markselfattended', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
     const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
