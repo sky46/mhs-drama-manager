@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.2 (Debian 17.2-1.pgdg120+1)
--- Dumped by pg_dump version 17.2 (Debian 17.2-1.pgdg120+1)
+-- Dumped from database version 17.3 (Debian 17.3-1.pgdg120+1)
+-- Dumped by pg_dump version 17.3 (Debian 17.3-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -151,6 +151,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public."Users
 
 COPY public.attendance (user_id, production_id, attendance_date) FROM stdin;
 1	1	2025-03-07
+8	1	2025-03-23
 \.
 
 
@@ -174,6 +175,7 @@ COPY public.productions_users (production_id, user_id) FROM stdin;
 2	9
 1	11
 2	11
+1	8
 \.
 
 
@@ -182,8 +184,7 @@ COPY public.productions_users (production_id, user_id) FROM stdin;
 --
 
 COPY public.session (sid, sess, expire) FROM stdin;
-pbC1opsCOlcpmyOKMLtI5-3FNFgyuIJd	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":9}	2025-03-08 17:13:38
-fuTTsPQsugZKWuf8fssAvC1klUkToUtl	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"}}	2025-03-08 16:51:44
+IHO3DjzpFXovAu3zJBlhSdN7Cjz04BY8	{"cookie":{"originalMaxAge":null,"expires":null,"secure":false,"httpOnly":true,"path":"/"},"user":8}	2025-03-24 20:58:32
 \.
 
 
@@ -194,11 +195,11 @@ fuTTsPQsugZKWuf8fssAvC1klUkToUtl	{"cookie":{"originalMaxAge":null,"expires":null
 COPY public.users (id, name, email, password, created_date, role) FROM stdin;
 1	lucas	test@gmail.com	testpassword                                                                                     	2025-01-21 18:40:56.441692+00	0
 7	s	s	$argon2id$v=19$m=65536,t=3,p=4$Rt/lTZYT4+FWCB9dNZ24+A$2kKdBWIUXzc2EF+JcaYXOzB25ha/A2FZ8phpcDvl/2s	2025-02-07 15:40:20.365896+00	1
-8	test	test@test.com	$argon2id$v=19$m=65536,t=3,p=4$uTwqRYjMo5dH95PbIkPJxA$l7QNmuiqM9yttEpJu1L8xALxn/7Pz/S7FgnAqafsNzg	2025-02-19 13:21:31.996186+00	1
 9	Teacher	teacher@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$WeIG5FHLszymWfnIhsQfBA$HnBD9QR4/eoEtk27yWjeTkLoZytrAwzvtMP5INCSH44	2025-02-27 18:42:51.624184+00	0
 10	Lucas	lucas@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$cKiQ8wl+5F5POyi4lPXunA$4vo2wuJVEmw1zpv4vnhsXEMjdVuxr8CuIP/8bfqnfb4	2025-03-03 17:30:05.206747+00	0
 11	Student	student@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$GsExEH9aFRlwF3L8FCfIIg$lDNdfneBNAQreVNEdph3mCl65c39j+qmow9Vaysuie0	2025-03-03 17:31:47.97819+00	1
 12	a	a@a.com	$argon2id$v=19$m=65536,t=3,p=4$dRTPBDilAtmSlfxGf7w1Ng$4LCoAutqqU8gDneXJNoTqLFZEYS2WQ9ykrHOwokdINk	2025-03-07 16:51:44.003471+00	1
+8	test	test@test.com	$argon2id$v=19$m=65536,t=3,p=4$uTwqRYjMo5dH95PbIkPJxA$l7QNmuiqM9yttEpJu1L8xALxn/7Pz/S7FgnAqafsNzg	2025-02-19 13:21:31.996186+00	0
 \.
 
 
