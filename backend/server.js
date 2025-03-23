@@ -462,6 +462,39 @@ app.post('/productions/:productionId/markselfattended', async (req, res) => {
     }
 })
 
+app.post('/productions/:productionId/markstudentsattended', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+    const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    const {students,} = req.body;
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const role = await getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        for (const student of students) {
+            await client.query(
+                'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)',
+                [student.value, productionId, attendanceDate]
+            );
+        }
+        await client.query('COMMIT');
+        res.status(200).json({message: 'Attendance marked successfully'});
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        client.release();
+    }
+})
+
 // route to check attendance
 app.get('/productions/:productionId/attendance', async (req, res) => {
     const userId = req.session.user;
