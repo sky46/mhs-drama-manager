@@ -304,29 +304,35 @@ app.post('/productions/new', async (req, res) => {
         return res.status(403).json({ error: "Missing permissions "});
     }
 
+    const client = await pool.connect();
     try {
+        await client.query('BEGIN;');
         const {name, teachers, students} = req.body;
-        const createQueryResult = await pool.query(
+        const createQueryResult = await client.query(
             'INSERT INTO productions (name) VALUES ($1) RETURNING id;',
             [name],
         );
         const productionId = createQueryResult.rows[0].id;
         // Creator teacher
-        await pool.query(
+        await client.query(
             'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2);',
             [productionId, userId],
         );
         // Other users
         for (const user of teachers.concat(students)) {
-            await pool.query(
+            await client.query(
                 'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2);',
-                [productionId, user.value],
+                [7, user.value],
             );
         }
+        await client.query('COMMIT;');
         return res.status(201).json({productionId: productionId});
     } catch (error) {
+        await client.query('ROLLBACK;');
         console.error('Database error:', error);
         return res.status(500).json({error: 'Internal server error', details: error.message,})
+    } finally {
+        client.release();
     }
 });
 
