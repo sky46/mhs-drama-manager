@@ -30,7 +30,7 @@ app.use(session({
 
 async function getUserRole(id) {
     try {
-        const queryText = 'SELECT role FROM USERS WHERE id = $1;';
+        const queryText = 'SELECT role FROM USERS WHERE id = $1';
         const queryParams = [id];
         const queryResult = await pool.query(queryText, queryParams);
         if (queryResult.rows.length === 0) {
@@ -306,29 +306,29 @@ app.post('/productions/new', async (req, res) => {
 
     const client = await pool.connect();
     try {
-        await client.query('BEGIN;');
+        await client.query('BEGIN');
         const {name, teachers, students} = req.body;
         const createQueryResult = await client.query(
-            'INSERT INTO productions (name) VALUES ($1) RETURNING id;',
+            'INSERT INTO productions (name) VALUES ($1) RETURNING id',
             [name],
         );
         const productionId = createQueryResult.rows[0].id;
         // Creator teacher
         await client.query(
-            'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2);',
+            'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
             [productionId, userId],
         );
         // Other users
         for (const user of teachers.concat(students)) {
             await client.query(
-                'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2);',
+                'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
                 [7, user.value],
             );
         }
-        await client.query('COMMIT;');
+        await client.query('COMMIT');
         res.status(201).json({productionId: productionId});
     } catch (error) {
-        await client.query('ROLLBACK;');
+        await client.query('ROLLBACK');
         console.error('Database error:', error);
         res.status(500).json({error: 'Internal server error', details: error.message,})
     } finally {
@@ -350,10 +350,10 @@ app.get('/productions/new/availableusers', async (req, res) => {
 
     try {
         const teachersResult = await pool.query(
-            'SELECT id, name FROM users WHERE role = 0 AND id <> $1;',
+            'SELECT id, name FROM users WHERE role = 0 AND id <> $1',
             [userId]
         );
-        const studentsResult = await pool.query('SELECT id, name FROM users WHERE role = 1;');
+        const studentsResult = await pool.query('SELECT id, name FROM users WHERE role = 1');
         return res.status(200).json({teachers: teachersResult.rows, students: studentsResult.rows,});
     } catch (error) {
         console.error('Database error:', error);
@@ -510,7 +510,7 @@ app.get('/productions/:productionId/attendance', async (req, res) => {
     }
 
     // Check if teacher is part of production
-    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2;';
+    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2';
     const allowedQueryParams = [productionId, userId];
     const allowedQueryResult = await pool.query(allowedQueryText, allowedQueryParams);
     if (allowedQueryResult.rows.length === 0) {
@@ -548,7 +548,7 @@ app.get('/productions/:productionId/attendance/all', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
 
-    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2;';
+    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2';
     const allowedQueryParams = [productionId, userId];
     const allowedQueryResult = await pool.query(allowedQueryText, allowedQueryParams);
     if (allowedQueryResult.rows.length === 0) {
