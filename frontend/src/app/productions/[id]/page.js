@@ -28,8 +28,10 @@ export default function ProductionPage() {
         fetchProduction();
         checkRole();
         getAllAttendance();
+        getNonResponders();
     }, []);
 
+    // need to fix
     const getAllAttendance = async() => { // attendance is 1 day behind, figure out why
         try {
             const response = await fetch(`http://localhost:3001/productions/${id}/attendance/all`, {
@@ -39,10 +41,26 @@ export default function ProductionPage() {
             });
             const data = await response.json();
             setAttendance(data.attendance);
+            console.log("ATTENDANCE THING", attendance);
         } catch (error) {
             console.log("ERROR:", error);
         }
     }
+
+    const getNonResponders = async() => {
+        try {
+            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/noresponse`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+            const data = await response.json();
+            console.log("Nonresponders:", data);
+        } catch (error) {
+            console.log("Error:", error);
+        }
+    }
+
     const fetchProduction = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/${id}`, {
