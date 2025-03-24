@@ -369,7 +369,8 @@ app.get('/productions/:productionId', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
     const productionId = req.params.productionId; 
-    
+    const role = await getUserRole(userId);
+
     try {
         const productionResult = await pool.query(
             'SELECT id, name FROM productions WHERE id = $1',
@@ -397,19 +398,47 @@ app.get('/productions/:productionId', async (req, res) => {
             [productionId]
         );
 
-        const studentCountResult = await pool.query(
-            `SELECT COUNT(*)
-            FROM users
-            INNER JOIN productions_users ON users.id = productions_users.user_id
-            WHERE productions_users.production_id = $1 AND users.role = 1`,
-            [productionId]
-        );
+        var students, studentCount;
+        
+        if (role === 0) {
+            const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+            const presentStudentsResult = await pool.query(
+                `SELECT id, name
+                FROM users
+                INNER JOIN attendance ON users.id = attendance.user_id
+                WHERE attendance.production_id = $1 AND attendance.attendance_date = $2`,
+                [productionId, attendanceDate]
+            );
+            const absentStudentsResult = await pool.query(
+                `SELECT id, name
+                FROM users
+                INNER JOIN productions_users ON users.id = productions_users.user_id
+                WHERE productions_users.production_id = $1
+                    AND id NOT IN
+                        (SELECT user_id
+                        FROM attendance
+                        WHERE production_id = $1 AND attendance_date = $2)`,
+                [productionId, attendanceDate]
+            );
+            students = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
+            studentCount = students.present.length + students.absent.length;
+        } else {
+            const studentCountResult = await pool.query(
+                `SELECT COUNT(*)
+                FROM users
+                INNER JOIN productions_users ON users.id = productions_users.user_id
+                WHERE productions_users.production_id = $1 AND users.role = 1`,
+                [productionId]
+            );
+            studentCount = studentCountResult.rows[0].count;
+        }
         
         productionData = {
             id: productionResult.rows[0].id,
             name: productionResult.rows[0].name,
             teachers: teachersResult.rows,
-            studentCount: studentCountResult.rows[0].count,
+            studentCount: studentCount,
+            ...(role === 0 ? {students: students} : {})
         };
         return res.status(200).json({productionData: productionData});
     } catch (error) {
