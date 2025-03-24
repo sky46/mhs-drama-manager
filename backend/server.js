@@ -398,7 +398,7 @@ app.get('/productions/:productionId', async (req, res) => {
             [productionId]
         );
 
-        var students, studentCount;
+        var attendance, studentCount;
         
         if (role === 0) {
             const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
@@ -420,8 +420,8 @@ app.get('/productions/:productionId', async (req, res) => {
                         WHERE production_id = $1 AND attendance_date = $2)`,
                 [productionId, attendanceDate]
             );
-            students = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
-            studentCount = students.present.length + students.absent.length;
+            attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
+            studentCount = attendance.present.length + attendance.absent.length;
         } else {
             const studentCountResult = await pool.query(
                 `SELECT COUNT(*)
@@ -438,7 +438,7 @@ app.get('/productions/:productionId', async (req, res) => {
             name: productionResult.rows[0].name,
             teachers: teachersResult.rows,
             studentCount: studentCount,
-            ...(role === 0 ? {students: students} : {})
+            ...(role === 0 ? {attendance: attendance} : {})
         };
         return res.status(200).json({productionData: productionData});
     } catch (error) {
