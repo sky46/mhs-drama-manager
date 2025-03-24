@@ -1,6 +1,7 @@
 'use client';
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import Select from 'react-select';
 
 import Qrcode from '../../components/qrcode'
 import Production from "../../components/production";
@@ -16,7 +17,14 @@ export default function ProductionPage() {
     const [message, setMessage] = useState("");
     const [attendance, setAttendance] = useState([]);
 
+    const [markPresentStudents, setMarkPresentStudents] = useState([]);
+    const [absentStudents, setAbsentStudents] = useState([]);
+    const [presentStudents, setPresentStudents] = useState([]);
+
+    const [domLoaded, setDomLoaded] = useState(false);
+
     useEffect(() => {
+        setDomLoaded();
         fetchProduction();
         checkRole();
         getAllAttendance();
@@ -51,6 +59,9 @@ export default function ProductionPage() {
     
             const data = await res.json();
             setProduction(data.productionData);
+            const attendance = data.productionData.attendance;
+            setPresentStudents(attendance.present);
+            setAbsentStudents(attendance.absent);
             console.log(data);
         } catch (error) {
             console.log(error.message);
@@ -71,7 +82,7 @@ export default function ProductionPage() {
     if (!production) {
         return <div></div>;
     }
-    const markAttendance = async () => {
+    const markSelfAttendance = async () => {
         try {
             const response = await fetch(`http://localhost:3001/productions/${id}/markselfattended`, {
                 method: 'POST',
@@ -93,6 +104,23 @@ export default function ProductionPage() {
         }
     }
 
+    const markStudentsAttendance = async () => {
+        try {
+            const response = await fetch(`http://localhost:3001/productions/${id}/markstudentsattended`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include',
+                body: JSON.stringify(markPresentStudents)
+            });
+            if (response.ok) {
+                alert('Attendance marked successfully!');
+
+            }
+        } catch (error) {
+            console.error("Error marking students attendance:", error);
+        }
+    }
+
     return (
         <div key={attendanceMarked}>
             <div>
@@ -106,7 +134,12 @@ export default function ProductionPage() {
                 <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
             </div>
             {role==="teacher" ? (
-                <div></div>
+                <div>
+                    <form onSubmit={markStudentsAttendance}>
+                        <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
+                        <button type="submit">Mark as present</button>
+                    </form>
+                </div>
             ) : (
                 <div>
                     {attendanceMarked ? (
@@ -115,7 +148,7 @@ export default function ProductionPage() {
                         </div>
                     ) : (
                         <div>
-                            <button onClick={markAttendance}>Log attendance</button>
+                            <button onClick={markSelfAttendance}>Log attendance</button>
                         </div>
                     )}
                     <div>
