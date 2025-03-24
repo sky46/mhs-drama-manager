@@ -51,6 +51,7 @@ export default function ProductionPage() {
     
             const data = await res.json();
             setProduction(data.productionData);
+            console.log(data);
         } catch (error) {
             console.log(error.message);
         }
@@ -94,17 +95,18 @@ export default function ProductionPage() {
 
     return (
         <div key={attendanceMarked}>
+            <div>
+                <Production 
+                key={production.id} 
+                name={production.name} 
+                id={production.id} 
+                teachers={production.teachers}
+                student={production.studentCount} 
+                />
+                <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
+            </div>
             {role==="teacher" ? (
-                <div>
-                    <Production 
-                    key={production.id} 
-                    name={production.name} 
-                    id={production.id} 
-                    teachers={production.teachers}
-                    student={production.studentCount} 
-                    />
-                    <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
-                </div>
+                <div></div>
             ) : (
                 <div>
                     {attendanceMarked ? (
