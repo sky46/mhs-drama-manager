@@ -30,9 +30,10 @@ app.use(session({
 
 async function getUserRole(id) {
     try {
-        const queryText = 'SELECT role FROM USERS WHERE id = $1';
-        const queryParams = [id];
-        const queryResult = await pool.query(queryText, queryParams);
+        const queryResult = await pool.query(
+            'SELECT role FROM USERS WHERE id = $1',
+            [id]
+        );
         if (queryResult.rows.length === 0) {
             return null;
         } else {
@@ -64,9 +65,11 @@ app.post('/users/create', async (req, res) => {
         return res.status(400).json({ error: 'Invalid role' });
     }
 
-    const emailCheckQuery = 'SELECT * FROM users WHERE email = $1';
     try {
-        const emailCheckResult = await pool.query(emailCheckQuery, [email]);
+        const emailCheckResult = await pool.query(
+            'SELECT * FROM users WHERE email = $1',
+            [email]
+        );
         if (emailCheckResult.rows.length > 0) {
             return res.status(400).json({ error: 'Email already in use' });
         }
@@ -76,10 +79,11 @@ app.post('/users/create', async (req, res) => {
     
     try {
         const passwordHash = await argon2.hash(password);
-        const queryText = 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role';
-        const queryParams = [name, email, passwordHash, roleID];
-        const queryResult = await pool.query(queryText, queryParams);
-        const user = queryResult.rows[0];
+        const createUserResult = await pool.query(
+            'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
+            [name, email, passwordHash, roleID]
+        );
+        const user = createUserResult.rows[0];
 
         // Login with signup
         req.session.regenerate((err) => {
@@ -108,9 +112,11 @@ app.post('/users/create', async (req, res) => {
 // Post to check user email if already registered
 app.post('/users/email', async (req, res) => {
     const { email } = req.body;
-    const emailCheckQuery = 'SELECT * FROM users WHERE email = $1';
     try {
-        const emailCheckResult = await pool.query(emailCheckQuery, [email]);
+        const emailCheckResult = await pool.query(
+            'SELECT * FROM users WHERE email = $1',
+            [email]
+        );
         if (emailCheckResult.rows.length > 0) {
             return res.json({ exists: true }); // Exists field for easier checking
         } else {
@@ -129,18 +135,18 @@ app.post('/users/login', async (req, res) => {
         return res.status(400).json({ error: "Missing fields" });
     }
 
-    const queryText = 'SELECT id, password FROM users WHERE email = $1 OR name = $2'
-    const queryParams = [nameOrEmail, nameOrEmail];
-    let queryResult;
-
+    let userResult;
     try {
-        queryResult = await pool.query(queryText, queryParams);
+        userResult = await pool.query(
+            'SELECT id, password FROM users WHERE email = $1 OR name = $2', 
+            [nameOrEmail, nameOrEmail]
+        );
     } catch (error) {
         return res.status(500).json({ error: "Database error" });
     }
 
-    if (queryResult.rows.length) {
-        const user = queryResult.rows[0];
+    if (userResult.rows.length) {
+        const user = userResult.rows[0];
         const isValidPassword = await argon2.verify(user.password, password);
 
         // Not valid password
@@ -206,16 +212,11 @@ app.get('/users/role', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
     try {
-        const queryText = 'SELECT role FROM users WHERE id = $1';
-        const queryParams = [req.session.user]
-        const queryResult = await pool.query(queryText, queryParams);
-
-        if (queryResult.rows.length === 0) {
+        const role = await getUserRole(req.session.user);
+        if (role === null) {
             return res.status(404).json({ error: "User not found" });
         }
-
-        const roleID = queryResult.rows[0].role;
-        return res.json({ role: roleID === 0 ? "teacher" : "student" });
+        return res.json({ role: role === 0 ? "teacher" : "student" });
     } catch (error) {
         return res.status(500).json({ error: "Database error", details: error.message });
     }
@@ -229,30 +230,29 @@ app.get('/productions', async (req, res) => {
     } 
     
     try {
-        const productionsQueryText = `
-            SELECT productions.id, productions.name
+
+        const productionsResult = await pool.query(
+            `SELECT productions.id, productions.name
             FROM productions
             JOIN productions_users ON productions.id = productions_users.production_id
-            WHERE productions_users.user_id = $1
-        `   // from productions table, it matches records for productions users id = productions id where it is the desired user id and returns the id and name for the filtered data
-        const productionQueryParams = [userId];
-
-        const productionsResult = await pool.query(productionsQueryText, productionQueryParams);
+            WHERE productions_users.user_id = $1`,
+            [userId]
+        );
         const productions = productionsResult.rows;
 
         const productionIds = productions.map(p => p.id);
         if (productionIds.length === 0) {
             return res.status(200).json({ productions: [], teachers: [] });
         }
-
-        const teachersQuery = `
-            SELECT users.id AS teacher_id, users.name AS teacher_name, productions_users.production_id
+        // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
+        const teachersResult = await pool.query(
+            `SELECT users.id AS teacher_id, users.name AS teacher_name, productions_users.production_id
             FROM users
             JOIN productions_users ON users.id = productions_users.user_id
             WHERE productions_users.production_id = ANY($1)
-            AND users.role = 0;
-        `   // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
-        const teachersResult = await pool.query(teachersQuery, [productionIds]);
+            AND users.role = 0;`, 
+            [productionIds]
+        );
 
         // Organizing teachers by production
         const teachersByProduction = {};
@@ -263,14 +263,15 @@ app.get('/productions', async (req, res) => {
             teachersByProduction[production_id].push({ id: teacher_id, name: teacher_name });
         });
 
-        const studentQuery = `
-            SELECT users.id AS student_id, users.name AS student_name, productions_users.production_id
+        // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
+        const studentResult = await pool.query(
+            `SELECT users.id AS student_id, users.name AS student_name, productions_users.production_id
             FROM users
             JOIN productions_users ON users.id = productions_users.user_id
             WHERE productions_users.production_id = ANY($1)
-            AND users.role = 1;
-        `   // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
-        const studentResult = await pool.query(studentQuery, [productionIds]);
+            AND users.role = 1`,
+            [productionIds]
+        );
         // Reduce accumulates amount of students (applied to each row)
         const studentCountByProduction = studentResult.rows.reduce((acc, { production_id }) => {
             if (!acc[production_id]) { // if no value for accumulator yet, make it 0 so not falsy
@@ -370,46 +371,39 @@ app.get('/productions/:productionId', async (req, res) => {
     const productionId = req.params.productionId; 
     
     try {
-        const productionQueryText = `
-            SELECT id, name
-            FROM productions
-            WHERE id = $1;
-        `;
-        const productionQueryParams = [productionId];
-        const productionResult = await pool.query(productionQueryText, productionQueryParams);
+        const productionResult = await pool.query(
+            'SELECT id, name FROM productions WHERE id = $1',
+            [productionId]
+        );
         if (productionResult.rows.length === 0) {
             return res.status(404).json({ error: 'Production not found'})
         }
-
-        const accessQueryText = `
-            SELECT productions.id
+        const accessResult = await pool.query(
+            `SELECT productions.id
             FROM productions
             INNER JOIN productions_users ON productions.id = productions_users.production_id
-            WHERE productions_users.production_id = $1 AND productions_users.user_id = $2;
-        `
-        const accessQueryParams = [productionId, userId];
-        const accessResult = await pool.query(accessQueryText, accessQueryParams);
+            WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
+            [productionId, userId]
+        );
         if (accessResult.rows.length === 0) {
             return res.status(401).json({ error: 'User is not a part of production'});
         }
 
-        const teachersQueryText = `
-            SELECT users.id, users.name
+        const teachersResult = await pool.query(
+            `SELECT users.id, users.name
             FROM users
             INNER JOIN productions_users ON users.id = productions_users.user_id
-            WHERE productions_users.production_id = $1 AND users.role = 0;
-        `
-        const teachersQueryParams = [productionId];
-        const teachersResult = await pool.query(teachersQueryText, teachersQueryParams);
+            WHERE productions_users.production_id = $1 AND users.role = 0;`,
+            [productionId]
+        );
 
-        const studentCountQueryText = `
-            SELECT COUNT(*)
+        const studentCountResult = await pool.query(
+            `SELECT COUNT(*)
             FROM users
             INNER JOIN productions_users ON users.id = productions_users.user_id
-            WHERE productions_users.production_id = $1 AND users.role = 1;
-        `
-        const studentCountQueryParams = [productionId];
-        const studentCountResult = await pool.query(studentCountQueryText, studentCountQueryParams);
+            WHERE productions_users.production_id = $1 AND users.role = 1`,
+            [productionId]
+        );
         
         productionData = {
             id: productionResult.rows[0].id,
@@ -439,21 +433,22 @@ app.post('/productions/:productionId/markselfattended', async (req, res) => {
         return res.status(403).json({ error: "Missing permissions"});
     }
 
-    const checkQuery = `
-        SELECT 1 FROM attendance 
-        WHERE user_id = $1 AND production_id = $2 AND attendance_date = $3
-    `;
-
-    const attendanceText = `INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)`;
     const attendanceParams = [userId, productionId, attendanceDate];
     
-    const existing = await pool.query(checkQuery, attendanceParams);
+    const existing = await pool.query(
+        `SELECT 1 FROM attendance 
+        WHERE user_id = $1 AND production_id = $2 AND attendance_date = $3`,
+        attendanceParams
+    );
 
     if (existing.rowCount > 0) {
         return res.status(409).json({ error: "Duplicate attendance" });
     } else {
         try {
-            await pool.query(attendanceText, attendanceParams);
+            await pool.query(
+                'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)',
+                attendanceParams
+            );
             return res.status(200).json({tracked: true});
         } catch (err) {
             console.error(err);
@@ -510,31 +505,29 @@ app.get('/productions/:productionId/attendance', async (req, res) => {
     }
 
     // Check if teacher is part of production
-    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2';
-    const allowedQueryParams = [productionId, userId];
-    const allowedQueryResult = await pool.query(allowedQueryText, allowedQueryParams);
+    const allowedQueryResult = await pool.query(
+        'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2',
+        [productionId, userId]
+    );
     if (allowedQueryResult.rows.length === 0) {
         return res.status(403).json({ error: "Missing permissions "});
     }
 
-    const queryText = `
-        SELECT users.name, productions.name, attendance.attendance_date
-        FROM attendance
-        JOIN users ON attendance.user_id = users.id
-        JOIN productions ON attendance.production_id = productions.id
-        WHERE attendance.production_id = $1 AND attendance.attendance_date = $2;
-    `;
-
-    const queryParams = [productionId, attendanceDate];
-
     try {
-        const result = await pool.query(queryText, queryParams);
+        const attendanceResult = await pool.query(
+            `SELECT users.name, productions.name, attendance.attendance_date
+            FROM attendance
+            JOIN users ON attendance.user_id = users.id
+            JOIN productions ON attendance.production_id = productions.id
+            WHERE attendance.production_id = $1 AND attendance.attendance_date = $2`,
+            [productionId, attendanceDate]
+        );
         
-        if (result.rows.length === 0) {
+        if (attendanceResult.rows.length === 0) {
             return res.status(404).json({ message: 'No attendance found' });
         }
 
-        res.json(result.rows);
+        res.json(attendanceResult.rows);
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -548,29 +541,29 @@ app.get('/productions/:productionId/attendance/all', async (req, res) => {
         return res.status(401).json({ error: "Not logged in" });
     }
 
-    const allowedQueryText = 'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2';
-    const allowedQueryParams = [productionId, userId];
-    const allowedQueryResult = await pool.query(allowedQueryText, allowedQueryParams);
+    const allowedQueryResult = await pool.query(
+        'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2',
+        [productionId, userId]
+    );
     if (allowedQueryResult.rows.length === 0) {
         return res.status(403).json({ error: "Missing permissions "});
     }
 
-    const queryAllAttendanceText = `
-        SELECT attendance.attendance_date
-        FROM attendance
-        JOIN users ON attendance.user_id = users.id
-        JOIN productions ON attendance.production_id = productions.id
-        WHERE attendance.production_id = $1 AND attendance.user_id = $2;
-    `
-    const queryAllAttendanceParams = [productionId, userId];
     try {
-        const result = await pool.query(queryAllAttendanceText, queryAllAttendanceParams);
+        const attendanceResult = await pool.query(
+            `SELECT attendance.attendance_date
+            FROM attendance
+            JOIN users ON attendance.user_id = users.id
+            JOIN productions ON attendance.production_id = productions.id
+            WHERE attendance.production_id = $1 AND attendance.user_id = $2`,
+            [productionId, userId]
+        );
         
-        if (result.rows.length === 0) {
+        if (attendanceResult.rows.length === 0) {
             return res.status(404).json({ message: 'No attendance found' });
         }
 
-        return res.json({ attendance: result.rows });
+        return res.json({ attendance: attendanceResult.rows });
     } catch (err) {
         return res.status(500).json({ error: 'Internal server error' });
     }
