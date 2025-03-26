@@ -1,0 +1,200 @@
+const Router = require('express-promise-router');
+require('dotenv').config()
+const { pool } = require('../db');  // Import the database connection
+const { getUserRole } = require('../helpers');
+
+
+const router = new Router();
+module.exports = router;
+
+// route to mark somebody as checked in
+router.post('/productions/:productionId/markselfattended', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+    const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const role = await getUserRole(userId);
+    if (role !== 1) { //need to be student to be in attendance
+        console.log("IDS", userId, role);
+        return res.status(403).json({ error: "Missing permissions"});
+    }
+
+    const attendanceParams = [userId, productionId, attendanceDate];
+    
+    const existing = await pool.query(
+        `SELECT 1 FROM attendance 
+        WHERE user_id = $1 AND production_id = $2 AND attendance_date = $3`,
+        attendanceParams
+    );
+
+    if (existing.rowCount > 0) {
+        return res.status(409).json({ error: "Duplicate attendance" });
+    } else {
+        try {
+            await pool.query(
+                'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)',
+                attendanceParams
+            );
+            return res.status(200).json({tracked: true});
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+    }
+})
+
+router.post('/productions/:productionId/markstudentsattended', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+    const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    const {students,} = req.body;
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const role = await getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        for (const student of students) {
+            await client.query(
+                'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)',
+                [student.value, productionId, attendanceDate]
+            );
+        }
+        await client.query('COMMIT');
+        res.status(200).json({message: 'Attendance marked successfully'});
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        client.release();
+    }
+})
+
+// route to check attendance
+router.get('/productions/:productionId/attendance', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+    const attendanceDate = req.query.attendanceDate;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    // Check if user is teacher
+    const role = await getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    // Check if teacher is part of production
+    const allowedQueryResult = await pool.query(
+        'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2',
+        [productionId, userId]
+    );
+    if (allowedQueryResult.rows.length === 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    try {
+        const attendanceResult = await pool.query(
+            `SELECT users.name, productions.name, attendance.attendance_date
+            FROM attendance
+            JOIN users ON attendance.user_id = users.id
+            JOIN productions ON attendance.production_id = productions.id
+            WHERE attendance.production_id = $1 AND attendance.attendance_date = $2`,
+            [productionId, attendanceDate]
+        );
+        
+        if (attendanceResult.rows.length === 0) {
+            return res.status(404).json({ message: 'No attendance found' });
+        }
+
+        res.json(attendanceResult.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get('/productions/:productionId/attendance/all', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId; 
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const allowedQueryResult = await pool.query(
+        `SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2`,
+        [productionId, userId]
+    );
+    if (allowedQueryResult.rows.length === 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    try {
+        const attendanceResult = await pool.query(
+            `SELECT attendance.attendance_date
+            FROM attendance
+            JOIN users ON attendance.user_id = users.id
+            JOIN productions ON attendance.production_id = productions.id
+            WHERE attendance.production_id = $1 AND attendance.user_id = $2`,
+            [productionId, userId]
+        );
+
+        return res.json({ attendance: attendanceResult.rows });
+    } catch (err) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+
+})
+
+// route to get all people not attended for the day
+router.get('/productions/:productionId/attendance/noresponse', async (req, res) => {
+    const userId = req.session.user;
+    const productionId = req.params.productionId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const allowedQueryResult = await pool.query(
+        `SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2`,
+        [productionId, userId]
+    );
+    if (allowedQueryResult.rows.length === 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    try {
+        const missingResult = await pool.query(
+            `SELECT productions_users.user_id FROM productions_users
+            JOIN users ON productions_users.user_id = users.id
+            LEFT JOIN attendance
+                ON productions_users.user_id = attendance.user_id 
+                AND productions_users.production_id = attendance.production_id 
+                AND attendance.attendance_date = CURRENT_DATE
+            WHERE productions_users.production_id = $1 
+            AND users.role = 1
+            AND attendance.user_id IS NULL`,
+            [productionId]
+        )
+        // get users from a specific production, filtered to be students and who have not yet marked as responded
+            // left join -> matches ALL values in left table to existing data in right table 
+
+        if (missingResult.rows.length === 0) {
+            return res.status(404).json({ message: 'No missing people found' });
+        }
+
+        return res.json({missing: missingResult.rows});
+
+    } catch (err) {
+        return res.status(500).json({ error: err });
+    }
+})
