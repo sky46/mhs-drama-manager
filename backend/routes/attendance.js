@@ -70,13 +70,34 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
             );
         }
         await client.query('COMMIT');
-        res.status(200).json({message: 'Attendance marked successfully'});
+        client.release();
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: 'Internal server error' });
-    } finally {
         client.release();
+        return res.status(500).json({ error: 'Internal server error' });
     }
+
+    const presentStudentsResult = await pool.query(
+        `SELECT id, name
+        FROM users
+        INNER JOIN attendance ON users.id = attendance.user_id
+        WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
+        [productionId, attendanceDate]
+    );
+    const absentStudentsResult = await pool.query(
+        `SELECT id, name
+        FROM users
+        INNER JOIN productions_users ON users.id = productions_users.user_id
+        WHERE productions_users.production_id = $1
+            AND id NOT IN
+                (SELECT user_id
+                FROM attendance
+                WHERE production_id = $1 AND attendance_date = $2)
+            AND role = 1`,
+        [productionId, attendanceDate]
+    );
+    attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
+    return res.status(200).json({message: 'Attendance marked successfully', newAttendance: attendance});
 })
 
 // route to check attendance

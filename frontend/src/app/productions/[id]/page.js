@@ -78,8 +78,9 @@ export default function ProductionPage() {
             const data = await res.json();
             setProduction(data.productionData);
             const attendance = data.productionData.attendance;
-            setPresentStudents(attendance.present);
-            setAbsentStudents(attendance.absent);
+            const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
+            setPresentStudents(attendance.present.map(mapStudentsSelectOptions));
+            setAbsentStudents(attendance.absent.map(mapStudentsSelectOptions));
             console.log(data);
         } catch (error) {
             console.log(error.message);
@@ -122,17 +123,22 @@ export default function ProductionPage() {
         }
     }
 
-    const markStudentsAttendance = async () => {
+    const markStudentsAttendance = async (e) => {
+        e.preventDefault();
         try {
             const response = await fetch(`http://localhost:3001/productions/${id}/markstudentsattended`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 credentials: 'include',
-                body: JSON.stringify(markPresentStudents)
+                body: JSON.stringify({students: markPresentStudents})
             });
             if (response.ok) {
                 alert('Attendance marked successfully!');
-
+                const data = await response.json();
+                const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
+                setPresentStudents(data.newAttendance.present.map(mapStudentsSelectOptions));
+                setAbsentStudents(data.newAttendance.absent.map(mapStudentsSelectOptions));
+                setMarkPresentStudents([]);
             }
         } catch (error) {
             console.error("Error marking students attendance:", error);

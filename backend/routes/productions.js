@@ -208,7 +208,6 @@ router.get('/productions/:productionId', async (req, res) => {
             );
             attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
             studentCount = attendance.present.length + attendance.absent.length;
-            console.log(attendance.present, attendance.absent);
         } else {
             const studentCountResult = await pool.query(
                 `SELECT COUNT(*)
