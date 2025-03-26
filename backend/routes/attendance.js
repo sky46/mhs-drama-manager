@@ -213,7 +213,15 @@ router.get('/productions/:productionId/attendance/noresponse', async (req, res) 
             return res.status(404).json({ message: 'No missing people found' });
         }
 
-        return res.json({missing: missingResult.rows});
+        const userIds = missingResult.rows.map(row => row.user_id);
+
+        const nameAndEmailResult = await pool.query(
+            `SELECT id, name, email from users
+            WHERE users.id = ANY($1)`,
+            [userIds]
+        )
+
+        return res.json(nameAndEmailResult.rows);
 
     } catch (err) {
         return res.status(500).json({ error: err });

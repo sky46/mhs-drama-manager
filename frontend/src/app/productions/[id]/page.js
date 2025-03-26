@@ -6,16 +6,21 @@ import Select from 'react-select';
 import Qrcode from '../../components/qrcode'
 import Production from "../../components/production";
 
+import { useRouter } from 'next/navigation'
+
 // based off page id, link qrcode to localhost:3000/productions/id/qrcode which will show check in button
 // change to if not signed in, route to sign in and then back to this
 
 export default function ProductionPage() {
+    const router = useRouter()
+    
     const { id } = useParams();
     const [production, setProduction] = useState(null);
     const [role, setRole] = useState("");
     const [attendanceMarked, setAttendanceMarked] = useState(false);
     const [message, setMessage] = useState("");
     const [attendance, setAttendance] = useState([]);
+    const [nonresponders, setNonresponders] = useState([]);
 
     const [markPresentStudents, setMarkPresentStudents] = useState([]);
     const [absentStudents, setAbsentStudents] = useState([]);
@@ -29,7 +34,7 @@ export default function ProductionPage() {
         checkRole();
         getAllAttendance();
         getNonResponders();
-    }, []);
+    }, [id]);
 
     // need to fix
     const getAllAttendance = async() => { // attendance is 1 day behind, figure out why
@@ -55,7 +60,9 @@ export default function ProductionPage() {
                 credentials: 'include'
             });
             const data = await response.json();
-            console.log("Nonresponders:", data);
+            const mapper = (user) => ({ value: user.id, name: user.name, email: user.email });
+            setNonresponders(data.map(mapper));
+            console.log("Nonresponders", data.map(mapper));
         } catch (error) {
             console.log("Error:", error);
         }
@@ -139,6 +146,7 @@ export default function ProductionPage() {
                 setPresentStudents(data.newAttendance.present.map(mapStudentsSelectOptions));
                 setAbsentStudents(data.newAttendance.absent.map(mapStudentsSelectOptions));
                 setMarkPresentStudents([]);
+                router.refresh();
             }
         } catch (error) {
             console.error("Error marking students attendance:", error);
@@ -157,12 +165,18 @@ export default function ProductionPage() {
                 />
                 <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
             </div>
-            {role==="teacher" ? (
+            {role==="teacher" && nonresponders.length > 0 ? (
                 <div>
                     <form onSubmit={markStudentsAttendance}>
                         <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
                         <button type="submit">Mark as present</button>
                     </form>
+                    <div>Students who haven't responded:</div>
+                    <ul>
+                        {nonresponders.map((entry, index) => (
+                            <li key={index}>{entry.name}</li>
+                        ))}
+                    </ul>
                 </div>
             ) : (
                 <div>
