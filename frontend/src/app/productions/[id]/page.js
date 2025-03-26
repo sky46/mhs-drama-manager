@@ -68,6 +68,22 @@ export default function ProductionPage() {
         }
     }
 
+    const emailNonResponders = async() => {
+        try {  
+            const emailList = nonresponders.map(user => user.email);
+            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ emailList }),
+            });
+            const data = await response.json();
+            console.log("Sent email", data);
+        } catch (error) {
+            console.log("Error:", error);
+        }
+    }
+
     const fetchProduction = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/${id}`, {
@@ -177,6 +193,9 @@ export default function ProductionPage() {
                             <li key={index}>{entry.name}</li>
                         ))}
                     </ul>
+                    <button onClick={emailNonResponders}>
+                        EMAIL NONRESPONDERS
+                    </button>
                 </div>
             ) : (
                 <div>
