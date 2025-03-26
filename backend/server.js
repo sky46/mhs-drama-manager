@@ -587,10 +587,6 @@ app.get('/productions/:productionId/attendance/all', async (req, res) => {
             WHERE attendance.production_id = $1 AND attendance.user_id = $2`,
             [productionId, userId]
         );
-        
-        if (attendanceResult.rows.length === 0) {
-            return res.status(404).json({ message: 'No attendance found' });
-        }
 
         return res.json({ attendance: attendanceResult.rows });
     } catch (err) {
