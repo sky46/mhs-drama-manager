@@ -191,7 +191,7 @@ router.get('/productions/:productionId', async (req, res) => {
                 `SELECT id, name
                 FROM users
                 INNER JOIN attendance ON users.id = attendance.user_id
-                WHERE attendance.production_id = $1 AND attendance.attendance_date = $2`,
+                WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
                 [productionId, attendanceDate]
             );
             const absentStudentsResult = await pool.query(
@@ -202,11 +202,13 @@ router.get('/productions/:productionId', async (req, res) => {
                     AND id NOT IN
                         (SELECT user_id
                         FROM attendance
-                        WHERE production_id = $1 AND attendance_date = $2)`,
+                        WHERE production_id = $1 AND attendance_date = $2)
+                    AND role = 1`,
                 [productionId, attendanceDate]
             );
             attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
             studentCount = attendance.present.length + attendance.absent.length;
+            console.log(attendance.present, attendance.absent);
         } else {
             const studentCountResult = await pool.query(
                 `SELECT COUNT(*)
