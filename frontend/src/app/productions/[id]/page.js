@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Select from 'react-select';
 
 import Qrcode from '../../components/qrcode'
-import Production from "../../components/production";
 
 import { useRouter } from 'next/navigation'
 
@@ -17,10 +16,9 @@ export default function ProductionPage() {
     const { id } = useParams();
     const [production, setProduction] = useState(null);
     const [role, setRole] = useState("");
-    const [attendanceMarked, setAttendanceMarked] = useState(false);
+    const [selfMarkedPresent, setSelfMarkedPresent] = useState(false);
     const [message, setMessage] = useState("");
-    const [attendance, setAttendance] = useState([]);
-    const [nonresponders, setNonresponders] = useState([]);
+    const [selfAttendanceHistory, setSelfAttendanceHistory] = useState([]);
 
     const [markPresentStudents, setMarkPresentStudents] = useState([]);
     const [absentStudents, setAbsentStudents] = useState([]);
@@ -31,42 +29,7 @@ export default function ProductionPage() {
     useEffect(() => {
         setDomLoaded();
         fetchProduction();
-        checkRole();
-        getAllAttendance();
-        getNonResponders();
     }, [id]);
-
-    // need to fix
-    const getAllAttendance = async() => { // attendance is 1 day behind, figure out why
-        try {
-            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/all`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-            });
-            const data = await response.json();
-            setAttendance(data.attendance);
-            console.log("ATTENDANCE THING", attendance);
-        } catch (error) {
-            console.log("ERROR:", error);
-        }
-    }
-
-    const getNonResponders = async() => {
-        try {
-            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/noresponse`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-            const data = await response.json();
-            const mapper = (user) => ({ value: user.id, name: user.name, email: user.email });
-            setNonresponders(data.map(mapper));
-            console.log("Nonresponders", data.map(mapper));
-        } catch (error) {
-            console.log("Error:", error);
-        }
-    }
 
     const emailNonResponders = async() => {
         try {  
@@ -100,24 +63,20 @@ export default function ProductionPage() {
     
             const data = await res.json();
             setProduction(data.productionData);
-            const attendance = data.productionData.attendance;
-            const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
-            setPresentStudents(attendance.present.map(mapStudentsSelectOptions));
-            setAbsentStudents(attendance.absent.map(mapStudentsSelectOptions));
-            console.log(data);
+            setRole(data.role);
+            if (role === 0) {
+                // Teacher
+                const attendance = data.productionData.attendance;
+                const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
+                setPresentStudents(attendance.present.map(mapStudentsSelectOptions));
+                setAbsentStudents(attendance.absent.map(mapStudentsSelectOptions));
+            } else {
+                // Student
+                setSelfAttendanceHistory(data.productionData.selfAttendanceHistory);
+                setSelfMarkedPresent(data.productionData.selfMarkedPresent);
+            }
         } catch (error) {
             console.log(error.message);
-        }
-    }
-    const checkRole = async () => {
-        try {
-            const response = await fetch("http://localhost:3001/users/role", {
-                credentials: "include",
-            })
-            const data = await response.json();
-            setRole(data.role);
-        } catch (error) {
-            console.error("Error geting role:", error);
         }
     }
 
@@ -133,14 +92,11 @@ export default function ProductionPage() {
             });
             const data = await response.json();
             if (response.status === 200) {
-                setAttendanceMarked(data.tracked);
+                setSelfMarkedPresent(data.tracked);
                 setMessage("Attendance successfully logged!");
             } else if (response.status === 409) {
-                setAttendanceMarked(true); 
-                setMessage("Attendance already recorded for today.");
-                console.log(attendanceMarked);
+                setSelfMarkedPresent(true); 
             }
-            console.log("ATTENDANCE MARKED:", attendanceMarked);
         } catch (error) { 
             console.log("Error:", error)
         }
@@ -162,7 +118,6 @@ export default function ProductionPage() {
                 setPresentStudents(data.newAttendance.present.map(mapStudentsSelectOptions));
                 setAbsentStudents(data.newAttendance.absent.map(mapStudentsSelectOptions));
                 setMarkPresentStudents([]);
-                router.refresh();
             }
         } catch (error) {
             console.error("Error marking students attendance:", error);
@@ -170,38 +125,58 @@ export default function ProductionPage() {
     }
 
     return (
-        <div key={attendanceMarked}>
+        <div key={selfMarkedPresent}>
             <div>
-                <Production 
-                key={production.id} 
-                name={production.name} 
-                id={production.id} 
-                teachers={production.teachers}
-                student={production.studentCount} 
-                />
+                <h1>{production.name}</h1>
+                <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
+                <p>Number of Students: {production.studentCount}</p>
                 <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
             </div>
-            {role==="teacher" && nonresponders.length > 0 ? (
+            {role===0 ? (
+                // Teacher view
                 <div>
+                    <div>
+                        <h2>Present</h2>
+                        {presentStudents.length > 0 ? (
+                            <ul>
+                                {presentStudents.map((entry, index) => (
+                                    <li key={index}>{entry.label}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No present students.</p>
+                        )}
+                        
+                    </div>
+                    <div>
+                        <h2>Missing</h2>
+                        {absentStudents.length > 0 ? (
+                            <ul>
+                                {absentStudents.map((entry, index) => (
+                                    <li key={index}>{entry.label}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No absent students.</p>
+                        )}
+                    </div>
+                    
                     <form onSubmit={markStudentsAttendance}>
+                        <h2>Mark attendance</h2>
                         <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
                         <button type="submit">Mark as present</button>
                     </form>
-                    <div>Students who haven't responded:</div>
-                    <ul>
-                        {nonresponders.map((entry, index) => (
-                            <li key={index}>{entry.name}</li>
-                        ))}
-                    </ul>
+                    <h2>Send email</h2>
                     <button onClick={emailNonResponders}>
                         EMAIL NONRESPONDERS
                     </button>
                 </div>
             ) : (
+                // Student view
                 <div>
-                    {attendanceMarked ? (
+                    {selfMarkedPresent ? (
                         <div>
-                            <div>{message}</div>
+                            <div>Marked as present.</div>
                         </div>
                     ) : (
                         <div>
@@ -211,8 +186,8 @@ export default function ProductionPage() {
                     <div>
                         <div>Days attended:</div>
                         <ul>
-                            {attendance.length > 0 ? (
-                                attendance.map((entry, index) => (
+                            {selfAttendanceHistory.length > 0 ? (
+                                selfAttendanceHistory.map((entry, index) => (
                                     <li key={index}>{new Date(entry.attendance_date).toLocaleDateString()}</li>
                                 ))
                             ) : (

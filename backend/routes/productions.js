@@ -183,16 +183,17 @@ router.get('/productions/:productionId', async (req, res) => {
             [productionId]
         );
 
-        var attendance, studentCount;
+        const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+        var attendance, studentCount, selfAttendanceHistory;
         
         if (role === 0) {
-            const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+            // Teacher
             const presentStudentsResult = await pool.query(
                 `SELECT id, name
                 FROM users
                 INNER JOIN attendance ON users.id = attendance.user_id
                 WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
-                [productionId, attendanceDate]
+                [productionId, today]
             );
             const absentStudentsResult = await pool.query(
                 `SELECT id, name
@@ -204,11 +205,21 @@ router.get('/productions/:productionId', async (req, res) => {
                         FROM attendance
                         WHERE production_id = $1 AND attendance_date = $2)
                     AND role = 1`,
-                [productionId, attendanceDate]
+                [productionId, today]
             );
             attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
             studentCount = attendance.present.length + attendance.absent.length;
         } else {
+            // Student
+            const selfAttendanceHistoryResult = await pool.query(
+                `SELECT attendance.attendance_date
+                FROM attendance
+                JOIN users ON attendance.user_id = users.id
+                JOIN productions ON attendance.production_id = productions.id
+                WHERE attendance.production_id = $1 AND attendance.user_id = $2`,
+                [productionId, userId]
+            );
+            selfAttendanceHistory = selfAttendanceHistoryResult.rows;
             const studentCountResult = await pool.query(
                 `SELECT COUNT(*)
                 FROM users
@@ -224,9 +235,15 @@ router.get('/productions/:productionId', async (req, res) => {
             name: productionResult.rows[0].name,
             teachers: teachersResult.rows,
             studentCount: studentCount,
-            ...(role === 0 ? {attendance: attendance} : {})
+            ...(role === 0
+                ? {attendance: attendance}
+                : {
+                    selfAttendanceHistory: selfAttendanceHistory,
+                    selfMarkedPresent: selfAttendanceHistory.includes(today)
+                }
+            )
         };
-        return res.status(200).json({productionData: productionData});
+        return res.status(200).json({productionData: productionData, role: role});
     } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
