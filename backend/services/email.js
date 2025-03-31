@@ -1,39 +1,51 @@
-const nodemailer = require("nodemailer");
+const mailjet = require('node-mailjet');
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-    },
-});
+// Set up your Mailjet credentials
+const mailClient = new mailjet.apiConnect(
+    process.env.MJ_APIKEY_PUBLIC, 
+    process.env.MJ_APIKEY_PRIVATE
+);
 
-
-// Function to send emails
+// Function to send an email
 async function sendReminderEmails(nonResponders) {
-    if (!nonResponders.length) {
+    console.log("HAHA", nonResponders)
+    if (nonResponders.length === 0) {
         console.log("No non-responders to email.");
         return;
     }
 
     for (const email of nonResponders) {
+        console.log("QOEWIPJR QW")
         try {
-            const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: email,
-                subject: "REMINDER: Drama Production Right Now",
-                text: 
-                    `
-                    Hello, please mark yourself as in attendance to today's drama production or inform the teacher.
-                    
-                    This is an automatic email. Please do not respond.
-                     `,
-            };
+            const request = mailClient
+                .post('send', { version: 'v3.1' })
+                .request({
+                    Messages: [
+                        {
+                            From: {
+                                Email: 'merivaledrama373@gmail.com',
+                                Name: 'Merivale Drama'
+                            },
+                            To: [
+                                {
+                                    Email: email,
+                                    Name: 'Student'
+                                }
+                            ],
+                            Subject: 'REMINDER: Drama Production Right Now',
+                            TextPart: `
+                            Hello, please mark yourself as in attendance to today's drama production or inform the teacher.
 
-            await transporter.sendMail(mailOptions);
-            console.log(`Email sent to ${email}`);
+                            This is an automatic email. Please do not respond.
+                            `,
+                        }
+                    ]
+                });
+    
+            const result = await request;
+            console.log('Email sent:', result.body);
         } catch (error) {
-            console.error(`Failed to send email to ${email}:`, error);
+            console.error('Error sending email:', error.response ? error.response.body : error);
         }
     }
 }

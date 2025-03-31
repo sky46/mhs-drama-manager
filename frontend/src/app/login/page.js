@@ -52,7 +52,7 @@ function Login({}) {
             <h1>Login!</h1>
             <form onSubmit={loginUser}>
                 <div className={styles.inputGroup}>
-                    <label className="label">Name or Email</label>
+                    <label className="label">Email</label>
                     <input
                         className={`${styles.input} ${displayError ? styles.invalid : ''}`} 
                         id="nameOrEmail"

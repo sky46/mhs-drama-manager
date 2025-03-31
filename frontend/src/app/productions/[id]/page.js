@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation'
 // based off page id, link qrcode to localhost:3000/productions/id/qrcode which will show check in button
 // change to if not signed in, route to sign in and then back to this
 
+// also if scan qr code and not yet in, give option to join?
+
 export default function ProductionPage() {
     const router = useRouter()
     
@@ -23,17 +25,36 @@ export default function ProductionPage() {
     const [markPresentStudents, setMarkPresentStudents] = useState([]);
     const [absentStudents, setAbsentStudents] = useState([]);
     const [presentStudents, setPresentStudents] = useState([]);
+    const [nonResponders, setNonResponders] = useState([]);
 
     const [domLoaded, setDomLoaded] = useState(false);
 
     useEffect(() => {
         setDomLoaded();
         fetchProduction();
+        getNonResponders();
     }, [id]);
+
+    const getNonResponders = async() => {
+        try {
+            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/noresponse`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+            const data = await response.json();
+            const mapper = (user) => ({ value: user.id, name: user.name, email: user.email });
+            setNonResponders(data.map(mapper));
+            console.log("Nonresponders", data.map(mapper));
+        } catch (error) {
+            console.log("Error:", error);
+        }
+    }
 
     const emailNonResponders = async() => {
         try {  
-            const emailList = nonresponders.map(user => user.email);
+            const emailList = nonResponders.map(user => user.email);
+            console.log("emails", emailList);
             const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -166,6 +187,12 @@ export default function ProductionPage() {
                         <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
                         <button type="submit">Mark as present</button>
                     </form>
+                    <div>Students who haven't responded:</div> {/* Keep here to allow teacher to see everybody that is non-response */}
+                    <ul>
+                        {nonResponders.map((entry, index) => (
+                            <li key={index}>{entry.name}</li>
+                        ))}
+                    </ul>
                     <h2>Send email</h2>
                     <button onClick={emailNonResponders}>
                         EMAIL NONRESPONDERS

@@ -1,7 +1,7 @@
 const Router = require('express-promise-router');
 require('dotenv').config()
 const { pool } = require('../db');  // Import the database connection
-const sendReminderEmails = require("../services/email"); // Import function (PROBLEM, FIGURE OUT WHY EMAIL NOT WORKING)
+const sendReminderEmails = require('../services/email'); // Import function (PROBLEM, FIGURE OUT WHY EMAIL NOT WORKING)
 const { getUserRole } = require('../helpers');
 
 const router = new Router();
@@ -228,17 +228,18 @@ router.get('/productions/:productionId/attendance/noresponse', async (req, res) 
     }
 })
 
-// app.post("/productions/:productionId/attendance/reminder", async (req, res) => {
-//     try {
-//         const nonResponders = req.body;
+router.post("/productions/:productionId/attendance/reminder", async (req, res) => {
+    try {
+        const nonResponders = req.body;
 
-//         if (!nonResponders || nonResponders.length === 0) {
-//             return res.status(400).json({ error: "No non-responders provided" });
-//         }
+        if (!nonResponders || nonResponders.length === 0) {
+            return res.status(400).json({ error: "No non-responders provided" });
+        }
+        console.log("Sending reminder emails to:", nonResponders);
 
-//         await sendReminderEmails(nonResponders);
-//         return res.json({ message: "Emails sent successfully!" });
-//     } catch (error) {
-//         return res.status(500).json({ error: "Failed to send emails" });
-//     }
-// });
+        await sendReminderEmails(nonResponders);
+        return res.json({ message: "Emails sent successfully!" });
+    } catch (error) {
+        return res.status(500).json({ error: "Failed to send emails" });
+    }
+});
