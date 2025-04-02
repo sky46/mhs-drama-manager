@@ -41,10 +41,9 @@ export default function ProductionPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ emailList }),
             });
             const data = await response.json();
-            console.log("Sent email", data);
+            console.log("PEOPLE", data.people);
         } catch (error) {
             console.log("Error:", error);
         }

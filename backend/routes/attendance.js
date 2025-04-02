@@ -176,25 +176,18 @@ router.get('/productions/:productionId/attendance/all', async (req, res) => {
 
 })
 
-// route to get all people not attended for the day
-router.get('/productions/:productionId/attendance/noresponse', async (req, res) => {
+router.post("/productions/:productionId/attendance/reminder", async (req, res) => {
     const userId = req.session.user;
-    const productionId = req.params.productionId;
-
     if (!userId) {
         return res.status(401).json({ error: "Not logged in" });
     }
-
-    const allowedQueryResult = await pool.query(
-        `SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2`,
-        [productionId, userId]
-    );
-    if (allowedQueryResult.rows.length === 0) {
-        return res.status(403).json({ error: "Missing permissions "});
+    const productionId = req.params.productionId; 
+    const role = await getUserRole(userId);
+    if (role == 1) {
+        return res.json({message: "No access"});
     }
-
     try {
-        const missingResult = await pool.query(
+        const absentStudentsResult = await pool.query(
             `SELECT productions_users.user_id FROM productions_users
             JOIN users ON productions_users.user_id = users.id
             LEFT JOIN attendance
@@ -205,40 +198,15 @@ router.get('/productions/:productionId/attendance/noresponse', async (req, res) 
             AND users.role = 1
             AND attendance.user_id IS NULL`,
             [productionId]
-        )
-        // get users from a specific production, filtered to be students and who have not yet marked as responded
-            // left join -> matches ALL values in left table to existing data in right table 
+        );
 
-        if (missingResult.rows.length === 0) {
-            return res.status(404).json({ message: 'No missing people found' });
-        }
-
-        const userIds = missingResult.rows.map(row => row.user_id);
-
-        const nameAndEmailResult = await pool.query(
-            `SELECT id, name, email from users
-            WHERE users.id = ANY($1)`,
-            [userIds]
-        )
-
-        return res.json(nameAndEmailResult.rows);
-
-    } catch (err) {
-        return res.status(500).json({ error: err });
-    }
-})
-
-router.post("/productions/:productionId/attendance/reminder", async (req, res) => {
-    try {
-        const nonResponders = req.body;
-
-        if (!nonResponders || nonResponders.length === 0) {
+        if (!absentStudentsResult || absentStudentsResult.length === 0) {
             return res.status(400).json({ error: "No non-responders provided" });
         }
-        console.log("Sending reminder emails to:", nonResponders);
+        console.log("Sending reminder emails to:", absentStudentsResult);
 
-        await sendReminderEmails(nonResponders);
-        return res.json({ message: "Emails sent successfully!" });
+        await sendReminderEmails(absentStudentsResult);
+        return res.json({ message: "Emails sent successfully!", people: absentStudentsResult });
     } catch (error) {
         return res.status(500).json({ error: "Failed to send emails" });
     }
