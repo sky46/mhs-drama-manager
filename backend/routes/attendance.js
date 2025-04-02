@@ -34,11 +34,11 @@ router.post('/productions/:productionId/markselfattended', async (req, res) => {
         return res.status(409).json({ error: "Duplicate attendance" });
     } else {
         try {
-            await pool.query(
-                'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)',
+            const markAttendanceResult = await pool.query(
+                'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3) RETURNING attendance_date',
                 attendanceParams
             );
-            return res.status(200).json({tracked: true});
+            return res.status(200).json({markedPresentRow: markAttendanceResult.rows[0]});
         } catch (err) {
             console.error(err);
             return res.status(500).json({ error: 'Database error' });

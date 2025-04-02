@@ -95,7 +95,8 @@ export default function ProductionPage() {
             });
             const data = await response.json();
             if (response.status === 200) {
-                setSelfMarkedPresent(data.tracked);
+                setSelfMarkedPresent(true);
+                setSelfAttendanceHistory(old => [...old, data.markedPresentRow]);
                 setMessage("Attendance successfully logged!");
             } else if (response.status === 409) {
                 setSelfMarkedPresent(true); 
