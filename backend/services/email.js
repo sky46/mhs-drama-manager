@@ -14,7 +14,10 @@ async function sendReminderEmails(nonResponders) {
         return;
     }
 
-    for (const email of nonResponders) {
+    for (const emailObject of nonResponders) {
+
+        const email = emailObject.email;
+
         console.log("QOEWIPJR QW")
         try {
             const request = mailClient
