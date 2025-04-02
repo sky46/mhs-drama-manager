@@ -1,7 +1,7 @@
 const Router = require('express-promise-router');
 require('dotenv').config()
 const { pool } = require('../db');  // Import the database connection
-// const sendReminderEmails = require('../services/email'); // Import function (PROBLEM, FIGURE OUT WHY EMAIL NOT WORKING)
+const sendReminderEmails = require('../services/email'); // Import function (PROBLEM, FIGURE OUT WHY EMAIL NOT WORKING)
 const { getUserRole } = require('../helpers');
 
 const router = new Router();
