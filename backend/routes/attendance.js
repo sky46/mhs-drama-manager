@@ -200,13 +200,22 @@ router.post("/productions/:productionId/attendance/reminder", async (req, res) =
             [productionId]
         );
 
-        if (!absentStudentsResult || absentStudentsResult.length === 0) {
+        if (!absentStudentsResult || absentStudentsResult.rows.length === 0) {
             return res.status(400).json({ error: "No non-responders provided" });
         }
-        console.log("Sending reminder emails to:", absentStudentsResult);
 
-        await sendReminderEmails(absentStudentsResult);
-        return res.json({ message: "Emails sent successfully!", people: absentStudentsResult });
+        const userIds = absentStudentsResult.rows.map(row => row.user_id);
+
+        const emailResult = await pool.query(
+            `SELECT email from users
+            WHERE users.id = ANY($1)`,
+            [userIds]
+        )
+
+        console.log("Sending reminder emails to:", emailResult.rows);
+
+        await sendReminderEmails(emailResult.rows);
+        return res.json({ message: "Emails sent successfully!", people: emailResult.rows });
     } catch (error) {
         return res.status(500).json({ error: "Failed to send emails" });
     }
