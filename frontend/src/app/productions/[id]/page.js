@@ -17,7 +17,7 @@ export default function ProductionPage() {
     
     const { id } = useParams();
     const [production, setProduction] = useState(null);
-    const [role, setRole] = useState("");
+    const [role, setRole] = useState(2);
     const [selfMarkedPresent, setSelfMarkedPresent] = useState(false);
     const [message, setMessage] = useState("");
     const [selfAttendanceHistory, setSelfAttendanceHistory] = useState([]);
@@ -25,35 +25,17 @@ export default function ProductionPage() {
     const [markPresentStudents, setMarkPresentStudents] = useState([]);
     const [absentStudents, setAbsentStudents] = useState([]);
     const [presentStudents, setPresentStudents] = useState([]);
-    const [nonResponders, setNonResponders] = useState([]);
 
     const [domLoaded, setDomLoaded] = useState(false);
 
     useEffect(() => {
         setDomLoaded();
         fetchProduction();
-        getNonResponders();
     }, [id]);
-
-    const getNonResponders = async() => {
-        try {
-            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/noresponse`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-            const data = await response.json();
-            const mapper = (user) => ({ value: user.id, name: user.name, email: user.email });
-            setNonResponders(data.map(mapper));
-            console.log("Nonresponders", data.map(mapper));
-        } catch (error) {
-            console.log("Error:", error);
-        }
-    }
 
     const emailNonResponders = async() => {
         try {  
-            const emailList = nonResponders.map(user => user.email);
+            const emailList = absentStudents.map(user => user.email);
             console.log("emails", emailList);
             const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
                 method: 'POST',
@@ -85,7 +67,7 @@ export default function ProductionPage() {
             const data = await res.json();
             setProduction(data.productionData);
             setRole(data.role);
-            if (role === 0) {
+            if (data.role === 0) {
                 // Teacher
                 const attendance = data.productionData.attendance;
                 const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
@@ -187,15 +169,9 @@ export default function ProductionPage() {
                         <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
                         <button type="submit">Mark as present</button>
                     </form>
-                    <div>Students who haven't responded:</div> {/* Keep here to allow teacher to see everybody that is non-response */}
-                    <ul>
-                        {nonResponders.map((entry, index) => (
-                            <li key={index}>{entry.name}</li>
-                        ))}
-                    </ul>
                     <h2>Send email</h2>
                     <button onClick={emailNonResponders}>
-                        EMAIL NONRESPONDERS
+                        EMAIL MISSING
                     </button>
                 </div>
             ) : (

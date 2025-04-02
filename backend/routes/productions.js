@@ -184,7 +184,8 @@ router.get('/productions/:productionId', async (req, res) => {
         );
 
         const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
-        var attendance, studentCount, selfAttendanceHistory;
+        const todayFull = new Date(new Date().setHours(0,0,0,0)).toISOString();
+        var attendance, studentCount, selfAttendanceHistory, selfMarkedPresent;
         
         if (role === 0) {
             // Teacher
@@ -228,6 +229,7 @@ router.get('/productions/:productionId', async (req, res) => {
                 [productionId]
             );
             studentCount = studentCountResult.rows[0].count;
+            selfMarkedPresent = selfAttendanceHistory.some((row) => row.attendance_date.toISOString() === todayFull);
         }
         
         productionData = {
@@ -239,7 +241,7 @@ router.get('/productions/:productionId', async (req, res) => {
                 ? {attendance: attendance}
                 : {
                     selfAttendanceHistory: selfAttendanceHistory,
-                    selfMarkedPresent: selfAttendanceHistory.includes(today)
+                    selfMarkedPresent: selfMarkedPresent
                 }
             )
         };
