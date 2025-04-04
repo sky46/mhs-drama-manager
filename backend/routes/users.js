@@ -90,20 +90,20 @@ router.post('/users/email', async (req, res) => {
 
 // Post to login user
 router.post('/users/login', async (req, res) => {
-    const { nameOrEmail, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!nameOrEmail || !password) {
+    if (!email || !password) {
         return res.status(400).json({ error: "Missing fields" });
     }
 
     let userResult;
     try {
         userResult = await pool.query(
-            'SELECT id, password FROM users WHERE email = $1 OR name = $2', 
-            [nameOrEmail, nameOrEmail]
+            'SELECT id, password FROM users WHERE email = $1', 
+            [email]
         );
     } catch (error) {
-        return res.status(500).json({ error: "Database error" });
+        return res.status(500).json({ error: "User with email already exists" });
     }
 
     if (userResult.rows.length) {

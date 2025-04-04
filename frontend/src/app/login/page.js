@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import styles from '../styles/login.module.css';
 
 function Login({}) {
-    const [nameOrEmail, setNameOrEmail] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [successfulLogin, setSuccessfulLogin] = useState(false);
@@ -26,7 +26,7 @@ function Login({}) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nameOrEmail, password }),
+            body: JSON.stringify({ email, password }),
             credentials: 'include'
         });
         if (loginCheckResponse.ok) {
@@ -55,10 +55,10 @@ function Login({}) {
                     <label className="label">Email</label>
                     <input
                         className={`${styles.input} ${displayError ? styles.invalid : ''}`} 
-                        id="nameOrEmail"
-                        value={nameOrEmail}
+                        id="email"
+                        value={email}
                         type="text"
-                        onChange={(e) => setNameOrEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 <div className={styles.inputGroup}>
