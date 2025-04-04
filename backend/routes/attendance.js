@@ -100,11 +100,10 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
     return res.status(200).json({message: 'Attendance marked successfully', newAttendance: attendance});
 })
 
-// route to check attendance
+// Get all attendance history for all students for a production
 router.get('/productions/:productionId/attendance', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
-    const attendanceDate = req.query.attendanceDate;
     if (!userId) {
         return res.status(401).json({ error: "Not logged in" });
     }
@@ -125,12 +124,12 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
 
     try {
         const attendanceResult = await pool.query(
-            `SELECT users.name, productions.name, attendance.attendance_date
+            `SELECT users.id, users.name, productions.name, attendance.attendance_date
             FROM attendance
             JOIN users ON attendance.user_id = users.id
             JOIN productions ON attendance.production_id = productions.id
-            WHERE attendance.production_id = $1 AND attendance.attendance_date = $2`,
-            [productionId, attendanceDate]
+            WHERE attendance.production_id = $1`,
+            [productionId]
         );
         
         if (attendanceResult.rows.length === 0) {
