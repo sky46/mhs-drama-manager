@@ -124,11 +124,13 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
 
     try {
         const attendanceResult = await pool.query(
-            `SELECT users.id, users.name, productions.name, attendance.attendance_date
+            `SELECT users.id, users.name, array_agg(attendance.attendance_date) AS attendance_dates
             FROM attendance
             JOIN users ON attendance.user_id = users.id
             JOIN productions ON attendance.production_id = productions.id
-            WHERE attendance.production_id = $1`,
+            WHERE attendance.production_id = $1
+            GROUP BY users.id
+            ORDER BY users.name DESC`,
             [productionId]
         );
         
@@ -136,7 +138,19 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             return res.status(404).json({ message: 'No attendance found' });
         }
 
-        res.json(attendanceResult.rows);
+        var attendance = [];
+        var curStudent;
+        var curStudentDates;
+        attendanceResult.rows.forEach((row) => {
+            curStudent = {name: row.name, user_id: row.id};
+            curStudentDates = {};
+            row.attendance_dates.forEach((date) => {
+                curStudentDates[date.toISOString()] = true;
+            });
+            curStudent.attendedDates = curStudentDates;
+            attendance.push(curStudent);
+        });
+        return res.status(200).json({attendance: attendance});
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
