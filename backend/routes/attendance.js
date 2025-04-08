@@ -49,7 +49,7 @@ router.post('/productions/:productionId/markselfattended', async (req, res) => {
 router.post('/productions/:productionId/markstudentsattended', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
-    const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    const attendanceDate = new Date().toLocaleDateString('en-CA'); // yyyy-mm-dd
     const {students,} = req.body;
 
     if (!userId) {
@@ -141,7 +141,8 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             curStudent = {name: row.name, user_id: row.id};
             curStudentDates = {};
             row.attendance_dates.forEach((date) => {
-                curStudentDates[date.toISOString()] = true;
+                const localDate = date.toLocaleDateString('en-CA'); 
+                curStudentDates[localDate] = true;
             });
             curStudent.attendedDates = curStudentDates;
             attendance.push(curStudent);

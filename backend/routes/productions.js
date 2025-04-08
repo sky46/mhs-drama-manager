@@ -183,8 +183,8 @@ router.get('/productions/:productionId', async (req, res) => {
             [productionId]
         );
 
-        const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
-        const todayFull = new Date(new Date().setHours(0,0,0,0)).toISOString();
+        const formatDate = (date) => new Date(date).toISOString().split('T')[0];
+        const todayFormatted = formatDate(new Date());
         var attendance, studentCount, selfAttendanceHistory, selfMarkedPresent;
         
         if (role === 0) {
@@ -194,7 +194,7 @@ router.get('/productions/:productionId', async (req, res) => {
                 FROM users
                 INNER JOIN attendance ON users.id = attendance.user_id
                 WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
-                [productionId, today]
+                [productionId, todayFormatted]
             );
             const absentStudentsResult = await pool.query(
                 `SELECT id, name
@@ -206,7 +206,7 @@ router.get('/productions/:productionId', async (req, res) => {
                         FROM attendance
                         WHERE production_id = $1 AND attendance_date = $2)
                     AND role = 1`,
-                [productionId, today]
+                [productionId, todayFormatted]
             );
             attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
             studentCount = attendance.present.length + attendance.absent.length;
@@ -229,7 +229,10 @@ router.get('/productions/:productionId', async (req, res) => {
                 [productionId]
             );
             studentCount = studentCountResult.rows[0].count;
-            selfMarkedPresent = selfAttendanceHistory.some((row) => row.attendance_date.toISOString() === todayFull);
+
+            selfMarkedPresent = selfAttendanceHistory.some(
+                (row) => formatDate(row.attendance_date) === todayFormatted
+            );
         }
         
         productionData = {

@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation'
 
 // also if scan qr code and not yet in, give option to join?
 
+// route away after email? also it is in spam rn
+
 export default function ProductionPage() {
     const router = useRouter()
     
@@ -193,7 +195,12 @@ export default function ProductionPage() {
                         <ul>
                             {selfAttendanceHistory.length > 0 ? (
                                 selfAttendanceHistory.map((entry, index) => (
-                                    <li key={index}>{new Date(entry.attendance_date).toLocaleDateString()}</li>
+                                    <li key={index}>{
+                                        new Date(new Date(entry.attendance_date)
+                                        .setDate(new Date(entry.attendance_date)
+                                        .getDate() + 1))
+                                        .toLocaleDateString()
+                                    }</li>
                                 ))
                             ) : (
                                 <p>No attendance records found.</p>
