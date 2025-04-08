@@ -133,10 +133,6 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             ORDER BY users.name DESC`,
             [productionId]
         );
-        
-        if (attendanceResult.rows.length === 0) {
-            return res.status(404).json({ message: 'No attendance found' });
-        }
 
         var attendance = [];
         var curStudent;
