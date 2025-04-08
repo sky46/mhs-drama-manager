@@ -1,0 +1,21 @@
+.flex {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.th {
+    padding: 1.5vh; 
+    text-align: center;
+    border: 1px solid #000000;
+}
+
+.td {
+    padding: 0.5vw; 
+    text-align: center;
+    border: 1px solid #000000; 
+}
