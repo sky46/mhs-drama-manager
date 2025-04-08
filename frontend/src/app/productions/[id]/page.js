@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Select from 'react-select';
+import Link from 'next/link';
 
 import Qrcode from '../../components/qrcode'
 
@@ -173,6 +174,7 @@ export default function ProductionPage() {
                     <button onClick={emailNonResponders}>
                         EMAIL MISSING
                     </button>
+                    <Link href={`/productions/${id}/attendance`}>Attendance history</Link>
                 </div>
             ) : (
                 // Student view
