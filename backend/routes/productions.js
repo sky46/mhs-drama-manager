@@ -251,3 +251,48 @@ router.get('/productions/:productionId', async (req, res) => {
         res.status(500).json({ error: "Internal Server Error", details: error.message });
     }
 });
+
+// Get data for existing production including existing/available users
+router.get('/productions/:productionId/editData', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const productionId = req.params.productionId;
+
+    try {
+        const role = await getUserRole(userId);
+        const productionResult = await pool.query(
+            'SELECT id, name FROM productions WHERE id = $1',
+            [productionId]
+        );
+        if (productionResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Production not found'})
+        }
+        const accessResult = await pool.query(
+            `SELECT productions.id
+            FROM productions
+            INNER JOIN productions_users ON productions.id = productions_users.production_id
+            WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
+            [productionId, userId]
+        );
+        if (accessResult.rows.length === 0) {
+            return res.status(401).json({ error: 'User is not a part of production'});
+        }
+
+        const currentTeachersResult = await pool.query(
+            `SELECT users.id, users.name
+            FROM users
+            INNER JOIN productions_users ON users.id = productions_users.user.id
+            WHERE productions_users.production_id = $1 AND users.role = 0`,
+            [productionId]
+        );
+        const availableTeachersResult = await pool.query(
+            
+        )
+
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+})
