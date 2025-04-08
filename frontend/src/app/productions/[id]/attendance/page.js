@@ -23,7 +23,6 @@ function ProdAttendancePage() {
             currentDate.setDate(currentDate.getDate() - 1);
         }
         setDates(generatedDates);
-        console.log(generatedDates);
     }
 
     const getProdAttendance = async () => {
@@ -41,7 +40,6 @@ function ProdAttendancePage() {
         
         const data = await res.json();
         setAttendance(data.attendance);
-        console.log(data.attendance[0].attendedDates);
     };
 
     return (
