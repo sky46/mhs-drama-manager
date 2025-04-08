@@ -124,7 +124,7 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
 
     try {
         const attendanceResult = await pool.query(
-            `SELECT users.id, users.name, array_agg(attendance.attendance_date) AS attendance_dates
+            `SELECT users.id, users.name, array_agg(DISTINCT attendance.attendance_date) AS attendance_dates
             FROM attendance
             JOIN users ON attendance.user_id = users.id
             JOIN productions ON attendance.production_id = productions.id
@@ -133,6 +133,8 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             ORDER BY users.name DESC`,
             [productionId]
         );
+        
+        console.log(attendanceResult.rows)
 
         var attendance = [];
         var curStudent;
@@ -141,11 +143,14 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             curStudent = {name: row.name, user_id: row.id};
             curStudentDates = {};
             row.attendance_dates.forEach((date) => {
-                const localDate = date.toLocaleDateString('en-CA'); 
-                curStudentDates[localDate] = true;
+                const localDate = new Date(date);
+                localDate.setDate(localDate.getDate() + 1);
+                const shiftedLocalDate = localDate.toLocaleDateString('en-CA');
+                curStudentDates[shiftedLocalDate] = true;
             });
             curStudent.attendedDates = curStudentDates;
             attendance.push(curStudent);
+            console.log(curStudent, curStudentDates);
         });
         return res.status(200).json({attendance: attendance});
     } catch (err) {

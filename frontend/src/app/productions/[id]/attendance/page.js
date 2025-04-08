@@ -42,6 +42,7 @@ function ProdAttendancePage() {
         
         const data = await res.json();
         setAttendance(data.attendance);
+        console.log(data.attendance);
     };
 
     const nextWeek = () => {
@@ -77,7 +78,10 @@ function ProdAttendancePage() {
                             <tr key={user.user_id}>
                                 <th scope="row" className={styles.th}>{user.name}</th>
                                 {dates.map(date => (
-                                    <td key={date} className={styles.td}>{user.attendedDates[date] === true ? (<span>Present</span>) : (<span>-</span>)}</td>
+                                    <td key={date} className={styles.td}>
+                                        {
+                                        user.attendedDates[date] === true ? (<span>Present</span>) : (<span>-</span>)}
+                                    </td>
                                 ))}
                             </tr>
                         ))}
