@@ -256,7 +256,7 @@ router.get('/productions/:productionId', async (req, res) => {
 });
 
 // Get data for existing production including existing/available users
-router.get('/productions/:productionId/editData', async (req, res) => {
+router.get('/productions/:productionId/getEditData', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
         return res.status(401).json({ error: "Not logged in" });
