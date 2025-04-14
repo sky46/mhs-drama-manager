@@ -265,6 +265,9 @@ router.get('/productions/:productionId/getEditData', async (req, res) => {
 
     try {
         const role = await getUserRole(userId);
+        if (role !== 0) {
+            return res.status(403).json({ error: "Only teachers can edit productions" })
+        }
         const productionResult = await pool.query(
             'SELECT id, name FROM productions WHERE id = $1',
             [productionId]
@@ -283,19 +286,101 @@ router.get('/productions/:productionId/getEditData', async (req, res) => {
             return res.status(401).json({ error: 'User is not a part of production'});
         }
 
+        // Exclude teacher making request because they are automatically part of production
         const currentTeachersResult = await pool.query(
             `SELECT users.id, users.name
             FROM users
-            INNER JOIN productions_users ON users.id = productions_users.user.id
-            WHERE productions_users.production_id = $1 AND users.role = 0`,
+            INNER JOIN productions_users ON users.id = productions_users.user_id
+            WHERE users.role = 0 AND productions_users.production_id = $1 AND users.id <> $2`,
+            [productionId, userId]
+        );
+        const allTeachersResult = await pool.query(
+            `SELECT id, name
+            FROM users
+            WHERE users.role = 0 AND users.id <> $1`,
+            [userId]
+        );
+        const currentStudentsResult = await pool.query(
+            `SELECT users.id, users.name
+            FROM users
+            INNER JOIN productions_users ON users.id = productions_users.user_id
+            WHERE users.role = 1 AND productions_users.production_id = $1`,
             [productionId]
         );
-        const availableTeachersResult = await pool.query(
-            
-        )
+        const allStudentsResult = await pool.query(
+            `SELECT id, name
+            FROM users
+            WHERE users.role = 1`,
+        );
+
+        return res.status(200).json({
+            production: {
+                ...(productionResult.rows[0]),
+                currentTeachers: currentTeachersResult.rows,
+                allTeachers: allTeachersResult.rows,
+                currentStudents: currentStudentsResult.rows,
+                allStudents: allStudentsResult.rows,
+            }
+        });
 
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
     }
 })
+
+router.post('/productions/:productionId/edit', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    // Check if user is teacher
+    const role = await getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    const productionId = req.params.productionId;
+
+    const accessResult = await pool.query(
+        `SELECT productions.id
+        FROM productions
+        INNER JOIN productions_users ON productions.id = productions_users.production_id
+        WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
+        [productionId, userId]
+    );
+    if (accessResult.rows.length === 0) {
+        return res.status(401).json({ error: 'User is not a part of production'});
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const {name, teachers, students} = req.body;
+        const alterQueryResult = await client.query(
+            ' productions (name) VALUES ($1) RETURNING id',
+            [name],
+        );
+        const productionId = createQueryResult.rows[0].id;
+        // Creator teacher
+        await client.query(
+            'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
+            [productionId, userId],
+        );
+        // Other users
+        for (const user of teachers.concat(students)) {
+            await client.query(
+                'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
+                [7, user.value],
+            );
+        }
+        await client.query('COMMIT');
+        res.status(201).json({productionId: productionId});
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Database error:', error);
+        res.status(500).json({error: 'Internal server error', details: error.message,})
+    } finally {
+        client.release();
+    }
+});
