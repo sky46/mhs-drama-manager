@@ -125,14 +125,15 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
     try {
         const attendanceResult = await pool.query(
             `SELECT users.id, users.name, array_agg(DISTINCT attendance.attendance_date) AS attendance_dates
-            FROM attendance
-            JOIN users ON attendance.user_id = users.id
-            JOIN productions ON attendance.production_id = productions.id
-            WHERE attendance.production_id = $1
+            FROM users
+            LEFT JOIN attendance ON attendance.user_id = users.id
+            LEFT JOIN productions ON attendance.production_id = productions.id
+            WHERE attendance.production_id = $1 OR attendance.production_id IS NULL
+            AND users.role = 1
             GROUP BY users.id
             ORDER BY users.name DESC`,
             [productionId]
-        );
+        ); // left join to make sure student shows up even if no attendance yet
         
         console.log(attendanceResult.rows)
 
