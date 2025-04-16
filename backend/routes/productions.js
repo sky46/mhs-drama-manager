@@ -357,21 +357,20 @@ router.post('/productions/:productionId/edit', async (req, res) => {
     try {
         await client.query('BEGIN');
         const {name, teachers, students} = req.body;
-        const alterQueryResult = await client.query(
-            ' productions (name) VALUES ($1) RETURNING id',
-            [name],
-        );
-        const productionId = createQueryResult.rows[0].id;
-        // Creator teacher
         await client.query(
-            'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
+            'UPDATE productions SET name = $1 WHERE id = $2',
+            [name, productionId],
+        );
+        // Remove all users from production, except editing user who will be added by default
+        await client.query(
+            'DELETE FROM productions_users WHERE production_id = $1 AND user_id <> $2',
             [productionId, userId],
         );
-        // Other users
+        // Add updated users to production
         for (const user of teachers.concat(students)) {
             await client.query(
                 'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
-                [7, user.value],
+                [productionId, user.value],
             );
         }
         await client.query('COMMIT');
