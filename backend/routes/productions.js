@@ -189,23 +189,34 @@ router.get('/productions/:productionId', async (req, res) => {
         
         if (role === 0) {
             // Teacher
-            const presentStudentsResult = await pool.query(
-                `SELECT id, name
+            const 
+            
+            presentStudentsResult = await pool.query(
+                `SELECT users.id, users.name
                 FROM users
-                INNER JOIN attendance ON users.id = attendance.user_id
-                WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
+                INNER JOIN productions_users 
+                    ON users.id = productions_users.user_id
+                INNER JOIN attendance 
+                    ON users.id = attendance.user_id 
+                    AND attendance.production_id = $1 
+                    AND attendance.attendance_date = $2
+                WHERE productions_users.production_id = $1
+                AND users.role = 1
+                `,
                 [productionId, todayFormatted]
             );
             const absentStudentsResult = await pool.query(
-                `SELECT id, name
+                `SELECT users.id, users.name
                 FROM users
-                INNER JOIN productions_users ON users.id = productions_users.user_id
+                INNER JOIN productions_users 
+                    ON users.id = productions_users.user_id
+                LEFT JOIN attendance 
+                    ON users.id = attendance.user_id 
+                    AND attendance.production_id = $1 
+                    AND attendance.attendance_date = $2
                 WHERE productions_users.production_id = $1
-                    AND id NOT IN
-                        (SELECT user_id
-                        FROM attendance
-                        WHERE production_id = $1 AND attendance_date = $2)
-                    AND role = 1`,
+                AND attendance.user_id IS NULL
+                AND users.role = 1`,
                 [productionId, todayFormatted]
             );
             attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};

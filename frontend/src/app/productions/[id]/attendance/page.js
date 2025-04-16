@@ -10,6 +10,7 @@ function ProdAttendancePage() {
     const [attendance, setAttendance] = useState([]);
     const [dates, setDates] = useState([]);
     const [startDate, setStartDate] = useState(new Date());
+    const [searchStudent, setSearchStudent] = useState("");
 
     useEffect(() => {
         getProdAttendance();
@@ -42,8 +43,22 @@ function ProdAttendancePage() {
         
         const data = await res.json();
         setAttendance(data.attendance);
-        console.log(data.attendance);
+        console.log("Attendance", data.attendance);
     };
+
+    const studentsAttendance = attendance.map(user => ({
+        name: user.name,
+        attendedDates: Object.entries(user.attendedDates)
+            .filter(([date, present]) => present === true)
+            .map(([date]) => date)
+    }));
+
+    const filteredStudentsAttendance = studentsAttendance.filter((item) => {
+        return searchStudent 
+        ? item.name.toLowerCase().includes(searchStudent.toLowerCase()) 
+        : true;
+    })
+    
 
     const nextWeek = () => {
         const newStartDate = new Date(startDate);
@@ -88,6 +103,20 @@ function ProdAttendancePage() {
                     </tbody>
                 </table>
                 <button onClick={nextWeek}>Next Week</button>
+            </div>
+            <div>
+                <h2>Students</h2>
+                <input type="Text" placeholder="Search for student..." value={searchStudent} onChange={(e) => setSearchStudent(e.target.value)}></input>
+                {
+                    filteredStudentsAttendance.map((student, index) => (
+                        <div key={index}>
+                            <h3>{student.name}</h3>
+                            <ul>
+                                {student.attendedDates.map((date, index) => (<li key={index}>{date}</li>))}
+                            </ul>
+                        </div>
+                    ))
+                }
             </div>
         </div>
     );

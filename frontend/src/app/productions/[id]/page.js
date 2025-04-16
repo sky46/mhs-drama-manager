@@ -72,6 +72,7 @@ export default function ProductionPage() {
             if (data.role === 0) {
                 // Teacher
                 const attendance = data.productionData.attendance;
+                console.log("ATTENDANCE", attendance);
                 const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
                 setPresentStudents(attendance.present.map(mapStudentsSelectOptions));
                 setAbsentStudents(attendance.absent.map(mapStudentsSelectOptions));
@@ -142,6 +143,7 @@ export default function ProductionPage() {
             {role===0 ? (
                 // Teacher view
                 <div>
+                    <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
                     <div>
                         <h2>Present</h2>
                         {presentStudents.length > 0 ? (
