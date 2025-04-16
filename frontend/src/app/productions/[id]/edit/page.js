@@ -73,7 +73,7 @@ export default function EditProductionPage() {
                     <input type="text" value={name} onChange={(val) => setName(val.target.value)} />
                     <Select isMulti options={teachersOptions} value={teachers} onChange={(val) => setTeachers(val)} />
                     <Select isMulti options={studentsOptions} value={students} onChange={(val) => setStudents(val)} />
-                    <button type="submit">Create</button>
+                    <button type="submit">Save</button>
                 </form>
             )}
         </div>
