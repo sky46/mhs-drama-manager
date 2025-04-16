@@ -28,7 +28,7 @@ router.get('/productions', async (req, res) => {
 
         const productionIds = productions.map(p => p.id);
         if (productionIds.length === 0) {
-            return res.status(200).json({ productions: [], teachers: [] });
+            return res.status(200).json({ productions: [], teachers: [], role: roleId });
         }
         // from users table, match records for production users id = productions id where the desired production id is given and selects all the teachers (0)
         const teachersResult = await pool.query(

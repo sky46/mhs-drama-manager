@@ -24,7 +24,7 @@ app.use(session({
     secret: process.env.SECRET_SESSION_KEY, 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } 
+    cookie: { secure: false, maxAge: 1000 * 3600 * 24 * 90 } 
 }));
 
 mountRoutes(app);
