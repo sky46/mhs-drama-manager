@@ -15,6 +15,7 @@ router.get('/productions', async (req, res) => {
     } 
     
     try {
+        const roleId = await getUserRole(userId);
 
         const productionsResult = await pool.query(
             `SELECT productions.id, productions.name
@@ -72,7 +73,7 @@ router.get('/productions', async (req, res) => {
             teachers: teachersByProduction[prod.id] || [],
             student: studentCountByProduction[prod.id] || 0
         }));
-        return res.status(200).json({ productions: productionsWithTeachersAndStudents });
+        return res.status(200).json({ productions: productionsWithTeachersAndStudents, role: roleId });
     } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
