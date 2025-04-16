@@ -14,7 +14,7 @@ function Login({}) {
     useEffect(() => {
         console.log("Router instance:", router);
         if (router && successfulLogin) {
-            router.push("/profile");
+            router.push("/productions");
 
         }
     }, [router, successfulLogin]);

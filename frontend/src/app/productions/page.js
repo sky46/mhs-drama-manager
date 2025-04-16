@@ -1,10 +1,10 @@
 "use client"; 
 import { useState, useEffect } from "react";
 
-import styles from '../styles/profile.module.css';
+import styles from '../styles/productions.module.css';
 import Production from "../components/production";
 
-function Profile() {
+export default function Productions() {
     // Implement protected page
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
@@ -93,5 +93,3 @@ function Profile() {
         </div>
     );
 }
-
-export default Profile;

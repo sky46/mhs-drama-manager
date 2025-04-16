@@ -35,7 +35,7 @@ function Signup({}) {
         console.log("Router instance:", router);
         if (router && successfulRegistration) {
             router.refresh();
-            router.push("/profile");
+            router.push("/productions");
         }
     }, [router, successfulRegistration]);
 

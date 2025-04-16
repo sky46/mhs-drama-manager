@@ -35,7 +35,7 @@ function RootLayout({ children }) {
             <ul className={styles.list}>
               <li className={styles.listitem}><Link href="/calendar" className={styles.navitem}>Calendar</Link></li>
               <li className={styles.listitem}><Link href="/attendance" className={styles.navitem}>Attendance</Link></li>
-              <li className={styles.listitem}><Link href="/profile" className={styles.navitem}>Profile</Link></li>
+              <li className={styles.listitem}><Link href="/productions" className={styles.navitem}>Productions</Link></li>
                 {isLoggedIn ? (
                   <li className={styles.listitem}><Logout onLogout={checkLoginStatus} /></li>
                 ) : (
