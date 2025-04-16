@@ -136,6 +136,7 @@ export default function ProductionPage() {
                 <h1>{production.name}</h1>
                 <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
                 <p>Number of Students: {production.studentCount}</p>
+                <Link href={`/productions/${id}/edit`}>Edit Production</Link>
                 <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
             </div>
             {role===0 ? (
