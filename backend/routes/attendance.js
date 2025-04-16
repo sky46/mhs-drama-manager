@@ -2,7 +2,7 @@ const Router = require('express-promise-router');
 require('dotenv').config()
 const { pool } = require('../db');  // Import the database connection
 const sendReminderEmails = require('../services/email'); // Import function (PROBLEM, FIGURE OUT WHY EMAIL NOT WORKING)
-const { getUserRole } = require('../helpers');
+const { getUserRole, localDateFormat } = require('../helpers');
 
 const router = new Router();
 module.exports = router;
@@ -11,7 +11,7 @@ module.exports = router;
 router.post('/productions/:productionId/markselfattended', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
-    const attendanceDate = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    const attendanceDate = localDateFormat.format(new Date());
 
     if (!userId) {
         return res.status(401).json({ error: "Not logged in" });

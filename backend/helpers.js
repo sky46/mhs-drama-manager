@@ -13,4 +13,9 @@ async function getUserRole(id) {
     }
 }
 
-module.exports = {getUserRole};
+const localDateFormat = new Intl.DateTimeFormat('en-CA', {
+    dateStyle: 'short',
+    timeZone: 'America/Toronto'
+});
+
+module.exports = {getUserRole, localDateFormat};

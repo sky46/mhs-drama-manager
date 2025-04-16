@@ -1,7 +1,7 @@
 const Router = require('express-promise-router');
 require('dotenv').config()
 const { pool } = require('../db');  // Import the database connection
-const { getUserRole } = require('../helpers');
+const { getUserRole, localDateFormat } = require('../helpers');
 
 
 const router = new Router();
@@ -184,8 +184,7 @@ router.get('/productions/:productionId', async (req, res) => {
             [productionId]
         );
 
-        const formatDate = (date) => new Date(date).toISOString().split('T')[0];
-        const todayFormatted = formatDate(new Date());
+        const todayFormatted = localDateFormat.format(new Date());
         var attendance, studentCount, selfAttendanceHistory, selfMarkedPresent;
         
         if (role === 0) {
@@ -231,8 +230,9 @@ router.get('/productions/:productionId', async (req, res) => {
             );
             studentCount = studentCountResult.rows[0].count;
 
+            console.log(selfAttendanceHistory[0].attendance_date);
             selfMarkedPresent = selfAttendanceHistory.some(
-                (row) => formatDate(row.attendance_date) === todayFormatted
+                (row) => localDateFormat.format(row.attendance_date) === todayFormatted
             );
         }
         
