@@ -128,7 +128,7 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             FROM users
             LEFT JOIN attendance ON attendance.user_id = users.id
             LEFT JOIN productions ON attendance.production_id = productions.id
-            WHERE attendance.production_id = $1 OR attendance.production_id IS NULL
+            WHERE (attendance.production_id = $1 OR attendance.production_id IS NULL)
             AND users.role = 1
             GROUP BY users.id
             ORDER BY users.name DESC`,
@@ -144,10 +144,12 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             curStudent = {name: row.name, user_id: row.id};
             curStudentDates = {};
             row.attendance_dates.forEach((date) => {
-                const localDate = new Date(date);
-                localDate.setDate(localDate.getDate() + 1);
-                const shiftedLocalDate = localDate.toLocaleDateString('en-CA');
-                curStudentDates[shiftedLocalDate] = true;
+                if (date) {
+                    const localDate = new Date(date);
+                    localDate.setDate(localDate.getDate() + 1);
+                    const shiftedLocalDate = localDate.toLocaleDateString('en-CA');
+                    curStudentDates[shiftedLocalDate] = true;
+                }
             });
             curStudent.attendedDates = curStudentDates;
             attendance.push(curStudent);

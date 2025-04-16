@@ -112,7 +112,13 @@ function ProdAttendancePage() {
                         <div key={index}>
                             <h3>{student.name}</h3>
                             <ul>
-                                {student.attendedDates.map((date, index) => (<li key={index}>{date}</li>))}
+                                {
+                                Object.keys(student.attendedDates).length !== 0 
+                                ? student.attendedDates.map((date, index) => (
+                                    <li key={index}>{date}</li>
+                                ))
+                                : <li>No recorded attendance yet</li>
+                                }
                             </ul>
                         </div>
                     ))
