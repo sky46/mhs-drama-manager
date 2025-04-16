@@ -36,6 +36,29 @@ export default function ProductionPage() {
         fetchProduction();
     }, [id]);
 
+    const deleteProduction = async () => {
+        try {
+            const res = await fetch(`http://localhost:3001/productions/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({productionId: id}),
+            });
+            
+            if (res.ok) {
+                router.push(`/productions`);
+            } else {
+                console.log("Deletion failed:", res.details);
+            }
+
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+
     const emailNonResponders = async() => {
         try {  
             const emailList = absentStudents.map(user => user.email);
@@ -137,7 +160,12 @@ export default function ProductionPage() {
                 <h1>{production.name}</h1>
                 <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
                 <p>Number of Students: {production.studentCount}</p>
-                {role === 0 && (<Link href={`/productions/${id}/edit`}>Edit Production</Link>)}
+                {role === 0 && (
+                    <>
+                        <Link href={`/productions/${id}/edit`}>Edit Production</Link>
+                        <button onClick={() => deleteProduction()}>Delete Production</button>
+                    </>
+                )}
                 <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>
             </div>
             {role===0 ? (

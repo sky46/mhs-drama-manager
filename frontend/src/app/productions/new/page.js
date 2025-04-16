@@ -43,11 +43,15 @@ export default function newProductionPage() {
             credentials: 'include',
             body: JSON.stringify({name: name, teachers: teachers, students: students}),
         });
+        const resData = await res.json();
+
         if (res.ok) {
-            const resData = await res.json();
             router.push(`/productions/${resData.productionId}`);
         } else {
-            console.error("Creation failed: ", res.statusText);
+            console.log("Creation failed: ", res.statusText);
+            if (resData.exists) {
+                alert("A production with this name already exists.");
+            }
         }
     }
     useEffect(() => {

@@ -95,6 +95,17 @@ router.post('/productions/new', async (req, res) => {
     try {
         await client.query('BEGIN');
         const {name, teachers, students} = req.body;
+
+        // check first to make sure no production already named this
+        const existingProduction = await client.query(
+            'SELECT id FROM productions WHERE name = $1',
+            [name]
+        );
+        if (existingProduction.rows.length > 0) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: "A production with this name already exists.", exists: true });
+        }
+
         const createQueryResult = await client.query(
             'INSERT INTO productions (name) VALUES ($1) RETURNING id',
             [name],
@@ -118,6 +129,61 @@ router.post('/productions/new', async (req, res) => {
         await client.query('ROLLBACK');
         console.error('Database error:', error);
         res.status(500).json({error: 'Internal server error', details: error.message,})
+    } finally {
+        client.release();
+    }
+});
+
+router.post('/productions/delete', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    // check if user is teacher
+    const role = await getUserRole(userId);
+    if (role !== 0) {
+        return res.status(403).json({ error: "Missing permissions "});
+    }
+
+    const productionId = req.body.productionId;
+    if (!productionId) {
+        return res.status(400).json({ error: "Missing productionId in request body" });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // check if part of production
+        const accessResult = await client.query(
+            `SELECT productions.id
+             FROM productions
+             INNER JOIN productions_users ON productions.id = productions_users.production_id
+             WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
+            [productionId, userId]
+        );
+        if (accessResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(401).json({ error: 'User is not a part of production' });
+        }
+
+        // deleting this deletes other places because of fk
+        await client.query(
+            'DELETE FROM productions_users WHERE production_id = $1',
+            [productionId]
+        );
+
+        await client.query(
+            'DELETE FROM productions WHERE id = $1',
+            [productionId]
+        );
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: "Production deleted successfully", productionId: productionId });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Database error:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
     } finally {
         client.release();
     }
