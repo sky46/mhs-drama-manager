@@ -9,6 +9,8 @@
     border-radius: 5px;
     display: inline-block;
     margin: 5px;
+    justify-items: center;
+    padding: 1em;
 }
 
 .card:hover {
