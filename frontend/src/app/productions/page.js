@@ -1,5 +1,6 @@
 "use client"; 
 import { useState, useEffect } from "react";
+import Link from 'next/link';
 
 import styles from '../styles/productions.module.css';
 import Production from "../components/production";
@@ -24,19 +25,6 @@ export default function Productions() {
         }
         checkLoginStatus();
 
-        async function checkRole() {
-            try {
-                const response = await fetch("http://localhost:3001/users/role", {
-                    credentials: "include",
-                })
-                const data = await response.json();
-                setRole(data.role);
-            } catch (error) {
-                console.error("Error geting role:", error);
-            }
-        }
-        checkRole();
-
         const fetchProductions = async () => {
             try {
                 const res = await fetch('http://localhost:3001/productions', {
@@ -53,7 +41,7 @@ export default function Productions() {
         
                 const data = await res.json();
                 setProductions(data.productions);
-                console.log(data.productions);
+                setRole(data.role);
             } catch (error) {
                 console.log(error.message);
             }
@@ -65,10 +53,10 @@ export default function Productions() {
 
     return (
         <div>
-            <div>{role}</div>
             {isLoggedIn ? (
                 <div>
-                    <div>You are logged in</div>
+                    <div>You are logged in as a {role === 0 ? 'teacher' : 'student'}.</div>
+                    {role === 0 && (<Link href='/productions/new'>New Production</Link>) }
                     <div>
                         {productions.length === 0 ? (
                             <p>No productions found for this user.</p>
