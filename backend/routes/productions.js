@@ -108,7 +108,7 @@ router.post('/productions/new', async (req, res) => {
         for (const user of teachers.concat(students)) {
             await client.query(
                 'INSERT INTO productions_users (production_id, user_id) VALUES ($1, $2)',
-                [7, user.value],
+                [productionId, user.value],
             );
         }
         await client.query('COMMIT');
