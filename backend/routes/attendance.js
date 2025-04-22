@@ -49,7 +49,7 @@ router.post('/productions/:productionId/markselfattended', async (req, res) => {
 router.post('/productions/:productionId/markstudentsattended', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
-    const attendanceDate = new Date().toLocaleDateString('en-CA'); // yyyy-mm-dd
+    const todayLocal = localDateFormat.format(new Date());
     const {students,} = req.body;
 
     if (!userId) {
@@ -66,7 +66,7 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
         for (const student of students) {
             await client.query(
                 'INSERT INTO attendance (user_id, production_id, attendance_date) VALUES ($1, $2, $3)',
-                [student.value, productionId, attendanceDate]
+                [student.value, productionId, todayLocal]
             );
         }
         await client.query('COMMIT');
@@ -82,7 +82,7 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
         FROM users
         INNER JOIN attendance ON users.id = attendance.user_id
         WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
-        [productionId, attendanceDate]
+        [productionId, todayLocal]
     );
     const absentStudentsResult = await pool.query(
         `SELECT id, name
@@ -94,7 +94,7 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
                 FROM attendance
                 WHERE production_id = $1 AND attendance_date = $2)
             AND role = 1`,
-        [productionId, attendanceDate]
+        [productionId, todayLocal]
     );
     attendance = {present: presentStudentsResult.rows, absent: absentStudentsResult.rows};
     return res.status(200).json({message: 'Attendance marked successfully', newAttendance: attendance});
@@ -145,10 +145,8 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             curStudentDates = {};
             row.attendance_dates.forEach((date) => {
                 if (date) {
-                    const localDate = new Date(date);
-                    localDate.setDate(localDate.getDate() + 1);
-                    const shiftedLocalDate = localDate.toLocaleDateString('en-CA');
-                    curStudentDates[shiftedLocalDate] = true;
+                    const localDate = localDateFormat.format(date);
+                    curStudentDates[localDate] = true;
                 }
             });
             curStudent.attendedDates = curStudentDates;
@@ -204,6 +202,7 @@ router.post("/productions/:productionId/attendance/reminder", async (req, res) =
     if (role == 1) {
         return res.json({message: "No access"});
     }
+    const todayLocal = localDateFormat.format(new Date());
     try {
         const absentStudentsResult = await pool.query(
             `SELECT productions_users.user_id FROM productions_users
@@ -211,11 +210,11 @@ router.post("/productions/:productionId/attendance/reminder", async (req, res) =
             LEFT JOIN attendance
                 ON productions_users.user_id = attendance.user_id 
                 AND productions_users.production_id = attendance.production_id 
-                AND attendance.attendance_date = CURRENT_DATE
-            WHERE productions_users.production_id = $1 
+                AND attendance.attendance_date = $1
+            WHERE productions_users.production_id = $2 
             AND users.role = 1
             AND attendance.user_id IS NULL`,
-            [productionId]
+            [todayLocal, productionId]
         );
 
         if (!absentStudentsResult || absentStudentsResult.rows.length === 0) {
