@@ -13,7 +13,7 @@ export default function Qrcode({ link }) {
                     text={link} // Change to backend api call later
                     options={{
                         margin: 2,
-                        width: 200,
+                        width: 300,
                         color: {
                         dark: '#000000',
                         light: '#ffffff',

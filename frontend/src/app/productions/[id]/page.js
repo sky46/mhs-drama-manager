@@ -10,13 +10,6 @@ import Qrcode from '../../components/qrcode'
 
 import { useRouter } from 'next/navigation'
 
-// based off page id, link qrcode to localhost:3000/productions/id/qrcode which will show check in button
-// change to if not signed in, route to sign in and then back to this
-
-// also if scan qr code and not yet in, give option to join?
-
-// route away after email? also it is in spam rn
-
 export default function ProductionPage() {
     const router = useRouter()
     
@@ -37,6 +30,17 @@ export default function ProductionPage() {
         setDomLoaded();
         fetchProduction();
     }, [id]);
+
+    const printQR = async () => {
+        // code to print specific part of webpage -> https://stackoverflow.com/questions/12997123/print-specific-part-of-webpage
+        var prtContent = document.getElementById("qr");
+        var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+        WinPrint.document.write(prtContent.innerHTML);
+        WinPrint.document.close();
+        WinPrint.focus();
+        WinPrint.print();
+        WinPrint.close();
+    }
 
     const deleteProduction = async () => {
         try {
@@ -168,7 +172,14 @@ export default function ProductionPage() {
                         <button onClick={() => deleteProduction()}>Delete Production</button>
                     </div>
                 )}
-                {role===0 && <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>}
+                {role===0 && 
+                <div>
+                    <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
+                    <button onClick={() => printQR()}>
+                        Print Qr code
+                    </button>
+                </div>
+                }
             </div>
             {role===0 ? (
                 // Teacher view
