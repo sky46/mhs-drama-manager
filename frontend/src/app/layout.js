@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from 'next/link';
 import Logout from './components/logout';
 import styles from './styles/layout.module.css'
+import './globals.css';
 
 
 function RootLayout({ children }) {

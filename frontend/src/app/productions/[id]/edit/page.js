@@ -69,8 +69,8 @@ export default function EditProductionPage() {
         <div>
             <h1>Edit production</h1>
             {domLoaded && (
-                <form onSubmit={saveProduction}>
-                    <label htmlFor="name">Production name</label>
+                <form onSubmit={saveProduction} className="flex flex-col">
+                    <label htmlFor="name" className="font-bold">Production name</label>
                     <input type="text" id="name" value={name} onChange={(val) => setName(val.target.value)} />
                     <label htmlFor="teachers">Teachers</label>
                     <Select
