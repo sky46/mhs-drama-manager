@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
 import styles from '../styles/signup.module.css';
 
-function Signup() {
+function Signup({}) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -34,7 +34,8 @@ function Signup() {
     useEffect(() => {
         console.log("Router instance:", router);
         if (router && successfulRegistration) {
-            router.push("/profile");
+            router.refresh();
+            router.push("/productions");
         }
     }, [router, successfulRegistration]);
 

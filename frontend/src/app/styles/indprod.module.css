@@ -1,0 +1,20 @@
+.individualproduction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5em;
+}
+
+.today {
+    display: flex;
+}
+
+.teacher {
+    display: flex;
+    flex-flow: column;
+}
+
+.editdelete {
+    display: flex;
+    flex-flow: column;
+}

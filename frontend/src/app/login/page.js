@@ -3,10 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" 
 import styles from '../styles/login.module.css';
 
-// ADD ERROR FOR IF LOGIN FAILS
-
-function Login() {
-    const [nameOrEmail, setNameOrEmail] = useState("");
+function Login({}) {
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [successfulLogin, setSuccessfulLogin] = useState(false);
@@ -16,7 +14,8 @@ function Login() {
     useEffect(() => {
         console.log("Router instance:", router);
         if (router && successfulLogin) {
-            router.push("/profile");
+            router.push("/productions");
+
         }
     }, [router, successfulLogin]);
 
@@ -27,7 +26,7 @@ function Login() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nameOrEmail, password }),
+            body: JSON.stringify({ email, password }),
             credentials: 'include'
         });
         if (loginCheckResponse.ok) {
@@ -35,12 +34,12 @@ function Login() {
             setDisplayError(false);
             const loginCheckData = await loginCheckResponse.json();
             console.log(loginCheckData);
-        } else if (response.status === 403) {
+        } else if (loginCheckResponse.status === 403) {
             setDisplayError(true);
             alert("Incorrect name/email or password.")
         } else {
             setDisplayError(true);
-            console.error("Login failed: ", response.statusText);
+            console.error("Login failed: ", loginCheckResponse.statusText);
         }
     };
 
@@ -53,13 +52,13 @@ function Login() {
             <h1>Login!</h1>
             <form onSubmit={loginUser}>
                 <div className={styles.inputGroup}>
-                    <label className="label">Name or Email</label>
+                    <label className="label">Email</label>
                     <input
                         className={`${styles.input} ${displayError ? styles.invalid : ''}`} 
-                        id="nameOrEmail"
-                        value={nameOrEmail}
+                        id="email"
+                        value={email}
                         type="text"
-                        onChange={(e) => setNameOrEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 <div className={styles.inputGroup}>
