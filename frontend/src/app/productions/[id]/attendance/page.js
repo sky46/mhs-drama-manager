@@ -4,6 +4,7 @@ import styles from '../../../styles/attendance.module.css'
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; 
 
+
 function ProdAttendancePage() {
     const {id} = useParams();
 
@@ -18,12 +19,12 @@ function ProdAttendancePage() {
     }, [startDate]);
 
     const getDates = (baseDate) => {
+        // dates[] stores Date objects
         var generatedDates = [];
         var currentDate = new Date(baseDate);
-        currentDate.setUTCHours(0, 0, 0, 0);
         for (var i = 0; i < 7; i++) {
-            generatedDates.push(currentDate.toISOString().split('T')[0]);
-            currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+            generatedDates.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
         }
         setDates(generatedDates);
     }
@@ -62,13 +63,13 @@ function ProdAttendancePage() {
 
     const nextWeek = () => {
         const newStartDate = new Date(startDate);
-        newStartDate.setUTCDate(startDate.getUTCDate()+7);
+        newStartDate.setDate(startDate.getDate()+7);
         setStartDate(newStartDate);
     };
 
     const lastWeek = () => {
         const newStartDate = new Date(startDate);
-        newStartDate.setUTCDate(startDate.getUTCDate()-7);
+        newStartDate.setDate(startDate.getDate()-7);
         setStartDate(newStartDate);
     };
 
@@ -83,7 +84,7 @@ function ProdAttendancePage() {
                             <td className={styles.td}></td>
                             {dates.map(date => (
                                 <th key={date} scope="col" className={styles.th}>
-                                    {new Date(date).toLocaleDateString('en-CA', {weekday: 'short', month: 'short', day: 'numeric'})}
+                                    {date.toLocaleDateString('en-CA', {weekday: 'short', month: 'short', day: 'numeric'})}
                                 </th>
                             ))}
                         </tr>
@@ -95,7 +96,7 @@ function ProdAttendancePage() {
                                 {dates.map(date => (
                                     <td key={date} className={styles.td}>
                                         {
-                                        user.attendedDates[date] === true ? (<span>Present</span>) : (<span>-</span>)}
+                                        user.attendedDates[date.toLocaleDateString('en-CA')] === true ? (<span>Present</span>) : (<span>-</span>)}
                                     </td>
                                 ))}
                             </tr>
