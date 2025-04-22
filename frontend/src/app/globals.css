@@ -17,3 +17,10 @@ body {
   color: var(--text);
   line-height: 1.6;
 }
+
+button {
+  border: 1px solid black;
+  border-radius: 0.3rem;
+  padding: 0.35rem 0.5rem;
+  background-color: var(--secondary);
+}

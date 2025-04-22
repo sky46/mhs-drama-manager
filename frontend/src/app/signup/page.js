@@ -123,7 +123,7 @@ function Signup({}) {
                 <div className={styles.inputGroup}>
                     <label className="label">Name</label>
                     <input
-                        className={`${styles.input} ${invalidFields.name ? styles.invalid : ''}`} // Styles = input + either name or invalid
+                        className={`${styles.input} ${invalidFields.name ? styles.invalid : ''} border rounded-md`} // Styles = input + either name or invalid
                         id="name"
                         value={name}
                         type="text"
@@ -136,7 +136,7 @@ function Signup({}) {
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, name: false}))}
                     >
                         <span className={styles.tooltipIcon}>?</span>
-                        <div className={`${styles.tooltipText} ${showTooltip.name ? styles.visible : ''}`}>
+                        <div className={`${styles.tooltipText} ${showTooltip.name ? styles.visible : ''} border rounded-md`}>
                             <ul className={styles.bulletList}>
                                 <li className={styles.bulletPoint}>Enter your full name</li>
                             </ul>
@@ -147,7 +147,7 @@ function Signup({}) {
                 <div className={styles.inputGroup}>
                     <label className="label">Email</label>
                     <input
-                        className={`${styles.input} ${invalidFields.email ? styles.invalid : ''}`}
+                        className={`${styles.input} ${invalidFields.email ? styles.invalid : ''} border rounded-md`}
                         id="email"
                         value={email}
                         type="text"
@@ -171,7 +171,7 @@ function Signup({}) {
                 <div className={styles.inputGroup}>
                     <label className="label">Password</label>
                     <input
-                        className={`${styles.input} ${invalidFields.password ? styles.invalid : ''}`}
+                        className={`${styles.input} ${invalidFields.password ? styles.invalid : ''} border rounded-md`}
                         id="password"
                         value={password}
                         type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
@@ -197,7 +197,7 @@ function Signup({}) {
                 <div className={styles.inputGroup}>
                     <label className="label">Re-enter Password</label>
                     <input
-                        className={`${styles.input} ${invalidFields.passwordCheck ? styles.invalid : ''}`}
+                        className={`${styles.input} ${invalidFields.passwordCheck ? styles.invalid : ''} border rounded-md`}
                         id="passwordcheck"
                         value={passwordCheck}
                         type={showPassword ? "text" : "password"}
@@ -216,7 +216,7 @@ function Signup({}) {
                     type="button"
                     onClick={() => setRole('teacher')}
                     style={{
-                        backgroundColor: role === 'teacher' ? 'lightblue' : '',
+                        backgroundColor: role === 'teacher' ? 'var(--primary)' : '',
                     }}
                     >
                     Teacher
@@ -225,7 +225,7 @@ function Signup({}) {
                     type="button"
                     onClick={() => setRole('student')}
                     style={{
-                        backgroundColor: role === 'student' ? 'lightblue' : '',
+                        backgroundColor: role === 'student' ? 'var(--primary)' : '',
                     }}
                     >
                     Student

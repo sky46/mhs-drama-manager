@@ -54,7 +54,7 @@ function Login({}) {
                 <div className={styles.inputGroup}>
                     <label className="label">Email</label>
                     <input
-                        className={`${styles.input} ${displayError ? styles.invalid : ''}`} 
+                        className={`${styles.input} ${displayError ? styles.invalid : ''} border rounded-md`} 
                         id="email"
                         value={email}
                         type="text"
@@ -64,7 +64,7 @@ function Login({}) {
                 <div className={styles.inputGroup}>
                     <label className="label">Password</label>
                     <input
-                        className={`${styles.input} ${displayError ? styles.invalid : ''}`}
+                        className={`${styles.input} ${displayError ? styles.invalid : ''} border rounded-md`}
                         id="password"
                         value={password}
                         type={showPassword ? "text" : "password"} 
