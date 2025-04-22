@@ -70,9 +70,26 @@ export default function EditProductionPage() {
             <h1>Edit production</h1>
             {domLoaded && (
                 <form onSubmit={saveProduction}>
-                    <input type="text" value={name} onChange={(val) => setName(val.target.value)} />
-                    <Select isMulti options={teachersOptions} value={teachers} onChange={(val) => setTeachers(val)} />
-                    <Select isMulti options={studentsOptions} value={students} onChange={(val) => setStudents(val)} />
+                    <label htmlFor="name">Production name</label>
+                    <input type="text" id="name" value={name} onChange={(val) => setName(val.target.value)} />
+                    <label htmlFor="teachers">Teachers</label>
+                    <Select
+                        isMulti
+                        options={teachersOptions}
+                        id="teachers"
+                        value={teachers}
+                        onChange={(val) => setTeachers(val)}
+                        placeholder="Start typing to search..."
+                    />
+                    <label htmlFor="students">Students</label>
+                    <Select
+                        isMulti
+                        options={studentsOptions}
+                        id="students"
+                        value={students}
+                        onChange={(val) => setStudents(val)}
+                        placeholder="Start typing to search..."
+                    />
                     <button type="submit">Save</button>
                 </form>
             )}
