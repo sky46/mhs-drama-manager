@@ -1,5 +1,7 @@
 import { API_URL } from "/constants.js";
 
+// delete this page?
+
 export default async function Home() {
   //var response = await fetch(API_URL)
   //var response = await fetch("http://host.docker.internal:3001/");

@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
 
+import clsx from "clsx";
+
 function Signup({}) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -117,9 +119,9 @@ function Signup({}) {
     
     return (
         <div className="form">
-            <h1>Sign Up!</h1>
-            <form onSubmit={registerUser}>
-                <div>
+            <h1 className="font-bold">Sign Up!</h1>
+            <form onSubmit={registerUser} className="flex flex-col">
+                <div className="inline-block my-1">
                     <label className="label">Name</label>
                     <input // Styles = input + either name or invalid
                         id="name"
@@ -127,21 +129,23 @@ function Signup({}) {
                         type="text"
                         onChange={(e) => setName(e.target.value)}
                         placeholder="i.e. Joe Bob"
+                        className={clsx("mx-1.5", invalidFields.name ? "border border-red-500" : "border border-gray-300")}
                     />
                     <div 
+                        className="relative inline-block"
                         onMouseEnter={() => setShowTooltip(prev => ({...prev, name: true}))} // spread rest of data (keep same)
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, name: false}))}
                     >
-                        <span>?</span>
-                        <div>
+                        <span className="bg-gray-300 py-1 px-1.5 border">?</span>
+                        <div className={clsx("absolute left-full top-0 ml-2 z-10 bg-white border p-2 shadow-md rounded w-48", showTooltip.name ? "block" : "hidden")}>
                             <ul>
                                 <li>Enter your full name</li>
                             </ul>
                         </div>
                     </div>
-                    {errorMessages.name && <div>{errorMessages.name}</div>}
+                    {errorMessages.name && <div className="text-red-500">{errorMessages.name}</div>}
                 </div>
-                <div>
+                <div className="inline-block my-1">
                     <label className="label">Email</label>
                     <input
                         id="email"
@@ -149,34 +153,38 @@ function Signup({}) {
                         type="text"
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="i.e. joebob@gmail.com"
+                        className={clsx("mx-1.5", invalidFields.email ? "border border-red-500" : "border border-gray-300")}
                     />
                     <div 
+                        className="relative inline-block"
                         onMouseEnter={() => setShowTooltip(prev => ({...prev, email: true}))}
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, email: false}))}
                     >
-                        <span>?</span>
-                        <div>
+                        <span className="bg-gray-300 py-1 px-1.5 border">?</span>
+                        <div className={clsx("absolute left-full top-0 ml-2 z-10 bg-white border p-2 shadow-md rounded w-48", showTooltip.email ? "block" : "hidden")}>
                             <ul>
                                 <li>Enter any email with a valid address</li>
                             </ul>
                         </div>
                     </div>
-                    {errorMessages.email && <div>{errorMessages.email}</div>}
+                    {errorMessages.email && <div className="text-red-500">{errorMessages.email}</div>}
                 </div>
-                <div>
+                <div className="inline-block my-1">
                     <label className="label">Password</label>
                     <input
                         id="password"
                         value={password}
                         type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
                         onChange={(e) => setPassword(e.target.value)}
+                        className={clsx("mx-1.5", invalidFields.password ? "border border-red-500" : "border border-gray-300")}
                     />
                     <div 
+                        className="relative inline-block"
                         onMouseEnter={() => setShowTooltip(prev => ({...prev, password: true}))}
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, password: false}))}
                     >
-                        <span>?</span>
-                        <div>
+                        <span className="bg-gray-300 py-1 px-1.5 border">?</span>
+                        <div className={clsx("absolute left-full top-0 ml-2 z-10 bg-white border p-2 shadow-md rounded w-48", showTooltip.password ? "block" : "hidden")}>
                             <ul>
                                 <li>Must include a lowercase character</li>
                                 <li>Must include an uppercase character</li>
@@ -185,17 +193,18 @@ function Signup({}) {
                             </ul>
                         </div>
                     </div>
-                    {errorMessages.password && <div>{errorMessages.password}</div>}
+                    {errorMessages.password && <div className="text-red-500">{errorMessages.password}</div>}
                 </div>
-                <div>
+                <div className="flex">
                     <label className="label">Re-enter Password</label>
                     <input
                         id="passwordcheck"
                         value={passwordCheck}
                         type={showPassword ? "text" : "password"}
                         onChange={(e) => setPasswordCheck(e.target.value)}
+                        className={clsx("mx-1.5", invalidFields.password ? "border border-red-500" : "border border-gray-300")}
                     />
-                    {errorMessages.passwordCheck && <div>{errorMessages.passwordCheck}</div>}
+                    {errorMessages.passwordCheck && <div className="text-red-500">{errorMessages.passwordCheck}</div>}
                 </div>
 
                 <div>
@@ -206,19 +215,15 @@ function Signup({}) {
                 <div>
                     <button
                     type="button"
-                    onClick={() => setRole('teacher')}
-                    style={{
-                        backgroundColor: role === 'teacher' ? 'var(--primary)' : '',
-                    }}
+                    onClick={() => setRole("teacher")}
+                    className={clsx(role === "teacher" ? "bg-emerald-200" : "bg-purple-200")}
                     >
                     Teacher
                     </button>
                     <button
                     type="button"
-                    onClick={() => setRole('student')}
-                    style={{
-                        backgroundColor: role === 'student' ? 'var(--primary)' : '',
-                    }}
+                    onClick={() => setRole("student")}
+                    className={clsx(role === "student" ? "bg-emerald-200" : "bg-purple-200")}
                     >
                     Student
                     </button>

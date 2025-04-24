@@ -29,19 +29,19 @@ function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body>
+      <body className="mx-4">
         <header>
           <nav>
-            <ul>
-              <li><Link href="/productions">Productions</Link></li>
-                {isLoggedIn ? (
-                  <li><Logout onLogout={checkLoginStatus} /></li>
-                ) : (
-                  <div>
-                    <li><Link href="/login">Login</Link></li>
-                    <li><Link href="/signup">Sign Up</Link></li>
-                  </div>
-                )}
+            <ul className="flex justify-between mt-4">
+              <li><Link href="/productions" className="font-bold text-2xl">Productions</Link></li>
+              {isLoggedIn ? (
+                <li><Logout onLogout={checkLoginStatus} /></li>
+              ) : (
+                <div className="flex gap-2">
+                  <li><Link href="/login" className="font-bold text-2xl">Login</Link></li>
+                  <li><Link href="/signup" className="font-bold text-2xl">Sign Up</Link></li>
+                </div>
+              )}
             </ul>
           </nav>
         </header>
