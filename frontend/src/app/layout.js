@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from 'next/link';
 import Logout from './components/logout';
-import styles from './styles/layout.module.css'
-import './globals.css';
 
+import './globals.css';
 
 function RootLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,14 +32,14 @@ function RootLayout({ children }) {
       <body>
         <header>
           <nav>
-            <ul className={styles.list}>
-              <li className={styles.listitem}><Link href="/productions" className={styles.navitem}>Productions</Link></li>
+            <ul>
+              <li><Link href="/productions">Productions</Link></li>
                 {isLoggedIn ? (
-                  <li className={styles.listitem}><Logout onLogout={checkLoginStatus} /></li>
+                  <li><Logout onLogout={checkLoginStatus} /></li>
                 ) : (
                   <div>
-                    <li className={styles.listitem}><Link href="/login" className={styles.navitem}>Login</Link></li>
-                    <li className={styles.listitem}><Link href="/signup" className={styles.navitem}>Sign Up</Link></li>
+                    <li><Link href="/login">Login</Link></li>
+                    <li><Link href="/signup">Sign Up</Link></li>
                   </div>
                 )}
             </ul>

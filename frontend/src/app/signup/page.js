@@ -1,7 +1,6 @@
 "use client"; // Need this to be able to use "useState"
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
-import styles from '../styles/signup.module.css';
 
 function Signup({}) {
     const [name, setName] = useState("");
@@ -120,10 +119,9 @@ function Signup({}) {
         <div className="form">
             <h1>Sign Up!</h1>
             <form onSubmit={registerUser}>
-                <div className={styles.inputGroup}>
+                <div>
                     <label className="label">Name</label>
-                    <input
-                        className={`${styles.input} ${invalidFields.name ? styles.invalid : ''} border rounded-md`} // Styles = input + either name or invalid
+                    <input // Styles = input + either name or invalid
                         id="name"
                         value={name}
                         type="text"
@@ -131,23 +129,21 @@ function Signup({}) {
                         placeholder="i.e. Joe Bob"
                     />
                     <div 
-                        className={styles.tooltipContainer}
                         onMouseEnter={() => setShowTooltip(prev => ({...prev, name: true}))} // spread rest of data (keep same)
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, name: false}))}
                     >
-                        <span className={styles.tooltipIcon}>?</span>
-                        <div className={`${styles.tooltipText} ${showTooltip.name ? styles.visible : ''} border rounded-md`}>
-                            <ul className={styles.bulletList}>
-                                <li className={styles.bulletPoint}>Enter your full name</li>
+                        <span>?</span>
+                        <div>
+                            <ul>
+                                <li>Enter your full name</li>
                             </ul>
                         </div>
                     </div>
-                    {errorMessages.name && <div className={styles.errorMessage}>{errorMessages.name}</div>}
+                    {errorMessages.name && <div>{errorMessages.name}</div>}
                 </div>
-                <div className={styles.inputGroup}>
+                <div>
                     <label className="label">Email</label>
                     <input
-                        className={`${styles.input} ${invalidFields.email ? styles.invalid : ''} border rounded-md`}
                         id="email"
                         value={email}
                         type="text"
@@ -155,63 +151,59 @@ function Signup({}) {
                         placeholder="i.e. joebob@gmail.com"
                     />
                     <div 
-                        className={styles.tooltipContainer}
                         onMouseEnter={() => setShowTooltip(prev => ({...prev, email: true}))}
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, email: false}))}
                     >
-                        <span className={styles.tooltipIcon}>?</span>
-                        <div className={`${styles.tooltipText} ${showTooltip.email ? styles.visible : ''}`}>
-                            <ul className={styles.bulletList}>
-                                <li className={styles.bulletPoint}>Enter any email with a valid address</li>
+                        <span>?</span>
+                        <div>
+                            <ul>
+                                <li>Enter any email with a valid address</li>
                             </ul>
                         </div>
                     </div>
-                    {errorMessages.email && <div className={styles.errorMessage}>{errorMessages.email}</div>}
+                    {errorMessages.email && <div>{errorMessages.email}</div>}
                 </div>
-                <div className={styles.inputGroup}>
+                <div>
                     <label className="label">Password</label>
                     <input
-                        className={`${styles.input} ${invalidFields.password ? styles.invalid : ''} border rounded-md`}
                         id="password"
                         value={password}
                         type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <div 
-                        className={styles.tooltipContainer}
                         onMouseEnter={() => setShowTooltip(prev => ({...prev, password: true}))}
                         onMouseLeave={() => setShowTooltip(prev => ({...prev, password: false}))}
                     >
-                        <span className={styles.tooltipIcon}>?</span>
-                        <div className={`${styles.tooltipText} ${showTooltip.password ? styles.visible : ''}`}>
-                            <ul className={styles.bulletList}>
-                                <li className={styles.bulletPoint}>Must include a lowercase character</li>
-                                <li className={styles.bulletPoint}>Must include an uppercase character</li>
-                                <li className={styles.bulletPoint}>Must include a special character</li>
-                                <li className={styles.bulletPoint}>Must include a number</li>
+                        <span>?</span>
+                        <div>
+                            <ul>
+                                <li>Must include a lowercase character</li>
+                                <li>Must include an uppercase character</li>
+                                <li>Must include a special character</li>
+                                <li>Must include a number</li>
                             </ul>
                         </div>
                     </div>
-                    {errorMessages.password && <div className={styles.errorMessage}>{errorMessages.password}</div>}
+                    {errorMessages.password && <div>{errorMessages.password}</div>}
                 </div>
-                <div className={styles.inputGroup}>
+                <div>
                     <label className="label">Re-enter Password</label>
                     <input
-                        className={`${styles.input} ${invalidFields.passwordCheck ? styles.invalid : ''} border rounded-md`}
                         id="passwordcheck"
                         value={passwordCheck}
                         type={showPassword ? "text" : "password"}
                         onChange={(e) => setPasswordCheck(e.target.value)}
                     />
-                    {errorMessages.passwordCheck && <div className={styles.errorMessage}>{errorMessages.passwordCheck}</div>}
+                    {errorMessages.passwordCheck && <div>{errorMessages.passwordCheck}</div>}
                 </div>
 
-                <div className={styles.inputGroup}>
+                <div>
                     <input type="checkbox" onClick={togglePasswordVisibility} />
                     <label className="label">Show Password</label>
                 </div>
 
-                <div className={styles.inputGroup}>
+                <div>
                     <button
                     type="button"
                     onClick={() => setRole('teacher')}

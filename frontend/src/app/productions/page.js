@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Link from 'next/link';
 
-import styles from '../styles/productions.module.css';
 import Production from "../components/production";
 
 export default function Productions() {
@@ -57,7 +56,7 @@ export default function Productions() {
                 <div>
                     <div>You are logged in as a {role === 0 ? 'teacher' : 'student'}.</div>
                     {role === 0 && (<Link href='/productions/new'>New Production</Link>) }
-                    <div className={styles.productions}>
+                    <div>
                         {productions.length === 0 ? (
                             <p>No productions found for this user.</p>
                         ) : (

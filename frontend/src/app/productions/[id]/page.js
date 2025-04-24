@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Select from 'react-select';
 import Link from 'next/link';
 
-import styles from "@/app/styles/indprod.module.css"
 
 import Qrcode from '../../components/qrcode'
 
@@ -161,13 +160,13 @@ export default function ProductionPage() {
     }
 
     return (
-        <div key={selfMarkedPresent} className={styles.individualproduction}>
+        <div key={selfMarkedPresent}>
             <div>
                 <h1>{production.name}</h1>
                 <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
                 <p>Number of Students: {production.studentCount}</p>
                 {role === 0 && (
-                    <div className={styles.editdelete}>
+                    <div>
                         <Link href={`/productions/${id}/edit`}>Edit Production</Link>
                         <button onClick={() => deleteProduction()}>Delete Production</button>
                     </div>
@@ -183,8 +182,8 @@ export default function ProductionPage() {
             </div>
             {role===0 ? (
                 // Teacher view
-                <div className={styles.teacher}>
-                    <div className={styles.today}>
+                <div>
+                    <div>
                         <div>
                             <h2>Present</h2>
                             {presentStudents.length > 0 ? (

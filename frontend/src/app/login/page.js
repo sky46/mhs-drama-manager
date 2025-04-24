@@ -1,7 +1,6 @@
 "use client"; // Need this to be able to use "useState"
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" 
-import styles from '../styles/login.module.css';
 
 function Login({}) {
     const [email, setEmail] = useState("");
@@ -51,20 +50,18 @@ function Login({}) {
         <div className="form">
             <h1>Login!</h1>
             <form onSubmit={loginUser}>
-                <div className={styles.inputGroup}>
+                <div>
                     <label className="label">Email</label>
-                    <input
-                        className={`${styles.input} ${displayError ? styles.invalid : ''} border rounded-md`} 
+                    <input 
                         id="email"
                         value={email}
                         type="text"
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
-                <div className={styles.inputGroup}>
+                <div>
                     <label className="label">Password</label>
                     <input
-                        className={`${styles.input} ${displayError ? styles.invalid : ''} border rounded-md`}
                         id="password"
                         value={password}
                         type={showPassword ? "text" : "password"} 
@@ -72,7 +69,7 @@ function Login({}) {
                     />
                 </div>
 
-                <div className={styles.inputGroup}>
+                <div>
                     <input type="checkbox" onClick={togglePasswordVisibility} />
                     <label className="label">Show Password</label>
                 </div>

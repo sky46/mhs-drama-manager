@@ -1,6 +1,5 @@
 'use client';
 
-import styles from '../../../styles/attendance.module.css'
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; 
 
@@ -76,14 +75,14 @@ function ProdAttendancePage() {
     return (
         <div>
             <h1>Attendance</h1>
-            <div className={styles.flex}>
+            <div>
                 <button onClick={lastWeek}>Previous Week</button>
-                <table className={styles.table}>
+                <table>
                     <thead>
                         <tr>
-                            <td className={styles.td}></td>
+                            <td></td>
                             {dates.map(date => (
-                                <th key={date} scope="col" className={styles.th}>
+                                <th key={date} scope="col">
                                     {date.toLocaleDateString('en-CA', {weekday: 'short', month: 'short', day: 'numeric'})}
                                 </th>
                             ))}
@@ -92,9 +91,9 @@ function ProdAttendancePage() {
                     <tbody>
                         {attendance.map(user => (
                             <tr key={user.user_id}>
-                                <th scope="row" className={styles.th}>{user.name}</th>
+                                <th scope="row">{user.name}</th>
                                 {dates.map(date => (
-                                    <td key={date} className={styles.td}>
+                                    <td key={date}>
                                         {
                                         user.attendedDates[date.toLocaleDateString('en-CA')] === true ? (<span>Present</span>) : (<span>-</span>)}
                                     </td>
