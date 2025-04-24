@@ -214,7 +214,13 @@ export default function ProductionPage() {
                     
                     <form onSubmit={markStudentsAttendance}>
                         <h2>Mark attendance</h2>
-                        <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
+                        <Select
+                            isMulti
+                            options={absentStudents}
+                            value={markPresentStudents}
+                            onChange={(val) => setMarkPresentStudents(val)}
+                            placeholder="Start typing to search..."
+                        />
                         <button type="submit">Mark as present</button>
                     </form>
                     <h2>Send email</h2>
