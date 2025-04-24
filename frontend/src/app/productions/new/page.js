@@ -35,22 +35,26 @@ export default function newProductionPage() {
     }
     const createProduction = async (e) => {
         e.preventDefault();
-        const res = await fetch(`http://localhost:3001/productions/new`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({name: name, teachers: teachers, students: students}),
-        });
-        const resData = await res.json();
-
-        if (res.ok) {
-            router.push(`/productions/${resData.productionId}`);
+        if (name === "") {
+            alert("You need to add a name for the production")
         } else {
-            console.log("Creation failed: ", res.statusText);
-            if (resData.exists) {
-                alert("A production with this name already exists.");
+            const res = await fetch(`http://localhost:3001/productions/new`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({name: name, teachers: teachers, students: students}),
+            });
+            const resData = await res.json();
+    
+            if (res.ok) {
+                router.push(`/productions/${resData.productionId}`);
+            } else {
+                console.log("Creation failed: ", res.statusText);
+                if (resData.exists) {
+                    alert("A production with this name already exists.");
+                }
             }
         }
     }
