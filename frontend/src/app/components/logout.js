@@ -22,8 +22,6 @@ export default function Logout({ onLogout }) {
     };
 
     return (
-        <div>
-            <button onClick={logoutUser}>Log out</button>
-        </div>
+        <a onClick={logoutUser} className="text-md">Log out</a>
     );
 }
