@@ -160,11 +160,17 @@ router.post('/users/logout', async (req, res) => {
 });
 
 // Check if logged in
-router.get('/users/status', (req, res) => {
+router.get('/users/status', async (req, res) => {
     if (req.session && req.session.user) {
-        return res.json({ loggedIn: true, userId: req.session.user });
+        const userResult = await pool.query(
+            'SELECT name, email FROM users WHERE id = $1',
+            [req.session.user]
+        );
+        if (userResult.rows.length) {
+            return res.json({ loggedIn: true, user: userResult.rows[0] });
+        }
     }
-    res.json({ loggedIn: false });
+    return res.json({ loggedIn: false });
 });
 
 // Route to check if teacher vs student
