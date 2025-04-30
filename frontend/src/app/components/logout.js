@@ -22,6 +22,6 @@ export default function Logout({ onLogout }) {
     };
 
     return (
-        <a onClick={logoutUser} className="text-md">Log out</a>
+        <a onClick={logoutUser} className="text-md hover:cursor-pointer">Log out</a>
     );
 }

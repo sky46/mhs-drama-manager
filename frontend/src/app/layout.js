@@ -24,7 +24,9 @@ function RootLayout({ children }) {
         });
         const data = await response.json();
         setIsLoggedIn(data.loggedIn);
-        setUserName(data.user.name);
+        if (data.loggedIn === true) {
+          setUserName(data.user.name);
+        }
     } catch (error) {
         console.error("Error checking login status:", error);
     }
@@ -42,21 +44,23 @@ function RootLayout({ children }) {
       </head>
       <body>
         <header>
-          <nav className="backdrop-filter backdrop-blur bg-primary-900/85 text-white fixed top-0 left-0 right-0 flex py-3 px-5">
-            <ul className="flex gap-8 items-center">
-              <li><Link href="/" className="font-semibold text-lg">Dratt!</Link></li>
-              <li><Link href="/productions" className="text-md">Productions</Link></li>
+          <nav className="backdrop-filter backdrop-blur bg-primary-900/85 text-white fixed top-0 left-0 right-0 flex py-3 px-5 items-center">
+            <ul className="flex gap-5 sm:gap-8 items-center">
+              <li><Link href="/" className="font-semibold text-lg hover:text-accent-50 focus-visible:text-accent-50 active:text-accent-100">Dratt!</Link></li>
+              {isLoggedIn && (
+                <li><Link href="/productions" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Productions</Link></li>
+              )}
             </ul>
             <div className="ml-auto">
               {isLoggedIn ? (
-                <div className="flex gap-8 items-center">
+                <div className="flex gap-5 sm:gap-8 items-center">
                   <span className="text-primary-100">Logged in as <span className="text-accent-100">{userName}</span></span>
                   <Logout onLogout={checkLoginStatus} />
                 </div>
               ) : (
-                <div className="flex gap-8 items-center">
-                  <Link href="/login" className="text-md">Login</Link>
-                  <Link href="/signup" className="text-md">Sign Up</Link>
+                <div className="flex gap-5 sm:gap-8 items-center">
+                  <Link href="/login" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Log in</Link>
+                  <Link href="/signup" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Sign Up</Link>
                 </div>
               )}
             </div>
