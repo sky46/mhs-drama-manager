@@ -54,7 +54,7 @@ body {
   color: var(--text);
   line-height: 1.6;
 } */
-
+/* 
 button {
   border: 1px solid black;
   border-radius: 0.3rem;
@@ -62,7 +62,7 @@ button {
 } 
 
 input {
-  /* border: 1px solid black; */
+  border: 1px solid black;
   padding: 0.05rem 0.2rem;
   border-radius: 0.3rem;
-}
+} */

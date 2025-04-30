@@ -47,37 +47,43 @@ function Login({}) {
     };
 
     return (
-        <div className="form">
-            <h1>Login!</h1>
-            <form onSubmit={loginUser}>
-                <div>
-                    <label className="label">Email</label>
-                    <input 
-                        id="email"
-                        value={email}
-                        type="text"
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label className="label">Password</label>
-                    <input
-                        id="password"
-                        value={password}
-                        type={showPassword ? "text" : "password"} 
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+        <div className="flex justify-center">
+            <div className="bg-secondary-100 w-1/2 rounded-lg py-10 flex flex-col items-center">
+                <h1 className="text-3xl mb-5">Log in</h1>
+                <form onSubmit={loginUser} className="w-1/2 flex flex-col gap-3">
+                    <div>
+                        <label className="label block">Email</label>
+                        <input 
+                            id="email"
+                            value={email}
+                            type="text"
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full bg-white my-1 inline-block p-1.5 rounded-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="label block">Password</label>
+                        <input
+                            id="password"
+                            value={password}
+                            type={showPassword ? "text" : "password"} 
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full bg-white my-1 inline-block p-1.5 rounded-sm"
+                        />
+                    </div>
 
-                <div>
-                    <input type="checkbox" onClick={togglePasswordVisibility} />
-                    <label className="label">Show Password</label>
-                </div>
-                
-                <button className="btn" type="submit">
-                    Submit
-                </button>
-            </form>
+                    <div className="text-center">
+                        <input type="checkbox" onClick={togglePasswordVisibility} />
+                        <label className="label">Show Password</label>
+                    </div>
+                    
+                    <div className="text-center">
+                        <button type="submit">
+                            Log in
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
