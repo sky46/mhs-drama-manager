@@ -163,7 +163,7 @@ router.post('/users/logout', async (req, res) => {
 router.get('/users/status', async (req, res) => {
     if (req.session && req.session.user) {
         const userResult = await pool.query(
-            'SELECT name, email FROM users WHERE id = $1',
+            'SELECT name, email, role FROM users WHERE id = $1',
             [req.session.user]
         );
         if (userResult.rows.length) {
