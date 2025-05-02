@@ -60,7 +60,7 @@ function RootLayout({ children }) {
               ) : (
                 <div className="flex gap-5 sm:gap-8 items-center">
                   <Link href="/login" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Log in</Link>
-                  <Link href="/signup" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Sign Up</Link>
+                  <Link href="/signup" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Sign up</Link>
                 </div>
               )}
             </div>

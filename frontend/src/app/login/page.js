@@ -74,7 +74,7 @@ function Login({}) {
 
                     <div className="text-center">
                         <input type="checkbox" id="passwordVisibleCheckbox" onClick={togglePasswordVisibility} className="mx-1" />
-                        <label className="label" htmlFor="passwordVisibleCheckbox">Show Password</label>
+                        <label className="label" htmlFor="passwordVisibleCheckbox">Show password</label>
                     </div>
                     
                     <div className="text-center">

@@ -68,9 +68,10 @@ function Signup({}) {
             newInvalidFields.email = true;
         }
 
-        //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special, 1 number)
-        const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?=.*\d)/;
-        if (!password || !passwordCheck || password !== passwordCheck || password.length < 8 || !passwordPatternChecker.test(password)) {
+        // //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special, 1 number)
+        // const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?=.*\d)/;
+        // if (!password || !passwordCheck || password !== passwordCheck || password.length < 8 || !passwordPatternChecker.test(password)) {
+        if (!password || password.length < 8 || password !== passwordCheck) {
             newErrors.password = "Invalid password and/or the passwords do not match."
             newErrors.passwordCheck = "Invalid password and/or the passwords do not match."
             newInvalidFields.password = true;
@@ -118,121 +119,104 @@ function Signup({}) {
     };
     
     return (
-        <div className="form">
-            <h1 className="font-bold">Sign Up!</h1>
-            <form onSubmit={registerUser} className="flex flex-col">
-                <div className="inline-block my-1">
-                    <label className="label">Name</label>
-                    <input // Styles = input + either name or invalid
-                        id="name"
-                        value={name}
-                        type="text"
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="i.e. Joe Bob"
-                        className={clsx("mx-1.5", invalidFields.name ? "border border-red-500" : "border border-gray-300")}
-                    />
-                    <div 
-                        className="relative inline-block"
-                        onMouseEnter={() => setShowTooltip(prev => ({...prev, name: true}))} // spread rest of data (keep same)
-                        onMouseLeave={() => setShowTooltip(prev => ({...prev, name: false}))}
-                    >
-                        <span className="bg-gray-300 py-1 px-1.5 border">?</span>
-                        <div className={clsx("absolute left-full top-0 ml-2 z-10 bg-white border p-2 shadow-md rounded w-48", showTooltip.name ? "block" : "hidden")}>
-                            <ul>
-                                <li>Enter your full name</li>
-                            </ul>
-                        </div>
+        <div className="flex justify-center">
+            <div className="bg-secondary-100 w-11/12 sm:w-3/4 md:w-1/2 rounded-lg py-10 flex flex-col items-center">
+                <h1 className="text-3xl mb-5">Sign up</h1>
+                <form onSubmit={registerUser} className="w-2/3 lg:w-1/2 flex flex-col gap-3">
+                    <div>
+                        <label className="label block">Name</label>
+                        <input // Styles = input + either name or invalid
+                            id="name"
+                            value={name}
+                            type="text"
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                var newInvalidFields = invalidFields;
+                                newInvalidFields.name = false;
+                                setInvalidFields(newInvalidFields);
+                            }}
+                            className={clsx(invalidFields.name && "ring-2 ring-red-300 focus:ring-secondary-300", "w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-secondary-200 focus:ring-2 focus:ring-secondary-300 focus:outline-none")}
+                        />
+                        {errorMessages.name && <div className="text-red-600">{errorMessages.name}</div>}
                     </div>
-                    {errorMessages.name && <div className="text-red-500">{errorMessages.name}</div>}
-                </div>
-                <div className="inline-block my-1">
-                    <label className="label">Email</label>
-                    <input
-                        id="email"
-                        value={email}
-                        type="text"
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="i.e. joebob@gmail.com"
-                        className={clsx("mx-1.5", invalidFields.email ? "border border-red-500" : "border border-gray-300")}
-                    />
-                    <div 
-                        className="relative inline-block"
-                        onMouseEnter={() => setShowTooltip(prev => ({...prev, email: true}))}
-                        onMouseLeave={() => setShowTooltip(prev => ({...prev, email: false}))}
-                    >
-                        <span className="bg-gray-300 py-1 px-1.5 border">?</span>
-                        <div className={clsx("absolute left-full top-0 ml-2 z-10 bg-white border p-2 shadow-md rounded w-48", showTooltip.email ? "block" : "hidden")}>
-                            <ul>
-                                <li>Enter any email with a valid address</li>
-                            </ul>
-                        </div>
+                    <div>
+                        <label className="label block">Email</label>
+                        <input
+                            id="email"
+                            value={email}
+                            type="text"
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                var newInvalidFields = invalidFields;
+                                newInvalidFields.email = false;
+                                setInvalidFields(newInvalidFields);
+                            }}
+                            className={clsx(invalidFields.email && "ring-2 ring-red-300 focus:ring-secondary-300", "w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-secondary-200 focus:ring-2 focus:ring-secondary-300 focus:outline-none")}
+                        />
+                        {errorMessages.email && <div className="text-red-600">{errorMessages.email}</div>}
                     </div>
-                    {errorMessages.email && <div className="text-red-500">{errorMessages.email}</div>}
-                </div>
-                <div className="inline-block my-1">
-                    <label className="label">Password</label>
-                    <input
-                        id="password"
-                        value={password}
-                        type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={clsx("mx-1.5", invalidFields.password ? "border border-red-500" : "border border-gray-300")}
-                    />
-                    <div 
-                        className="relative inline-block"
-                        onMouseEnter={() => setShowTooltip(prev => ({...prev, password: true}))}
-                        onMouseLeave={() => setShowTooltip(prev => ({...prev, password: false}))}
-                    >
-                        <span className="bg-gray-300 py-1 px-1.5 border">?</span>
-                        <div className={clsx("absolute left-full top-0 ml-2 z-10 bg-white border p-2 shadow-md rounded w-48", showTooltip.password ? "block" : "hidden")}>
-                            <ul>
-                                <li>Must include a lowercase character</li>
-                                <li>Must include an uppercase character</li>
-                                <li>Must include a special character</li>
-                                <li>Must include a number</li>
-                            </ul>
-                        </div>
+                    <div className="inline-block my-1">
+                        <label className="label block">Password (min. 8 characters)</label>
+                        <input
+                            id="password"
+                            value={password}
+                            type={showPassword ? "text" : "password"} // Link up both passwords to same conditional
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                var newInvalidFields = invalidFields;
+                                newInvalidFields.password = false;
+                                setInvalidFields(newInvalidFields);
+                            }}
+                            className={clsx(invalidFields.password && "ring-2 ring-red-300 focus:ring-secondary-300", "w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-secondary-200 focus:ring-2 focus:ring-secondary-300 focus:outline-none")}
+                        />
+                        {errorMessages.password && <div className="text-red-600">{errorMessages.password}</div>}
                     </div>
-                    {errorMessages.password && <div className="text-red-500">{errorMessages.password}</div>}
-                </div>
-                <div className="flex">
-                    <label className="label">Re-enter Password</label>
-                    <input
-                        id="passwordcheck"
-                        value={passwordCheck}
-                        type={showPassword ? "text" : "password"}
-                        onChange={(e) => setPasswordCheck(e.target.value)}
-                        className={clsx("mx-1.5", invalidFields.password ? "border border-red-500" : "border border-gray-300")}
-                    />
-                    {errorMessages.passwordCheck && <div className="text-red-500">{errorMessages.passwordCheck}</div>}
-                </div>
+                    <div>
+                        <label className="label block">Confirm password</label>
+                        <input
+                            id="passwordcheck"
+                            value={passwordCheck}
+                            type={showPassword ? "text" : "password"}
+                            onChange={(e) => {
+                                setPasswordCheck(e.target.value);
+                                var newInvalidFields = invalidFields;
+                                newInvalidFields.passwordCheck = false;
+                                setInvalidFields(newInvalidFields);
+                            }}
+                            className={clsx(invalidFields.passwordCheck && "ring-2 ring-red-300 focus:ring-secondary-300", "w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-secondary-200 focus:ring-2 focus:ring-secondary-300 focus:outline-none")}
+                        />
+                        {errorMessages.passwordCheck && <div className="text-red-600">{errorMessages.passwordCheck}</div>}
+                    </div>
 
-                <div>
-                    <input type="checkbox" onClick={togglePasswordVisibility} />
-                    <label className="label">Show Password</label>
-                </div>
+                    <div className="text-center">
+                        <input type="checkbox" onClick={togglePasswordVisibility} className="mx-1" />
+                        <label className="label">Show password</label>
+                    </div>
 
-                <div>
-                    <button
-                    type="button"
-                    onClick={() => setRole("teacher")}
-                    className={clsx(role === "teacher" ? "bg-emerald-200" : "bg-purple-200")}
-                    >
-                    Teacher
-                    </button>
-                    <button
-                    type="button"
-                    onClick={() => setRole("student")}
-                    className={clsx(role === "student" ? "bg-emerald-200" : "bg-purple-200")}
-                    >
-                    Student
-                    </button>
-                </div>
-                
-                <button className="btn" type="submit">
-                    Submit
-                </button>
-            </form>
+                    <div>
+                        <button
+                        type="button"
+                        onClick={() => setRole("teacher")}
+                        className={clsx(role === "teacher" ? "bg-emerald-200" : "bg-purple-200")}
+                        >
+                        Teacher
+                        </button>
+                        <button
+                        type="button"
+                        onClick={() => setRole("student")}
+                        className={clsx(role === "student" ? "bg-emerald-200" : "bg-purple-200")}
+                        >
+                        Student
+                        </button>
+                    </div>
+                    
+                    <div className="text-center">
+                        <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">
+                            Sign up
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
