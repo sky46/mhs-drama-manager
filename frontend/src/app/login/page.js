@@ -48,9 +48,9 @@ function Login({}) {
 
     return (
         <div className="flex justify-center">
-            <div className="bg-secondary-100 w-1/2 rounded-lg py-10 flex flex-col items-center">
+            <div className="bg-secondary-100 w-11/12 sm:w-3/4 md:w-1/2 rounded-lg py-10 flex flex-col items-center">
                 <h1 className="text-3xl mb-5">Log in</h1>
-                <form onSubmit={loginUser} className="w-1/2 flex flex-col gap-3">
+                <form onSubmit={loginUser} className="w-2/3 lg:w-1/2 flex flex-col gap-3">
                     <div>
                         <label className="label block">Email</label>
                         <input 
@@ -58,7 +58,7 @@ function Login({}) {
                             value={email}
                             type="text"
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-white my-1 inline-block p-1.5 rounded-sm"
+                            className="w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-secondary-200 focus:ring-2 ring-secondary-300 focus:outline-none"
                         />
                     </div>
                     <div>
@@ -68,17 +68,17 @@ function Login({}) {
                             value={password}
                             type={showPassword ? "text" : "password"} 
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-white my-1 inline-block p-1.5 rounded-sm"
+                            className="w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-secondary-200 focus:ring-2 ring-secondary-300 focus:outline-none"
                         />
                     </div>
 
                     <div className="text-center">
-                        <input type="checkbox" onClick={togglePasswordVisibility} />
-                        <label className="label">Show Password</label>
+                        <input type="checkbox" id="passwordVisibleCheckbox" onClick={togglePasswordVisibility} className="mx-1" />
+                        <label className="label" htmlFor="passwordVisibleCheckbox">Show Password</label>
                     </div>
                     
                     <div className="text-center">
-                        <button type="submit">
+                        <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">
                             Log in
                         </button>
                     </div>
