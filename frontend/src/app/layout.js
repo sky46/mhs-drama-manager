@@ -57,7 +57,7 @@ function RootLayout({ children }) {
             <div className="ml-auto">
               {isLoggedIn ? (
                 <div className="flex gap-5 sm:gap-8 items-center">
-                  <span className="text-primary-100">Logged in as <span className="text-accent-100">{userData.name}</span></span>
+                  <span className="text-primary-100 hidden sm:inline-block">Logged in as <span className="text-accent-100">{userData.name}</span></span>
                   <Logout onLogout={checkLoginStatus} />
                 </div>
               ) : (
