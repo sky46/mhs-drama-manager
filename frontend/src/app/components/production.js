@@ -10,11 +10,11 @@ export default function Production({ name, teachers, student, id }) {
         <div>
             <div
                 onClick={() => router.push(`/productions/${id}`)}
-                className="bg-gray-100 w-1/3 p-3 m-3 hover:cursor-pointer hover:bg-gray-200 focus:bg-gray-200 active:bg-gray-300"
+                className="bg-primary-100 w-5/6 sm:w-3/4 lg:w-1/2 p-5 m-3 hover:cursor-pointer rounded-md hover:bg-primary-200 focus:bg-primary-200 active:ring-3 active:ring-primary-400"
             >
-                <h2>{name}</h2>
+                <h2 className="text-2xl mb-1">{name}</h2>
                 <p>Teachers: {teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
-                <p>Number of Students: {student}</p>
+                <p>Number of students: {student}</p>
             </div>
         </div>
     );

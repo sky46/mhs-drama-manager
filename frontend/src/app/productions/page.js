@@ -54,7 +54,7 @@ export default function Productions() {
         <div>
             {isLoggedIn ? (
                 <div>
-                    <div>You are logged in as a {role === 0 ? 'teacher' : 'student'}.</div>
+                    <h1 className="text-3xl mb-5 mx-2">My productions</h1>
                     <div>
                         {productions.length === 0 ? (
                             <p>No productions found for this user.</p>

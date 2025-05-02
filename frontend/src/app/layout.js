@@ -69,7 +69,7 @@ function RootLayout({ children }) {
             </div>
           </nav>
         </header>
-        <main className="pt-18 px-2 sm:px-5">
+        <main className="pt-20 px-2 sm:px-5">
           {children}
         </main>
       </body>
