@@ -14,7 +14,7 @@ const inter = Inter({
 
 function RootLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
+  const [userData, setUserData] = useState({});
   const pathname = usePathname();
 
   async function checkLoginStatus() {
@@ -25,7 +25,7 @@ function RootLayout({ children }) {
         const data = await response.json();
         setIsLoggedIn(data.loggedIn);
         if (data.loggedIn === true) {
-          setUserName(data.user.name);
+          setUserData(data.user);
         }
     } catch (error) {
         console.error("Error checking login status:", error);
@@ -50,11 +50,14 @@ function RootLayout({ children }) {
               {isLoggedIn && (
                 <li><Link href="/productions" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Productions</Link></li>
               )}
+              {isLoggedIn && userData.role === 0 && (
+                <li><Link href="/productions/new" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">New production</Link></li>
+              )}
             </ul>
             <div className="ml-auto">
               {isLoggedIn ? (
                 <div className="flex gap-5 sm:gap-8 items-center">
-                  <span className="text-primary-100">Logged in as <span className="text-accent-100">{userName}</span></span>
+                  <span className="text-primary-100">Logged in as <span className="text-accent-100">{userData.name}</span></span>
                   <Logout onLogout={checkLoginStatus} />
                 </div>
               ) : (

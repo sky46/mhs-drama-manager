@@ -55,7 +55,6 @@ export default function Productions() {
             {isLoggedIn ? (
                 <div>
                     <div>You are logged in as a {role === 0 ? 'teacher' : 'student'}.</div>
-                    {role === 0 && (<Link className="bg-emerald-100 p-3 m-3 inline-block" href='/productions/new'>New Production</Link>) }
                     <div>
                         {productions.length === 0 ? (
                             <p>No productions found for this user.</p>
