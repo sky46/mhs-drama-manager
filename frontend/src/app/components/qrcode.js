@@ -7,7 +7,6 @@ export default function Qrcode({ link }) {
     
     return(
         <div>
-            <div>QR Code</div>
             <div>
                 <SVG
                     text={link} // Change to backend api call later

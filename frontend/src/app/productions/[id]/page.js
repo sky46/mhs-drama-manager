@@ -161,24 +161,29 @@ export default function ProductionPage() {
 
     return (
         <div key={selfMarkedPresent}>
-            <div className="bg-primary-100 w-5/6 sm:w-3/4 lg:w-1/2 p-8 m-3 rounded-md">
-                <h1 className="text-3xl my-2">{production.name}</h1>
-                <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
-                <p>{production.studentCount} students</p>
-                {role === 0 && (
-                    <div>
-                        <Link href={`/productions/${id}/edit`}>Edit Production</Link>
-                        <button onClick={() => deleteProduction()}>Delete Production</button>
-                    </div>
-                )}
-                {role===0 && 
+            <div className="bg-primary-100 w-5/6 md:w-3/4 2xl:w-1/2 p-12 m-3 rounded-md flex flex-col lg:flex-row gap-8 lg:gap-20">
                 <div>
-                    <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
-                    <button onClick={() => printQR()}>
-                        Print Qr code
-                    </button>
+                    <h1 className="text-3xl my-3">{production.name}</h1>
+                    <p className="mb-1">
+                        Teachers: {production.teachers.map((teacher, index) => (
+                            <span key={teacher.id}>
+                                {index > 0 && ", "}
+                                <span className="text-accent-700 font-semibold">{teacher.name}</span>
+                            </span>
+                        ))}
+                    </p> {/* Need to map first because object */}
+                    <p><span className="text-accent-700 font-semibold">{production.studentCount}</span> student{production.studentCount !== 1 && 's'}</p>
+                    {role === 0 && (
+                        <div className="my-5">
+                            <Link href={`/productions/${id}/edit`} className="inline-block me-2 hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Edit</Link>
+                            <button onClick={() => deleteProduction()} className="me-2 hover:cursor-pointer py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 active:ring-red-300 active:ring-3">Delete</button>
+                            <button onClick={() => printQR()} className="me-2 hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">
+                                Print QR code
+                            </button>
+                        </div>
+                    )}
                 </div>
-                }
+                <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
             </div>
             {role===0 ? (
                 // Teacher view
