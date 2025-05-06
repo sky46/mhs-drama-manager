@@ -161,10 +161,10 @@ export default function ProductionPage() {
 
     return (
         <div key={selfMarkedPresent}>
-            <div>
-                <h1>{production.name}</h1>
+            <div className="bg-primary-100 w-5/6 sm:w-3/4 lg:w-1/2 p-8 m-3 rounded-md">
+                <h1 className="text-3xl my-2">{production.name}</h1>
                 <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
-                <p>Number of Students: {production.studentCount}</p>
+                <p>{production.studentCount} students</p>
                 {role === 0 && (
                     <div>
                         <Link href={`/productions/${id}/edit`}>Edit Production</Link>
