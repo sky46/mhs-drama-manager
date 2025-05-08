@@ -185,86 +185,90 @@ export default function ProductionPage() {
                 </div>
                 <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
             </div>
-            {role===0 ? (
-                // Teacher view
-                <div>
-                    <div>
-                        <div>
-                            <h2>Present</h2>
-                            {presentStudents.length > 0 ? (
-                                <ul>
-                                    {presentStudents.map((entry, index) => (
-                                        <li key={index}>{entry.label}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>No present students.</p>
-                            )}
-                            
+            <div className="bg-secondary-100 w-5/6 md:w-3/4 2xl:w-1/2 p-12 m-3 rounded-md">
+                <h2 className="text-2xl mb-3">Attendance</h2>
+                {role===0 ? (
+                    // Teacher view
+                    <div className="flex flex-col">
+                        <div className="flex gap-3">
+                            <Link href={`/productions/${id}/attendance`} className="inline-block hover:cursor-pointer py-2 px-3 bg-primary-700 text-white rounded-md hover:bg-primary-800 active:ring-primary-300 active:ring-3">Attendance history</Link>
+                            <button onClick={emailNonResponders} className="hover:cursor-pointer py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 active:ring-red-300 active:ring-3">
+                                Email missing students
+                            </button>
                         </div>
-                        <div>
-                            <h2>Missing</h2>
-                            {absentStudents.length > 0 ? (
-                                <ul>
-                                    {absentStudents.map((entry, index) => (
-                                        <li key={index}>{entry.label}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>No absent students.</p>
-                            )}
+                        <div className="flex gap-16 py-5">
+                            <div>
+                                <h3 className="text-lg">Present</h3>
+                                {presentStudents.length > 0 ? (
+                                    <ul className="list-disc list-inside">
+                                        {presentStudents.map((entry, index) => (
+                                            <li key={index}>{entry.label}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No present students.</p>
+                                )}
+                                
+                            </div>
+                            <div>
+                                <h3 className="text-lg">Missing</h3>
+                                {absentStudents.length > 0 ? (
+                                    <ul className="list-disc list-inside">
+                                        {absentStudents.map((entry, index) => (
+                                            <li key={index}>{entry.label}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No absent students.</p>
+                                )}
+                            </div>
                         </div>
+                        <form onSubmit={markStudentsAttendance}>
+                            <h3 className="text-lg">Mark attendance</h3>
+                            <Select
+                                isMulti
+                                options={absentStudents}
+                                value={markPresentStudents}
+                                onChange={(val) => setMarkPresentStudents(val)}
+                                placeholder="Start typing to search..."
+                                className="mb-2"
+                            />
+                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Mark as present</button>
+                        </form>
                     </div>
-                    
-                    <form onSubmit={markStudentsAttendance}>
-                        <h2>Mark attendance</h2>
-                        <Select
-                            isMulti
-                            options={absentStudents}
-                            value={markPresentStudents}
-                            onChange={(val) => setMarkPresentStudents(val)}
-                            placeholder="Start typing to search..."
-                        />
-                        <button type="submit">Mark as present</button>
-                    </form>
-                    <h2>Send email</h2>
-                    <button onClick={emailNonResponders}>
-                        EMAIL MISSING
-                    </button>
-                    <Link href={`/productions/${id}/attendance`}>Attendance history</Link>
-                </div>
-            ) : (
-                // Student view
-                <div>
-                    {selfMarkedPresent ? (
+                ) : (
+                    // Student view
+                    <div className="flex flex-col lg:flex-row gap-8 lg:gap-20"> 
+                        {selfMarkedPresent ? (
+                            <div>
+                                <div>Marked as present.</div>
+                            </div>
+                        ) : (
+                            <div>
+                                <button onClick={markSelfAttendance}>Log attendance</button>
+                            </div>
+                        )}
                         <div>
-                            <div>Marked as present.</div>
-                        </div>
-                    ) : (
-                        <div>
-                            <button onClick={markSelfAttendance}>Log attendance</button>
-                        </div>
-                    )}
-                    <div>
-                        <div>Days attended:</div>
-                        <ul>
-                            {selfAttendanceHistory.length > 0 ? (
-                                selfAttendanceHistory.map((entry, index) => (
-                                    <li key={index}>{
-                                        new Date(new Date(entry.attendance_date)
-                                        .setDate(new Date(entry.attendance_date)
-                                        .getDate() + 1))
-                                        .toLocaleDateString()
-                                    }</li>
-                                ))
-                            ) : (
-                                <p>No attendance records found.</p>
-                            )}
-                        </ul>
+                            <div>Days attended:</div>
+                            <ul>
+                                {selfAttendanceHistory.length > 0 ? (
+                                    selfAttendanceHistory.map((entry, index) => (
+                                        <li key={index}>{
+                                            new Date(new Date(entry.attendance_date)
+                                            .setDate(new Date(entry.attendance_date)
+                                            .getDate() + 1))
+                                            .toLocaleDateString()
+                                        }</li>
+                                    ))
+                                ) : (
+                                    <p>No attendance records found.</p>
+                                )}
+                            </ul>
 
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
