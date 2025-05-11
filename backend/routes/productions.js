@@ -306,8 +306,7 @@ router.get('/productions/:productionId', async (req, res) => {
                 [productionId]
             );
             studentCount = studentCountResult.rows[0].count;
-
-            console.log(selfAttendanceHistory[0].attendance_date);
+            
             selfMarkedPresent = selfAttendanceHistory.some(
                 (row) => localDateFormat.format(row.attendance_date) === todayFormatted
             );
