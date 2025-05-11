@@ -173,8 +173,8 @@ export default function ProductionPage() {
 
     return (
         <div key={selfMarkedPresent}>
-            <div className="flex flex-col md:flex-row gap-3 ">
-                <div className="bg-primary-100 p-12 rounded-md flex flex-col lg:flex-row gap-8 lg:gap-20">
+            <div className="flex flex-col md:flex-row gap-3">
+                <div className="basis-1/2 bg-primary-100 p-12 rounded-md flex flex-col lg:flex-row gap-8 lg:gap-20">
                     <div>
                         <h1 className="text-3xl my-3">{production.name}</h1>
                         <p className="mb-1">
@@ -198,7 +198,7 @@ export default function ProductionPage() {
                     </div>
                     <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
                 </div>
-                <div className="grow bg-secondary-100 p-12 rounded-md">
+                <div className="basis-1/2 bg-secondary-100 p-12 rounded-md">
                     <h2 className="text-2xl mb-3">Attendance</h2>
                     {role===0 ? (
                         // Teacher view
@@ -251,32 +251,30 @@ export default function ProductionPage() {
                         </div>
                     ) : (
                         // Student view
-                        <div className="flex flex-col lg:flex-row gap-8 lg:gap-20">
-                            {selfMarkedPresent ? (
-                                <div>
-                                    <div>Marked as present.</div>
-                                </div>
-                            ) : (
-                                <div>
-                                    <button onClick={markSelfAttendance}>Log attendance</button>
-                                </div>
-                            )}
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <div>Days attended:</div>
-                                <ul>
-                                    {selfAttendanceHistory.length > 0 ? (
-                                        selfAttendanceHistory.map((entry, index) => (
+                                {selfMarkedPresent ? (
+                                    <div className="inline-block py-2 px-3 bg-accent-500 text-white rounded-md">Marked as present today!</div>
+                                ) : (
+                                    <button onClick={markSelfAttendance} className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Log attendance</button>
+                                )}
+                            </div>
+                            <div>
+                                <div className="text-lg">History</div>
+                                {selfAttendanceHistory.length > 0 ? (
+                                    <ul className="list-disc list-inside">
+                                        {selfAttendanceHistory.toReversed().map((entry, index) => (
                                             <li key={index}>{
                                                 new Date(new Date(entry.attendance_date)
                                                 .setDate(new Date(entry.attendance_date)
                                                 .getDate() + 1))
                                                 .toLocaleDateString()
                                             }</li>
-                                        ))
-                                    ) : (
-                                        <p>No attendance records found.</p>
-                                    )}
-                                </ul>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No attendance records found.</p>
+                                )}
                             </div>
                         </div>
                     )}
