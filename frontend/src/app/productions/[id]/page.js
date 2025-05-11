@@ -43,21 +43,24 @@ export default function ProductionPage() {
 
     const deleteProduction = async () => {
         try {
-            const res = await fetch(`http://localhost:3001/productions/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({productionId: id}),
-            });
-            
-            if (res.ok) {
-                router.push(`/productions`);
-            } else {
-                console.log("Deletion failed:", res.details);
+            if (confirm('Permanently delete production?')) {
+                const res = await fetch(`http://localhost:3001/productions/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({productionId: id}),
+                });
+                
+                if (res.ok) {
+                    alert('Production deleted successfully.');
+                    router.push(`/productions`);
+                } else {
+                    alert('An error occurred while deleting production.')
+                }
             }
-
+        
         } catch (error) {
             console.log(error.message);
         }
@@ -65,16 +68,24 @@ export default function ProductionPage() {
 
 
     const emailNonResponders = async() => {
-        try {  
+        try {
             const emailList = absentStudents.map(user => user.email);
-            console.log("emails", emailList);
-            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-            });
+            if (emailList.length === 0) {
+                alert('No missing students to send emails to.');
+            }
+            else if (confirm('Send a reminder email to all missing students?')) {
+                const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                if (response.ok) {
+                    alert('Reminder emails sent.');
+                } else {
+                    alert('An error occurred while sending reminder emails.')
+                }
+            }
             const data = await response.json();
-            console.log("PEOPLE", data.people);
         } catch (error) {
             console.log("Error:", error);
         }
@@ -129,6 +140,7 @@ export default function ProductionPage() {
                 setSelfMarkedPresent(true);
                 setSelfAttendanceHistory(old => [...old, data.markedPresentRow]);
                 setMessage("Attendance successfully logged!");
+                alert("Attendance logged succesfully.");
             } else if (response.status === 409) {
                 setSelfMarkedPresent(true); 
             }
@@ -147,7 +159,7 @@ export default function ProductionPage() {
                 body: JSON.stringify({students: markPresentStudents})
             });
             if (response.ok) {
-                alert('Attendance marked successfully!');
+                alert('Attendance marked succesfully.');
                 const data = await response.json();
                 const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
                 setPresentStudents(data.newAttendance.present.map(mapStudentsSelectOptions));
@@ -233,7 +245,7 @@ export default function ProductionPage() {
                                 placeholder="Start typing to search..."
                                 className="mb-2"
                             />
-                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Mark as present</button>
+                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Mark selected as present</button>
                         </form>
                     </div>
                 ) : (
