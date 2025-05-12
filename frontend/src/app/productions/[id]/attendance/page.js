@@ -10,9 +10,13 @@ function ProdAttendancePage() {
 
     const [attendance, setAttendance] = useState([]);
     const [dates, setDates] = useState([]);
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(null);
     const [searchStudent, setSearchStudent] = useState('');
     const [productionName, setProductionName] = useState('');
+
+    useEffect(() => {
+        setInitialStartDate();
+    }, [])
 
     useEffect(() => {
         getProdAttendance();
@@ -28,6 +32,12 @@ function ProdAttendancePage() {
             currentDate.setDate(currentDate.getDate() + 1);
         }
         setDates(generatedDates);
+    }
+    
+    const setInitialStartDate = () => {
+        var previousSunday = new Date();
+        previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() % 7));
+        setStartDate(previousSunday);
     }
     
     const getProdAttendance = async () => {
