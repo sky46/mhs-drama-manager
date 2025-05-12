@@ -85,7 +85,7 @@ function ProdAttendancePage() {
     };
 
     return (
-        <div className="px-2">
+        <div>
             <h1 className="text-3xl mb-2">Attendance history for <span className="text-primary-800">{productionName}</span></h1>
             <Link href={`/productions/${id}`} className="inline-block mb-8 py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Back to production</Link>
             <div className="flex flex-col gap-6">

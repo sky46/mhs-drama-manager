@@ -51,7 +51,7 @@ export default function Productions() {
     
 
     return (
-        <div className="px-2">
+        <div>
             {isLoggedIn ? (
                 <div>
                     <h1 className="text-3xl mb-5">My productions</h1>
