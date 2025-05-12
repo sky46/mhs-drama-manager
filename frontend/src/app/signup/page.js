@@ -193,7 +193,7 @@ function Signup({}) {
                         <label className="label">Show password</label>
                     </div>
 
-                    <div>
+                    {/* <div>
                         <button
                         type="button"
                         onClick={() => setRole("teacher")}
@@ -208,7 +208,7 @@ function Signup({}) {
                         >
                         Student
                         </button>
-                    </div>
+                    </div> */}
                     
                     <div className="text-center">
                         <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">

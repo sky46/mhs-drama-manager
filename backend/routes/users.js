@@ -20,13 +20,14 @@ router.post('/users/create', async (req, res) => {
         return res.status(400).json({ error: "Passwords do not match" }); // Maybe redundant? (checked in frontend)
     }
     var roleID;
-    if (role === 'teacher') {
-        roleID = 0;
-    } else if (role === 'student') {
-        roleID = 1;
-    } else {
-        return res.status(400).json({ error: 'Invalid role' });
-    }
+    roleID = 1;
+    // if (role === 'teacher') {
+    //     roleID = 0;
+    // } else if (role === 'student') {
+    //     roleID = 1;
+    // } else {
+    //     return res.status(400).json({ error: 'Invalid role' });
+    // }
 
     try {
         const emailCheckResult = await pool.query(
