@@ -51,13 +51,13 @@ export default function Productions() {
     
 
     return (
-        <div>
+        <div className="px-2">
             {isLoggedIn ? (
                 <div>
-                    <h1 className="text-3xl mb-5 mx-2">My productions</h1>
+                    <h1 className="text-3xl mb-5">My productions</h1>
                     <div>
                         {productions.length === 0 ? (
-                            <p>No productions found for this user.</p>
+                            <p>Not currently a member of any productions.</p>
                         ) : (
                                 productions.map((production) => (  
                                     <Production 
