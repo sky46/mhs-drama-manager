@@ -199,7 +199,7 @@ export default function ProductionPage() {
                     <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
                 </div>
                 <div className="basis-1/2 bg-secondary-100 py-8 lg:py-12 px-4 sm:px-12 rounded-md">
-                    <h2 className="text-2xl mb-3">Attendance</h2>
+                    <h2 className="text-2xl mb-3">Today's attendance</h2>
                     {role===0 ? (
                         // Teacher view
                         <div className="flex flex-col">
