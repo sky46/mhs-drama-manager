@@ -101,7 +101,7 @@ export default function newProductionPage() {
                             />
                         </div>
                         <div>
-                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Create</button>
+                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Create</button>
                         </div>
                     </form>
                 )}

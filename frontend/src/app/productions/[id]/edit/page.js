@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import Select from 'react-select';
 
 export default function EditProductionPage() {
@@ -104,7 +105,8 @@ export default function EditProductionPage() {
                             />
                         </div>
                         <div>
-                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Save</button>
+                            <Link href={`/productions/${id}`} className="inline-block py-2 px-3 me-2 bg-red-600 text-white rounded-md hover:bg-red-700 active:ring-red-300 active:ring-3">Cancel</Link>
+                            <button type="submit" className="hover:cursor-pointer py-2 px-3 me-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Save</button>
                         </div>
                     </form>
                 )}
