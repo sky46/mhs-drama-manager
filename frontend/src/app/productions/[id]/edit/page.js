@@ -66,33 +66,49 @@ export default function EditProductionPage() {
     }
 
     return (
-        <div>
-            <h1>Edit production</h1>
-            {domLoaded && (
-                <form onSubmit={saveProduction} className="flex flex-col">
-                    <label htmlFor="name" className="font-bold">Production name</label>
-                    <input type="text" id="name" value={name} onChange={(val) => setName(val.target.value)} />
-                    <label htmlFor="teachers">Teachers</label>
-                    <Select
-                        isMulti
-                        options={teachersOptions}
-                        id="teachers"
-                        value={teachers}
-                        onChange={(val) => setTeachers(val)}
-                        placeholder="Start typing to search..."
-                    />
-                    <label htmlFor="students">Students</label>
-                    <Select
-                        isMulti
-                        options={studentsOptions}
-                        id="students"
-                        value={students}
-                        onChange={(val) => setStudents(val)}
-                        placeholder="Start typing to search..."
-                    />
-                    <button type="submit">Save</button>
-                </form>
-            )}
+        <div className="flex justify-center sm:justify-start">
+            <div className="w-11/12 sm:w-3/4 lg:w-1/2 bg-primary-100 py-8 lg:py-12 px-4 md:px-8 lg:px-12 rounded-md">
+                <h1 className="text-3xl mb-6">Edit production</h1>
+                {domLoaded && (
+                    <form onSubmit={saveProduction} className="flex flex-col gap-3">
+                        <div>
+                            <label htmlFor="name" className="block">Production name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                value={name}
+                                onChange={(val) => setName(val.target.value)}
+                                className="w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-gray-300 focus:ring-2 focus:ring-primary-300 focus:outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="teachers" className="block">Teachers</label>
+                            <Select
+                                isMulti
+                                options={teachersOptions}
+                                id="teachers"
+                                value={teachers}
+                                onChange={(val) => setTeachers(val)}
+                                placeholder="Start typing to search..."
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="students" className="block">Students</label>
+                            <Select
+                                isMulti
+                                options={studentsOptions}
+                                id="students"
+                                value={students}
+                                onChange={(val) => setStudents(val)}
+                                placeholder="Start typing to search..."
+                            />
+                        </div>
+                        <div>
+                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Save</button>
+                        </div>
+                    </form>
+                )}
+            </div>
         </div>
     )
 }
