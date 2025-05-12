@@ -51,7 +51,7 @@ function RootLayout({ children }) {
                 <li><Link href="/productions" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">Productions</Link></li>
               )}
               {isLoggedIn && userData.role === 0 && (
-                <li><Link href="/productions/new" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">New production</Link></li>
+                <li><Link href="/productions/new" className="text-md hover:text-primary-100 focus-visible:text-primary-100 active:text-primary-200">New<span className="hidden sm:inline"> production</span></Link></li>
               )}
             </ul>
             <div className="ml-auto">
