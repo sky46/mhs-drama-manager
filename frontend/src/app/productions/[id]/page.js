@@ -174,7 +174,7 @@ export default function ProductionPage() {
     return (
         <div key={selfMarkedPresent}>
             <div className="flex flex-col md:flex-row gap-3">
-                <div className="basis-1/2 bg-primary-100 p-12 rounded-md flex flex-col lg:flex-row gap-8 lg:gap-20">
+                <div className="basis-1/2 bg-primary-100 py-8 lg:py-12 px-4 sm:px-12 rounded-md flex flex-col lg:flex-row gap-8 lg:gap-20">
                     <div>
                         <h1 className="text-3xl my-3">{production.name}</h1>
                         <p className="mb-1">
@@ -198,7 +198,7 @@ export default function ProductionPage() {
                     </div>
                     <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
                 </div>
-                <div className="basis-1/2 bg-secondary-100 p-12 rounded-md">
+                <div className="basis-1/2 bg-secondary-100 py-8 lg:py-12 px-4 sm:px-12 rounded-md">
                     <h2 className="text-2xl mb-3">Attendance</h2>
                     {role===0 ? (
                         // Teacher view
