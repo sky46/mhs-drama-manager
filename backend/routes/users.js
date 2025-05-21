@@ -20,13 +20,14 @@ router.post('/users/create', async (req, res) => {
         return res.status(400).json({ error: "Passwords do not match" }); // Maybe redundant? (checked in frontend)
     }
     var roleID;
-    if (role === 'teacher') {
-        roleID = 0;
-    } else if (role === 'student') {
-        roleID = 1;
-    } else {
-        return res.status(400).json({ error: 'Invalid role' });
-    }
+    roleID = 1;
+    // if (role === 'teacher') {
+    //     roleID = 0;
+    // } else if (role === 'student') {
+    //     roleID = 1;
+    // } else {
+    //     return res.status(400).json({ error: 'Invalid role' });
+    // }
 
     try {
         const emailCheckResult = await pool.query(
@@ -160,11 +161,17 @@ router.post('/users/logout', async (req, res) => {
 });
 
 // Check if logged in
-router.get('/users/status', (req, res) => {
+router.get('/users/status', async (req, res) => {
     if (req.session && req.session.user) {
-        return res.json({ loggedIn: true, userId: req.session.user });
+        const userResult = await pool.query(
+            'SELECT name, email, role FROM users WHERE id = $1',
+            [req.session.user]
+        );
+        if (userResult.rows.length) {
+            return res.json({ loggedIn: true, user: userResult.rows[0] });
+        }
     }
-    res.json({ loggedIn: false });
+    return res.json({ loggedIn: false });
 });
 
 // Route to check if teacher vs student

@@ -4,18 +4,10 @@ import { useState, useEffect } from "react";
 import Select from 'react-select';
 import Link from 'next/link';
 
-import styles from "@/app/styles/indprod.module.css"
 
 import Qrcode from '../../components/qrcode'
 
 import { useRouter } from 'next/navigation'
-
-// based off page id, link qrcode to localhost:3000/productions/id/qrcode which will show check in button
-// change to if not signed in, route to sign in and then back to this
-
-// also if scan qr code and not yet in, give option to join?
-
-// route away after email? also it is in spam rn
 
 export default function ProductionPage() {
     const router = useRouter()
@@ -38,23 +30,37 @@ export default function ProductionPage() {
         fetchProduction();
     }, [id]);
 
+    const printQR = async () => {
+        // code to print specific part of webpage -> https://stackoverflow.com/questions/12997123/print-specific-part-of-webpage
+        var prtContent = document.getElementById("qr");
+        var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+        WinPrint.document.write(prtContent.innerHTML);
+        WinPrint.document.close();
+        WinPrint.focus();
+        WinPrint.print();
+        WinPrint.close();
+    }
+
     const deleteProduction = async () => {
         try {
-            const res = await fetch(`http://localhost:3001/productions/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({productionId: id}),
-            });
-            
-            if (res.ok) {
-                router.push(`/productions`);
-            } else {
-                console.log("Deletion failed:", res.details);
+            if (confirm('Permanently delete production?')) {
+                const res = await fetch(`http://localhost:3001/productions/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({productionId: id}),
+                });
+                
+                if (res.ok) {
+                    alert('Production deleted successfully.');
+                    router.push(`/productions`);
+                } else {
+                    alert('An error occurred while deleting production.')
+                }
             }
-
+        
         } catch (error) {
             console.log(error.message);
         }
@@ -62,16 +68,24 @@ export default function ProductionPage() {
 
 
     const emailNonResponders = async() => {
-        try {  
+        try {
             const emailList = absentStudents.map(user => user.email);
-            console.log("emails", emailList);
-            const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-            });
+            if (emailList.length === 0) {
+                alert('No missing students to send emails to.');
+            }
+            else if (confirm('Send a reminder email to all missing students?')) {
+                const response = await fetch(`http://localhost:3001/productions/${id}/attendance/reminder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                if (response.ok) {
+                    alert('Reminder emails sent.');
+                } else {
+                    alert('An error occurred while sending reminder emails.')
+                }
+            }
             const data = await response.json();
-            console.log("PEOPLE", data.people);
         } catch (error) {
             console.log("Error:", error);
         }
@@ -126,6 +140,7 @@ export default function ProductionPage() {
                 setSelfMarkedPresent(true);
                 setSelfAttendanceHistory(old => [...old, data.markedPresentRow]);
                 setMessage("Attendance successfully logged!");
+                alert("Attendance logged succesfully.");
             } else if (response.status === 409) {
                 setSelfMarkedPresent(true); 
             }
@@ -144,7 +159,7 @@ export default function ProductionPage() {
                 body: JSON.stringify({students: markPresentStudents})
             });
             if (response.ok) {
-                alert('Attendance marked successfully!');
+                alert('Attendance marked succesfully.');
                 const data = await response.json();
                 const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
                 setPresentStudents(data.newAttendance.present.map(mapStudentsSelectOptions));
@@ -157,93 +172,114 @@ export default function ProductionPage() {
     }
 
     return (
-        <div key={selfMarkedPresent} className={styles.individualproduction}>
-            <div>
-                <h1>{production.name}</h1>
-                <p>Teachers: {production.teachers.map(teacher => teacher.name).join(', ')}</p> {/* Need to map first because object */}
-                <p>Number of Students: {production.studentCount}</p>
-                {role === 0 && (
-                    <div className={styles.editdelete}>
-                        <Link href={`/productions/${id}/edit`}>Edit Production</Link>
-                        <button onClick={() => deleteProduction()}>Delete Production</button>
+        <div key={selfMarkedPresent}>
+            <div className="flex flex-col md:flex-row gap-3">
+                <div className="basis-1/2 bg-primary-100 py-8 lg:py-12 px-4 sm:px-12 rounded-md flex flex-col lg:flex-row gap-8 lg:gap-20">
+                    <div>
+                        <h1 className="text-3xl my-3">{production.name}</h1>
+                        <p className="mb-1">
+                            Teachers: {production.teachers.map((teacher, index) => (
+                                <span key={teacher.id}>
+                                    {index > 0 && ", "}
+                                    <span className="text-accent-700 font-semibold">{teacher.name}</span>
+                                </span>
+                            ))}
+                        </p> {/* Need to map first because object */}
+                        <p><span className="text-accent-700 font-semibold">{production.studentCount}</span> student{production.studentCount !== 1 && 's'}</p>
+                        {role === 0 && (
+                            <div className="my-3 flex gap-2 flex-wrap">
+                                <Link href={`/productions/${id}/edit`} className="inline-block hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Edit</Link>
+                                <button onClick={() => deleteProduction()} className="hover:cursor-pointer py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 active:ring-red-300 active:ring-3">Delete</button>
+                                <button onClick={() => printQR()} className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">
+                                    Print QR code
+                                </button>
+                            </div>
+                        )}
                     </div>
-                )}
-                {role===0 && <Qrcode link={`http://localhost:3000/productions/${id}`}></Qrcode>}
-            </div>
-            {role===0 ? (
-                // Teacher view
-                <div className={styles.teacher}>
-                    <div className={styles.today}>
-                        <div>
-                            <h2>Present</h2>
-                            {presentStudents.length > 0 ? (
-                                <ul>
-                                    {presentStudents.map((entry, index) => (
-                                        <li key={index}>{entry.label}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>No present students.</p>
-                            )}
-                            
-                        </div>
-                        <div>
-                            <h2>Missing</h2>
-                            {absentStudents.length > 0 ? (
-                                <ul>
-                                    {absentStudents.map((entry, index) => (
-                                        <li key={index}>{entry.label}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>No absent students.</p>
-                            )}
-                        </div>
-                    </div>
-                    
-                    <form onSubmit={markStudentsAttendance}>
-                        <h2>Mark attendance</h2>
-                        <Select isMulti options={absentStudents} value={markPresentStudents} onChange={(val) => setMarkPresentStudents(val)} />
-                        <button type="submit">Mark as present</button>
-                    </form>
-                    <h2>Send email</h2>
-                    <button onClick={emailNonResponders}>
-                        EMAIL MISSING
-                    </button>
-                    <Link href={`/productions/${id}/attendance`}>Attendance history</Link>
+                    <div id='qr'><Qrcode link={`http://localhost:3000/productions/${id}`} className="qrprint"></Qrcode></div>
                 </div>
-            ) : (
-                // Student view
-                <div>
-                    {selfMarkedPresent ? (
-                        <div>
-                            <div>Marked as present.</div>
+                <div className="basis-1/2 bg-secondary-100 py-8 lg:py-12 px-4 sm:px-12 rounded-md">
+                    <h2 className="text-2xl mb-3">Today's attendance</h2>
+                    {role===0 ? (
+                        // Teacher view
+                        <div className="flex flex-col">
+                            <div className="flex gap-2 flex-wrap">
+                                <Link href={`/productions/${id}/attendance`} className="inline-block hover:cursor-pointer py-2 px-3 bg-primary-700 text-white rounded-md hover:bg-primary-800 active:ring-primary-300 active:ring-3">History</Link>
+                                <button onClick={emailNonResponders} className="hover:cursor-pointer py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 active:ring-red-300 active:ring-3">
+                                    Reminder email
+                                </button>
+                            </div>
+                            <div className="flex gap-16 py-5">
+                                <div>
+                                    <h3 className="text-lg">Present</h3>
+                                    {presentStudents.length > 0 ? (
+                                        <ul className="list-disc list-inside">
+                                            {presentStudents.map((entry, index) => (
+                                                <li key={index}>{entry.label}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>No present students.</p>
+                                    )}
+                
+                                </div>
+                                <div>
+                                    <h3 className="text-lg">Missing</h3>
+                                    {absentStudents.length > 0 ? (
+                                        <ul className="list-disc list-inside">
+                                            {absentStudents.map((entry, index) => (
+                                                <li key={index}>{entry.label}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>No absent students.</p>
+                                    )}
+                                </div>
+                            </div>
+                            <form onSubmit={markStudentsAttendance}>
+                                <h3 className="text-lg">Mark attendance</h3>
+                                <Select
+                                    isMulti
+                                    options={absentStudents}
+                                    value={markPresentStudents}
+                                    onChange={(val) => setMarkPresentStudents(val)}
+                                    placeholder="Start typing to search..."
+                                    className="mb-2"
+                                />
+                                <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Mark selected as present</button>
+                            </form>
                         </div>
                     ) : (
-                        <div>
-                            <button onClick={markSelfAttendance}>Log attendance</button>
+                        // Student view
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                {selfMarkedPresent ? (
+                                    <div className="inline-block py-2 px-3 bg-accent-500 text-white rounded-md">Marked as present today!</div>
+                                ) : (
+                                    <button onClick={markSelfAttendance} className="hover:cursor-pointer py-2 px-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:ring-primary-300 active:ring-3">Log attendance</button>
+                                )}
+                            </div>
+                            <div>
+                                <div className="text-lg">History</div>
+                                {selfAttendanceHistory.length > 0 ? (
+                                    <ul className="list-disc list-inside">
+                                        {selfAttendanceHistory.toReversed().map((entry, index) => (
+                                            <li key={index}>{
+                                                new Date(new Date(entry.attendance_date)
+                                                .setDate(new Date(entry.attendance_date)
+                                                .getDate() + 1))
+                                                .toLocaleDateString()
+                                            }</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No attendance records found.</p>
+                                )}
+                            </div>
                         </div>
                     )}
-                    <div>
-                        <div>Days attended:</div>
-                        <ul>
-                            {selfAttendanceHistory.length > 0 ? (
-                                selfAttendanceHistory.map((entry, index) => (
-                                    <li key={index}>{
-                                        new Date(new Date(entry.attendance_date)
-                                        .setDate(new Date(entry.attendance_date)
-                                        .getDate() + 1))
-                                        .toLocaleDateString()
-                                    }</li>
-                                ))
-                            ) : (
-                                <p>No attendance records found.</p>
-                            )}
-                        </ul>
-
-                    </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

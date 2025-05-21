@@ -113,6 +113,12 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
         return res.status(403).json({ error: "Missing permissions "});
     }
 
+    const productionResult = await pool.query(
+        'SELECT name FROM productions WHERE id = $1', [productionId]
+    );
+    if (productionResult.rows.length === 0) {
+        return res.status(404).json({error: 'Production not found'});
+    }
     // Check if teacher is part of production
     const allowedQueryResult = await pool.query(
         'SELECT * FROM productions_users WHERE production_id = $1 AND user_id = $2',
@@ -153,7 +159,7 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             attendance.push(curStudent);
             console.log(curStudent, curStudentDates);
         });
-        return res.status(200).json({attendance: attendance});
+        return res.status(200).json({attendance: attendance, production: productionResult.rows[0]});
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }

@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Link from 'next/link';
 
-import styles from '../styles/productions.module.css';
 import Production from "../components/production";
 
 export default function Productions() {
@@ -55,11 +54,10 @@ export default function Productions() {
         <div>
             {isLoggedIn ? (
                 <div>
-                    <div>You are logged in as a {role === 0 ? 'teacher' : 'student'}.</div>
-                    {role === 0 && (<Link href='/productions/new'>New Production</Link>) }
-                    <div className={styles.productions}>
+                    <h1 className="text-3xl mb-5">My productions</h1>
+                    <div>
                         {productions.length === 0 ? (
-                            <p>No productions found for this user.</p>
+                            <p>Not currently a member of any productions.</p>
                         ) : (
                                 productions.map((production) => (  
                                     <Production 

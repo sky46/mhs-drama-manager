@@ -15,15 +15,13 @@ export default function Logout({ onLogout }) {
                 throw new Error('Logout failed');
             }
             onLogout();
-            router.push("/");
+            router.push("/login");
         } catch (error) {
             console.error("Logout Failed:", error);
         }
     };
 
     return (
-        <div>
-            <button onClick={logoutUser}>Log out</button>
-        </div>
+        <a onClick={logoutUser} className="text-md hover:cursor-pointer">Log out</a>
     );
 }

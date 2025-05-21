@@ -35,22 +35,26 @@ export default function newProductionPage() {
     }
     const createProduction = async (e) => {
         e.preventDefault();
-        const res = await fetch(`http://localhost:3001/productions/new`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({name: name, teachers: teachers, students: students}),
-        });
-        const resData = await res.json();
-
-        if (res.ok) {
-            router.push(`/productions/${resData.productionId}`);
+        if (name === "") {
+            alert("You need to add a name for the production")
         } else {
-            console.log("Creation failed: ", res.statusText);
-            if (resData.exists) {
-                alert("A production with this name already exists.");
+            const res = await fetch(`http://localhost:3001/productions/new`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({name: name, teachers: teachers, students: students}),
+            });
+            const resData = await res.json();
+    
+            if (res.ok) {
+                router.push(`/productions/${resData.productionId}`);
+            } else {
+                console.log("Creation failed: ", res.statusText);
+                if (resData.exists) {
+                    alert("A production with this name already exists.");
+                }
             }
         }
     }
@@ -59,15 +63,49 @@ export default function newProductionPage() {
         getAvailableUsers();
     }, []);
     return (
-        <div>
-            {domLoaded && (
-                <form onSubmit={createProduction}>
-                    <input type="text" value={name} onChange={(val) => setName(val.target.value)} />
-                    <Select isMulti options={teachersOptions} value={teachers} onChange={(val) => setTeachers(val)} />
-                    <Select isMulti options={studentsOptions} value={students} onChange={(val) => setStudents(val)} />
-                    <button type="submit">Create</button>
-                </form>
-            )}
+        <div className="flex justify-center sm:justify-start">
+            <div className="w-11/12 sm:w-3/4 lg:w-1/2 bg-primary-100 py-8 lg:py-12 px-4 md:px-8 lg:px-12 rounded-md">
+                <h1 className="text-3xl mb-6">New production</h1>
+                {domLoaded && (
+                    <form onSubmit={createProduction} className="flex flex-col gap-3">
+                        <div>
+                            <label htmlFor="name" className="block">Production name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                value={name}
+                                onChange={(val) => setName(val.target.value)}
+                                className="w-full bg-white my-1 inline-block py-1.5 px-2 rounded-sm border border-gray-300 focus:ring-2 focus:ring-primary-300 focus:outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="teachers" className="block">Teachers</label>
+                            <Select
+                                isMulti
+                                options={teachersOptions}
+                                id="teachers"
+                                value={teachers}
+                                onChange={(val) => setTeachers(val)}
+                                placeholder="Start typing to search..."
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="students" className="block">Students</label>
+                            <Select
+                                isMulti
+                                options={studentsOptions}
+                                id="students"
+                                value={students}
+                                onChange={(val) => setStudents(val)}
+                                placeholder="Start typing to search..."
+                            />
+                        </div>
+                        <div>
+                            <button type="submit" className="hover:cursor-pointer py-2 px-3 bg-accent-600 text-white rounded-md hover:bg-accent-700 active:ring-accent-300 active:ring-3">Create</button>
+                        </div>
+                    </form>
+                )}
+            </div>
         </div>
     )
 }
