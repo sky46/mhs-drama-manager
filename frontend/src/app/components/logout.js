@@ -15,7 +15,7 @@ export default function Logout({ onLogout }) {
                 throw new Error('Logout failed');
             }
             onLogout();
-            router.push("/");
+            router.push("/login");
         } catch (error) {
             console.error("Logout Failed:", error);
         }
