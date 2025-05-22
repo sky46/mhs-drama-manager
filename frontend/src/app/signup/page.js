@@ -68,12 +68,11 @@ function Signup({}) {
             newInvalidFields.email = true;
         }
 
-        // //regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special, 1 number)
-        // const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?=.*\d)/;
-        // if (!password || !passwordCheck || password !== passwordCheck || password.length < 8 || !passwordPatternChecker.test(password)) {
-        if (!password || password.length < 8 || password !== passwordCheck) {
-            newErrors.password = "Invalid password and/or the passwords do not match."
-            newErrors.passwordCheck = "Invalid password and/or the passwords do not match."
+        // regex -> the ?= is a look ahead (need 1 upper, 1 lower, 1 special, 1 number)
+        const passwordPatternChecker = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?=.*\d)/;
+        if (!password || password.length < 8 || password !== passwordCheck || !passwordPatternChecker.test(password)) {
+            newErrors.password = "Invalid password (it must be a minimum of 8 letters and contain at least 1 upper case, 1 lower case, 1 special character and 1 number) / the passwords do not match."
+            newErrors.passwordCheck = "Invalid password (it must be a minimum of 8 letters and contain at least 1 upper case, 1 lower case, 1 special character and 1 number) / the passwords do not match."
             newInvalidFields.password = true;
             newInvalidFields.passwordCheck = true;
         }
