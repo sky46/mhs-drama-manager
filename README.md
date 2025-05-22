@@ -21,6 +21,6 @@ Some key dependencies are [Node.js](https://nodejs.org/en), [PostgreSQL](https:/
 ## Known Bugs
 TODO
 ## Support
-Contact Skyler (skyler@skylerma.com) or Lucas (lucasjin.hh@gmail.com) with any questions.
+Contact Skyler (skyler@skylerma.com) or Lucas (kblazer20@gmail.com) with any questions.
 ## Sources
 TODO
