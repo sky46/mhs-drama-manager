@@ -2,6 +2,7 @@
 Dratt (stylized as Dratt!) is a web app for managing students' attendance in high school drama productions, built for simplicity and ease of use.
 ## Features
 Both teachers and students can log in and use Dratt. Users have different permissions depending on their account type.
+
 Some key features for teachers include:
 - Creating, editing, and deleting productions, with separate attendance and users for each production
 - Marking and viewing students' daily attendance
