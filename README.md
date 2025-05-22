@@ -7,6 +7,7 @@ Some key features for teachers include:
 - Marking and viewing students' daily attendance
 - Quickly sending reminder emails to all missing students
 - Viewing students' attendance history
+
 Some key features for students include:
 - Marking their own attendance with the click of a button on a page accessible by QR code or link
 - Viewing their own attendance history
