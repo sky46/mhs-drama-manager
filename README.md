@@ -1,5 +1,12 @@
-# Dratt!
+<h1 align="center">Dratt!</h1>
+<p align="center">
+  <img src="/static/Dratt.svg" alt="Logo" width="200"/>
+</p>
+
+---
+
 Dratt (stylized as Dratt!) is a web application for managing students' attendance in high school drama productions, built for simplicity and ease of use.
+
 ## Features
 Both teachers and students can log in and use Dratt. Users have different permissions depending on their account type.
 
