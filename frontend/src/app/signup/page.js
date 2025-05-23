@@ -1,6 +1,6 @@
 "use client"; // Need this to be able to use "useState"
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
+import { useRouter } from "next/navigation" //https://stackoverflow.com/questions/76285831/whats-the-difference-between-next-router-and-next-navigation -> use next/navigation instead of next/router because it's no longer in pages directory (now uses app)
 
 import clsx from "clsx"; // https://stackoverflow.com/questions/67383686/how-to-add-a-style-on-a-condition-in-tailwind-css -> using clsx for readability for incorporating terniary operator in styling
 

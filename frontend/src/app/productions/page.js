@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Production from "../components/production";
 
 export default function Productions() {
-    // Implement protected page
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
     const [productions, setProductions] = useState([]);

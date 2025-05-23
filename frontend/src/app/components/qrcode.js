@@ -1,6 +1,7 @@
 'use client';
 import React from "react";
-import { useQRCode } from 'next-qrcode'; // https://www.npmjs.com/package/next-qrcode -> use SVG to be able to be printed out later on
+import { useQRCode } from 'next-qrcode'; // https://www.npmjs.com/package/next-qrcode
+    // https://medium.com/stackanatomy/svg-vs-canvas-a-comparison-1b58e6c84326 -> use SVG to be able to be printed out later on
 
 export default function Qrcode({ link }) {
     const { SVG } = useQRCode();
@@ -9,7 +10,7 @@ export default function Qrcode({ link }) {
         <div>
             <div>
                 <SVG
-                    text={link} // Change to backend api call later
+                    text={link}
                     options={{
                         margin: 2,
                         width: 300,

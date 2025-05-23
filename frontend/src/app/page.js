@@ -1,4 +1,5 @@
 'use client';
+// https://stackoverflow.com/questions/74965849/youre-importing-a-component-that-needs-usestate-it-only-works-in-a-client-comp -> used this link to figure out how to change the page from server to client component in order to use useState
 
 import { useState, useEffect } from "react";
 import Link from 'next/link';

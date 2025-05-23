@@ -1,12 +1,11 @@
 const mailjet = require('node-mailjet');
 
-// Set up your Mailjet credentials
 const mailClient = new mailjet.apiConnect(
     process.env.MJ_APIKEY_PUBLIC, 
     process.env.MJ_APIKEY_PRIVATE
 );
 
-// Function to send an email
+// https://www.mailslurp.com/blog/send-emails-with-mailjet/ -> used as the basis for the structure of sending the email (the request)
 async function sendReminderEmails(nonResponders) {
     if (nonResponders.length === 0) {
         console.log("No non-responders to email.");
