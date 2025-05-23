@@ -53,3 +53,5 @@ The following bullet points are all the sources used to aid in the creation of t
     - Used to figure out how to print a specific portion/element of a webpage (the QR code)
 - https://www.npmjs.com/package/next-qrcode
     - Used to generate the QR code
+- https://jsdoc.app/
+    - Documentation used for adding jsdoc comments/descriptions

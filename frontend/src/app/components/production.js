@@ -2,7 +2,21 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
+/**
+ * @fileoverview Production card component that shows important information.
+ * */
 
+/**
+ * Renders a clickable production card.
+ *
+ * @param {{ 
+ *   name: string, 
+ *   teachers: { name: string }[], 
+ *   student: number, 
+ *   id: string 
+ * }} props - Production data.
+ * @returns {JSX.Element} The card component.
+ */
 export default function Production({ name, teachers, student, id }) {
     const router = useRouter();
     
