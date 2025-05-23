@@ -1,5 +1,5 @@
 # Dratt!
-Dratt (stylized as Dratt!) is a web app for managing students' attendance in high school drama productions, built for simplicity and ease of use.
+Dratt (stylized as Dratt!) is a web application for managing students' attendance in high school drama productions, built for simplicity and ease of use.
 ## Features
 Both teachers and students can log in and use Dratt. Users have different permissions depending on their account type.
 
@@ -7,20 +7,22 @@ Some key features for teachers include:
 - Creating, editing, and deleting productions, with separate attendance and users for each production
 - Marking and viewing students' daily attendance
 - Quickly sending reminder emails to all missing students
-- Viewing students' attendance history
+- Viewing individual and overall student attendance histories
 
 Some key features for students include:
 - Marking their own attendance with the click of a button on a page accessible by QR code or link
 - Viewing their own attendance history
 ## Installation
-The application runs inside [Docker Compose](https://docs.docker.com/compose/), so to run it, simply install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on Linux, Docker Compose installed as a command-line program also works) and run the command `docker compose up` in a terminal in the application's root directory. A prepopulated database is included in `/postgres_dump/` and will be automatically imported when first running the app.
+The application runs inside [Docker Compose](https://docs.docker.com/compose/). So, there is no need for downloading dependencies from a requirements.txt file. Rather, to run it, simply install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on Linux, Docker Compose installed as a command-line program also works) and run the command `docker compose up` in a terminal in the application's root directory. A prepopulated database is included in `/postgres_dump/` and will be automatically imported when first running the app.
 
 The build instructions of the Docker images are stored in `/docker-compose.yml` as well as the `Dockerfile`s in `/frontend/` and `/backend/`. The required npm modules for each container are listed in their respective `package.json` and `package-lock.json` files, and are automatically installed when building the app.
 
 Some key dependencies are [Node.js](https://nodejs.org/en), [PostgreSQL](https://www.postgresql.org/), [Next.js](https://nextjs.org/), [Express](https://expressjs.com/), and [Tailwind CSS](https://tailwindcss.com/).
-## Known Bugs
-TODO
+## Known Bugs 
+The following are known bugs that are in the process of being addressed by the development team:
+- Currently, when viewing the student attendance history, the wrong student may be fetched from the database (i.e. student A is in the class but student B's data is what ends up getting displayed)
+- Reminder emails may end up in spam on the first email (*Note: This is not a bug but it is something to be aware of if you are planning on using this feature*)
 ## Support
 Contact Skyler (skyler@skylerma.com) or Lucas (kblazer20@gmail.com) with any questions.
 ## Sources
-TODO
+The following bullet points are all the sources used to aid in the creation of this application, as well as a description of how they were used. They are also documented inside the code using comments for further clarity.
