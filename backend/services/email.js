@@ -8,7 +8,6 @@ const mailClient = new mailjet.apiConnect(
 
 // Function to send an email
 async function sendReminderEmails(nonResponders) {
-    console.log("HAHA", nonResponders)
     if (nonResponders.length === 0) {
         console.log("No non-responders to email.");
         return;
@@ -18,7 +17,6 @@ async function sendReminderEmails(nonResponders) {
 
         const email = emailObject.email;
 
-        console.log("QOEWIPJR QW")
         try {
             const request = mailClient
                 .post('send', { version: 'v3.1' })

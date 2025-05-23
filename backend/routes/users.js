@@ -11,7 +11,6 @@ module.exports = router;
 // Post to create new user
 router.post('/users/create', async (req, res) => {
     const { name, email, password, passwordCheck, role } = req.body;
-    console.log(name, email, password, passwordCheck, role);
 
     if (!name || !email || !password || !passwordCheck || !role) {
         return res.status(400).json({ error: "Missing fields" }); // Missing fields

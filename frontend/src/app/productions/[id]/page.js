@@ -111,7 +111,6 @@ export default function ProductionPage() {
             if (data.role === 0) {
                 // Teacher
                 const attendance = data.productionData.attendance;
-                console.log("ATTENDANCE", attendance);
                 const mapStudentsSelectOptions = (user) => ({value: user.id, label: user.name});
                 setPresentStudents(attendance.present.map(mapStudentsSelectOptions));
                 setAbsentStudents(attendance.absent.map(mapStudentsSelectOptions));

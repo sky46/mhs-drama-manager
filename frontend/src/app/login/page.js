@@ -11,7 +11,6 @@ function Login({}) {
     
     const router = useRouter();
     useEffect(() => {
-        console.log("Router instance:", router);
         if (router && successfulLogin) {
             router.push("/productions");
 
@@ -32,7 +31,6 @@ function Login({}) {
             setSuccessfulLogin(true);
             setDisplayError(false);
             const loginCheckData = await loginCheckResponse.json();
-            console.log(loginCheckData);
         } else if (loginCheckResponse.status === 403) {
             setDisplayError(true);
             alert("Incorrect name/email or password.")

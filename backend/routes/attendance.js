@@ -18,7 +18,6 @@ router.post('/productions/:productionId/markselfattended', async (req, res) => {
     }
     const role = await getUserRole(userId);
     if (role !== 1) { //need to be student to be in attendance
-        console.log("IDS", userId, role);
         return res.status(403).json({ error: "Missing permissions"});
     }
 
@@ -141,7 +140,7 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             [productionId]
         ); // left join to make sure student shows up even if no attendance yet
         
-        console.log(attendanceResult.rows)
+        //console.log(attendanceResult.rows)
 
         var attendance = [];
         var curStudent;
@@ -157,7 +156,6 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             });
             curStudent.attendedDates = curStudentDates;
             attendance.push(curStudent);
-            console.log(curStudent, curStudentDates);
         });
         return res.status(200).json({attendance: attendance, production: productionResult.rows[0]});
     } catch (err) {
@@ -235,7 +233,7 @@ router.post("/productions/:productionId/attendance/reminder", async (req, res) =
             [userIds]
         )
 
-        console.log("Sending reminder emails to:", emailResult.rows);
+        //console.log("Sending reminder emails to:", emailResult.rows);
 
         await sendReminderEmails(emailResult.rows);
         return res.json({ message: "Emails sent successfully!", people: emailResult.rows });

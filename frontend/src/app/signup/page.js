@@ -33,7 +33,6 @@ function Signup({}) {
     const router = useRouter();
     // Need to use effect to mount router cause normally its in components
     useEffect(() => {
-        console.log("Router instance:", router);
         if (router && successfulRegistration) {
             router.refresh();
             router.push("/productions");
