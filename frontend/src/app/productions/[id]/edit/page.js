@@ -1,11 +1,20 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Select from 'react-select';
 
+/**
+ * @fileoverview Page to edit a production's name, teachers, and students.
+ * Fetches current production data and displays it to be updated via forms.
+ */
+
+/**
+ * Page component for displaying a page to edit an individual production.
+ * 
+ * @returns {JSX.Element} The edit production page.
+ */
 export default function EditProductionPage() {
     const {id} = useParams();
 
@@ -18,11 +27,15 @@ export default function EditProductionPage() {
 
     const router = useRouter();
 
+    // On mount -> make page appear and get the data
     useEffect(() => {
         setDomLoaded(true);
         getCurrentProduction();
     }, []);
 
+    /**
+     * Fetches current production data (i.e. name, studnets, teachers) and sets corresponding state values in form.
+     */
     const getCurrentProduction = async () => {
         const res = await fetch(`http://localhost:3001/productions/${id}/getEditData`, {
             method: 'GET',
@@ -39,6 +52,7 @@ export default function EditProductionPage() {
         const productionData = data.production;
         setName(productionData.name);
 
+        // Converts users to list of objects that are select-compatible options
         function usersToOptions(userRows) {
             return userRows.map((user) => ({value: user.id, label: user.name}));
         } 
@@ -49,6 +63,11 @@ export default function EditProductionPage() {
         setStudentsOptions(usersToOptions(productionData.allStudents));
     }
 
+    /**
+     * Updates backend with production data and redirects to the specific production view page.
+     * 
+     * @param {Event} e - Form submission event.
+     */
     const saveProduction = async (e) => {
         e.preventDefault();
         const res = await fetch(`http://localhost:3001/productions/${id}/edit`, {

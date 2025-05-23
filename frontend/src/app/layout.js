@@ -7,16 +7,32 @@ import Logout from './components/logout';
 
 import './globals.css';
 
+// Font
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
 });
 
+/**
+ * @fileoverview Exports a root layout component that wraps all pages.
+ */
+
+/**
+ * Root layout component that wraps all pages.
+ * Handles nav bar and auth status.
+ * 
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Nested page content (i.e. other pages).
+ * @returns {JSX.Element} The layout page and anything nested inside it.
+ */
 function RootLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
   const pathname = usePathname();
 
+  /**
+   * Checks user login status and updates logged in state (to update UI).
+   */
   async function checkLoginStatus() {
     try {
         const response = await fetch("http://localhost:3001/users/status", {
@@ -32,6 +48,7 @@ function RootLayout({ children }) {
     }
   }
 
+  // Check if logged in every time route (pathname) changes -> otherwise, it won't show as updated unless you manually refresh
   useEffect(() => {
     checkLoginStatus(); 
   }, [pathname]);

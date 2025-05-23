@@ -2,6 +2,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" 
 
+/**
+ * @fileoverview Page for logging in.
+ * */
+
+/**
+ * Login component with email/password form and basic validation.
+ * Redirects to /productions on successful login.
+ *
+ * @returns {JSX.Element} The login form component.
+ */
 function Login({}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -9,6 +19,7 @@ function Login({}) {
     const [successfulLogin, setSuccessfulLogin] = useState(false);
     const [displayError, setDisplayError] = useState(false);
     
+    // Redirects to /productions on succesful login
     const router = useRouter();
     useEffect(() => {
         if (router && successfulLogin) {
@@ -17,6 +28,11 @@ function Login({}) {
         }
     }, [router, successfulLogin]);
 
+    /**
+     * Sends login request to backend and handles success or error response.
+     * @param {React.FormEvent<HTMLFormElement>} e - Form submission event.
+     * @returns {Promise<void>}
+     */
     const loginUser = async (e) => {
         e.preventDefault();
         const loginCheckResponse = await fetch("http://localhost:3001/users/login", {
@@ -40,6 +56,9 @@ function Login({}) {
         }
     };
 
+    /**
+     * Changes state for password.
+     */
     const togglePasswordVisibility = () => { 
         setShowPassword(!showPassword);
     };
