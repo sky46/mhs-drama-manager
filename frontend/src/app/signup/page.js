@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation" //https://nextjs.org/docs/pages/api-reference/functions/use-router#the-nextcompatrouter-export (acts like an app because of use client)
 
-import clsx from "clsx";
+import clsx from "clsx"; // https://stackoverflow.com/questions/67383686/how-to-add-a-style-on-a-condition-in-tailwind-css -> using clsx for readability for incorporating terniary operator in styling
 
 function Signup({}) {
     const [name, setName] = useState("");

@@ -79,14 +79,14 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
     const presentStudentsResult = await pool.query(
         `SELECT id, name
         FROM users
-        INNER JOIN attendance ON users.id = attendance.user_id
+        JOIN attendance ON users.id = attendance.user_id
         WHERE attendance.production_id = $1 AND attendance.attendance_date = $2 AND role = 1`,
         [productionId, todayLocal]
     );
     const absentStudentsResult = await pool.query(
         `SELECT id, name
         FROM users
-        INNER JOIN productions_users ON users.id = productions_users.user_id
+        JOIN productions_users ON users.id = productions_users.user_id
         WHERE productions_users.production_id = $1
             AND id NOT IN
                 (SELECT user_id
@@ -128,6 +128,8 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
     }
 
     try {
+        // https://launchschool.com/books/sql/read/joins (left join section) -> used to implement collection of all user data even if they aren't in they don't have attendance data yet
+        // https://www.ibm.com/docs/en/db2-for-zos/12.0.0?topic=type-arrays-in-sql-statements -> used to create a list of all the attendance dates within SQL
         const attendanceResult = await pool.query(
             `SELECT users.id, users.name, array_agg(DISTINCT attendance.attendance_date) AS attendance_dates
             FROM users
@@ -138,7 +140,7 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
             GROUP BY users.id
             ORDER BY users.name DESC`,
             [productionId]
-        ); // left join to make sure student shows up even if no attendance yet
+        ); 
         
         //console.log(attendanceResult.rows)
 

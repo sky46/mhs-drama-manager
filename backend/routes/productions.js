@@ -158,7 +158,7 @@ router.post('/productions/delete', async (req, res) => {
         const accessResult = await client.query(
             `SELECT productions.id
              FROM productions
-             INNER JOIN productions_users ON productions.id = productions_users.production_id
+             JOIN productions_users ON productions.id = productions_users.production_id
              WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
             [productionId, userId]
         );
@@ -234,7 +234,7 @@ router.get('/productions/:productionId', async (req, res) => {
         const accessResult = await pool.query(
             `SELECT productions.id
             FROM productions
-            INNER JOIN productions_users ON productions.id = productions_users.production_id
+            JOIN productions_users ON productions.id = productions_users.production_id
             WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
             [productionId, userId]
         );
@@ -245,7 +245,7 @@ router.get('/productions/:productionId', async (req, res) => {
         const teachersResult = await pool.query(
             `SELECT users.id, users.name
             FROM users
-            INNER JOIN productions_users ON users.id = productions_users.user_id
+            JOIN productions_users ON users.id = productions_users.user_id
             WHERE productions_users.production_id = $1 AND users.role = 0;`,
             [productionId]
         );
@@ -260,9 +260,9 @@ router.get('/productions/:productionId', async (req, res) => {
             presentStudentsResult = await pool.query(
                 `SELECT users.id, users.name
                 FROM users
-                INNER JOIN productions_users 
+                JOIN productions_users 
                     ON users.id = productions_users.user_id
-                INNER JOIN attendance 
+                JOIN attendance 
                     ON users.id = attendance.user_id 
                     AND attendance.production_id = $1 
                     AND attendance.attendance_date = $2
@@ -274,7 +274,7 @@ router.get('/productions/:productionId', async (req, res) => {
             const absentStudentsResult = await pool.query(
                 `SELECT users.id, users.name
                 FROM users
-                INNER JOIN productions_users 
+                JOIN productions_users 
                     ON users.id = productions_users.user_id
                 LEFT JOIN attendance 
                     ON users.id = attendance.user_id 
@@ -301,7 +301,7 @@ router.get('/productions/:productionId', async (req, res) => {
             const studentCountResult = await pool.query(
                 `SELECT COUNT(*)
                 FROM users
-                INNER JOIN productions_users ON users.id = productions_users.user_id
+                JOIN productions_users ON users.id = productions_users.user_id
                 WHERE productions_users.production_id = $1 AND users.role = 1`,
                 [productionId]
             );
@@ -355,7 +355,7 @@ router.get('/productions/:productionId/getEditData', async (req, res) => {
         const accessResult = await pool.query(
             `SELECT productions.id
             FROM productions
-            INNER JOIN productions_users ON productions.id = productions_users.production_id
+            JOIN productions_users ON productions.id = productions_users.production_id
             WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
             [productionId, userId]
         );
@@ -367,7 +367,7 @@ router.get('/productions/:productionId/getEditData', async (req, res) => {
         const currentTeachersResult = await pool.query(
             `SELECT users.id, users.name
             FROM users
-            INNER JOIN productions_users ON users.id = productions_users.user_id
+            JOIN productions_users ON users.id = productions_users.user_id
             WHERE users.role = 0 AND productions_users.production_id = $1 AND users.id <> $2`,
             [productionId, userId]
         );
@@ -380,7 +380,7 @@ router.get('/productions/:productionId/getEditData', async (req, res) => {
         const currentStudentsResult = await pool.query(
             `SELECT users.id, users.name
             FROM users
-            INNER JOIN productions_users ON users.id = productions_users.user_id
+            JOIN productions_users ON users.id = productions_users.user_id
             WHERE users.role = 1 AND productions_users.production_id = $1`,
             [productionId]
         );
@@ -422,7 +422,7 @@ router.post('/productions/:productionId/edit', async (req, res) => {
     const accessResult = await pool.query(
         `SELECT productions.id
         FROM productions
-        INNER JOIN productions_users ON productions.id = productions_users.production_id
+        JOIN productions_users ON productions.id = productions_users.production_id
         WHERE productions_users.production_id = $1 AND productions_users.user_id = $2`,
         [productionId, userId]
     );

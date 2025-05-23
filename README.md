@@ -26,3 +26,11 @@ The following are known bugs that are in the process of being addressed by the d
 Contact Skyler (skyler@skylerma.com) or Lucas (kblazer20@gmail.com) with any questions.
 ## Sources
 The following bullet points are all the sources used to aid in the creation of this application, as well as a description of how they were used. They are also documented inside the code using comments for further clarity.
+- https://stackoverflow.com/questions/67383686/how-to-add-a-style-on-a-condition-in-tailwind-css
+    - Used this link to figure out how to add terniary operators in TailwindCSS styling for the sign up page (i.e. turn red if incorrect)
+- https://www.geeksforgeeks.org/sql-cheat-sheet/
+    - General SQL cheatsheet that was used when writing the SQL text
+- https://launchschool.com/books/sql/read/joins 
+    - Used this link to understand all the different types of joins for the backend routes 
+- https://www.ibm.com/docs/en/db2-for-zos/12.0.0?topic=type-arrays-in-sql-statements
+    - Used this link to understand how to create a list/array inside SQL statements using ARRAY_AGG
