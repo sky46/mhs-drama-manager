@@ -5,6 +5,12 @@ const mailClient = new mailjet.apiConnect(
     process.env.MJ_APIKEY_PRIVATE
 );
 
+/**
+ * Send reminder emails to a list of missing students.
+ * 
+ * @param { Object[] } nonResponders - List of non-responder objects, each with an email attribute.
+ * @returns { null }
+ */
 // https://www.mailslurp.com/blog/send-emails-with-mailjet/ -> used as the basis for the structure of sending the email (the request)
 async function sendReminderEmails(nonResponders) {
     if (nonResponders.length === 0) {

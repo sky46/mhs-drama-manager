@@ -8,7 +8,17 @@ const { getUserRole } = require('../helpers');
 const router = new Router();
 module.exports = router;
 
-// Post to create new user
+/**
+ * Unauthenticated route.
+ * Create a new student user, i.e. sign up an account. Afterwards, log in with created account.
+ * 
+ * POST data
+ *  - name: Display name
+ *  - email: Email, used as identifier and login
+ *  - password: Password.
+ *  - passwordCheck: Confirm password, which much match password.
+ *  - role (DEPRECATED): Has no effect. Formerly used to select student or teacher account type.
+ */
 router.post('/users/create', async (req, res) => {
     const { name, email, password, passwordCheck, role } = req.body;
 
@@ -70,7 +80,15 @@ router.post('/users/create', async (req, res) => {
     }
 });
 
-// Post to check user email if already registered
+/**
+ * Unauthenticated route.
+ * Check if user with email already exists.
+ * 
+ * POST data
+ *  - email: Email to check.
+ * Response
+ *  - exists: Boolean representing whether or not a user with this email exists already.
+ */
 router.post('/users/email', async (req, res) => {
     const { email } = req.body;
     try {
@@ -88,7 +106,14 @@ router.post('/users/email', async (req, res) => {
     }
 });
 
-// Post to login user
+/**
+ * Unauthenticated route.
+ * Log in user.
+ * 
+ * POST data
+ *  - email: Email.
+ *  - password: Password (in plaintext).
+ */
 router.post('/users/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -144,6 +169,10 @@ router.post('/users/login', async (req, res) => {
     }
 });
 
+/**
+ * Unauthenticated route.
+ * Log out user.
+ */
 router.post('/users/logout', async (req, res) => {
     req.session.user = null;
     req.session.save((err) => {
@@ -159,7 +188,14 @@ router.post('/users/logout', async (req, res) => {
     })
 });
 
-// Check if logged in
+/**
+ * Unathenticated route.
+ * Check whether a user is currently logged in based on browser cookies.
+ * 
+ * Response
+ *  - loggedIn: Boolean representing whether a user is logged in.
+ *  - user: Only returned if loggedIn is true. Data of logged in user.
+ */
 router.get('/users/status', async (req, res) => {
     if (req.session && req.session.user) {
         const userResult = await pool.query(
@@ -173,7 +209,14 @@ router.get('/users/status', async (req, res) => {
     return res.json({ loggedIn: false });
 });
 
-// Route to check if teacher vs student
+
+/**
+ * Authenticated route.
+ * Check role of logged in user.
+ * 
+ * Response
+ *  - role: "teacher" or "student" depending on role.
+ */
 router.get('/users/role', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: "Not logged in" });

@@ -7,7 +7,15 @@ const { getUserRole, localDateFormat } = require('../helpers');
 const router = new Router();
 module.exports = router;
 
-// route to mark somebody as checked in
+/**
+ * Student route.
+ * Mark the current logged in user as present for today in a production.
+ * 
+ * URL params
+ *  - productionId: Production ID.
+ * Response
+ *  - markedPresentRow: Attendance row inserted into database.
+ */
 router.post('/productions/:productionId/markselfattended', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
@@ -45,6 +53,18 @@ router.post('/productions/:productionId/markselfattended', async (req, res) => {
     }
 })
 
+/**
+ * Teacher route.
+ * Mark a list of students as present for today in the production specified.
+ * 
+ * URL params
+ *  - productionID: Production ID.
+ * POST data
+ *  - students: List of student IDs to mark as present.
+ * Response
+ *  - present: Updated list of present students.
+ *  - absent: Updated list of missing students.
+ */
 router.post('/productions/:productionId/markstudentsattended', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
@@ -99,7 +119,17 @@ router.post('/productions/:productionId/markstudentsattended', async (req, res) 
     return res.status(200).json({message: 'Attendance marked successfully', newAttendance: attendance});
 })
 
-// Get all attendance history for all students for a production
+/**
+ * Teacher route.
+ * Get attendance history for all dates and all users for a production.
+ * 
+ * URL params
+ *  - productionId: Production ID.
+ * Response
+ *  - production: Production data.
+ *  - attendancce: List where each element is a student object. Each student object contains
+ *      user data as well as an object where keys are attended dates with value true. 
+ */
 router.get('/productions/:productionId/attendance', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
@@ -165,6 +195,15 @@ router.get('/productions/:productionId/attendance', async (req, res) => {
     }
 });
 
+/**
+ * Student route.
+ * Get all attendance history for the current user for a production.
+ * 
+ * URL params
+ *  - productionId: Production ID.
+ * Response
+ *  - attendance: List of days attended by student.
+ */
 router.get('/productions/:productionId/attendance/all', async (req, res) => {
     const userId = req.session.user;
     const productionId = req.params.productionId; 
@@ -197,7 +236,15 @@ router.get('/productions/:productionId/attendance/all', async (req, res) => {
     }
 
 })
-
+/**
+ * Teacher route.
+ * Send a reminder email to all missing students today for a production.
+ * 
+ * URL params
+ *  - productionId: Production ID.
+ * Response
+ *  - people: List of users emailed.
+ */
 router.post("/productions/:productionId/attendance/reminder", async (req, res) => {
     const userId = req.session.user;
     if (!userId) {

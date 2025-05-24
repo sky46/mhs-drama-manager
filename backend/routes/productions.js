@@ -7,7 +7,16 @@ const { getUserRole, localDateFormat } = require('../helpers');
 const router = new Router();
 module.exports = router;
 
-// Route to get productions user is a part of 
+/**
+ * Authenticated route.
+ * Get list of productions with data.
+ * 
+ * URL params
+ *  - productionId: production ID.
+ * Response
+ *  - productions: List of production objects containing production info, teacher list, and number of students.
+ *  - role: Role of currently logged in user.
+ */
 router.get('/productions', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
@@ -80,6 +89,17 @@ router.get('/productions', async (req, res) => {
     }
 });
 
+/**
+ * Teacher route.
+ * Create a new production.
+ * 
+ * POST data
+ *  - name: Production name.
+ *  - teachers: List of teacher IDs to be added to production.
+ *  - students: List of student IDs to be added to production.
+ * Response
+ *  - productionId: ID of created production.
+ */
 router.post('/productions/new', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
@@ -134,6 +154,15 @@ router.post('/productions/new', async (req, res) => {
     }
 });
 
+/**
+ * Teacher route.
+ * Delete a production.
+ * 
+ * POST data
+ *  - productionId: ID of production to delete.
+ * Response
+ *  - productionId: ID of deleted production.
+ */
 router.post('/productions/delete', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
@@ -189,7 +218,16 @@ router.post('/productions/delete', async (req, res) => {
     }
 });
 
-// Available users to add to production when creating, i.e. all users but self
+/**
+ * Teacher route.
+ * Get a list of students and a list of teachers available to be added when creating a production.
+ * This includes all students, and all teachers except for currently logged in teacher who will
+ * automaticcally be added to production.
+ * 
+ * Response
+ *  - teachers: List of available teachers.
+ *  - students: List of available students.
+ */
 router.get('/productions/new/availableusers', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
@@ -214,7 +252,27 @@ router.get('/productions/new/availableusers', async (req, res) => {
     }
 });
 
-// Route to get productions user is a part of 
+/**
+ * Authenticated route.
+ * Get production data.
+ * Data accessible is different depending on user role.
+ * 
+ * URL params
+ *  - productionId: production ID.
+ * Response
+ *  - role: User role.
+ *  - productionData: Production data object containing:
+ *      Available for all users:
+ *          - id: ID.
+ *          - name: Name.
+ *          - teachers: List of teachers.
+ *          - studentCount: Number of students.
+ *      Available for teachers only:
+ *          - attendance: Today's attendance for all students.
+ *      Available for students only:
+ *          - selfAttendanceHistory: Student's own attendance history.
+ *          - selfMarkedPresent: Whether or not student has been marked present today.
+ */
 router.get('/productions/:productionId', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
@@ -332,7 +390,23 @@ router.get('/productions/:productionId', async (req, res) => {
     }
 });
 
-// Get data for existing production including existing/available users
+/**
+ * Teacher route.
+ * Get existing data for production as well as available students and teachers to be added.
+ * Available students and teachers contains all students and all teachers except currently logged in teacher,
+ * who will be automatically added.
+ * 
+ * URL params
+ *  - productionId: production ID.
+ * Response
+ *  - production: Production object including:
+ *      - id: ID.
+ *      - name: Name.
+ *      - currentTeachers: IDs and names of teachers who are currently part of production.
+ *      - allTeachers: IDs of all teachers except currently logged in teacher.
+ *      - currentStudents: IDs and names of teachers who are currently part of production.
+ *      - allStudents: IDs of all students.
+ */
 router.get('/productions/:productionId/getEditData', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {
@@ -406,6 +480,19 @@ router.get('/productions/:productionId/getEditData', async (req, res) => {
     }
 })
 
+/**
+ * Teacher route.
+ * Edit a production.
+ * 
+ * URL params
+ *  - productionId: production ID.
+ * POST data:
+ *  - name: New name.
+ *  - teachers: New list of teacher IDs to be part of production.
+ *  - students: New list of student IDs to be part of production.
+ * Response
+ *  - productionID: production ID.
+ */
 router.post('/productions/:productionId/edit', async (req, res) => {
     const userId = req.session.user;
     if (!userId) {

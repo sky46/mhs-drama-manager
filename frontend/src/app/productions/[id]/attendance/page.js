@@ -22,7 +22,9 @@ function ProdAttendancePage() {
         getProdAttendance();
         getDates(startDate);
     }, [startDate]);
-
+    
+    // https://stackoverflow.com/questions/57466655/how-to-generate-each-week-list-from-date-range-start-date-and-end-date
+    // Used to generate list of dates in a week.
     const getDates = (baseDate) => {
         // dates[] stores Date objects
         var generatedDates = [];
@@ -34,6 +36,8 @@ function ProdAttendancePage() {
         setDates(generatedDates);
     }
     
+    // https://stackoverflow.com/questions/35088088/javascript-for-getting-the-previous-monday?noredirect=1&lq=1
+    // Adapted to get most recent Sunday including today.
     const setInitialStartDate = () => {
         var previousSunday = new Date();
         previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() % 7));
