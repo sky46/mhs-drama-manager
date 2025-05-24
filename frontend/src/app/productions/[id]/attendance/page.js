@@ -4,9 +4,18 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; 
 import Link from 'next/link';
 
+/**
+ * @fileoverview Displays weekly overall attendance data and individual student attendance for a specific production.
+ */
 
+/**
+ * Page component for displaying attendance of a specific production.
+ * Fetches and displays attendance by day and by student.
+ * 
+ * @returns {JSX.Element} Attendance view for the selected production.
+ */
 function ProdAttendancePage() {
-    const {id} = useParams();
+    const {id} = useParams(); // Get production id from url
 
     const [attendance, setAttendance] = useState([]);
     const [dates, setDates] = useState([]);
@@ -14,19 +23,25 @@ function ProdAttendancePage() {
     const [searchStudent, setSearchStudent] = useState('');
     const [productionName, setProductionName] = useState('');
 
+    // On mount, initialize the week's start date
     useEffect(() => {
         setInitialStartDate();
     }, [])
 
+    // Get new attendance data when new date
     useEffect(() => {
         getProdAttendance();
         getDates(startDate);
     }, [startDate]);
     
+
+    /**
+     * Generates the dates for this week (array of 7 consecutive Dase objects) based on baseDate.
+     * @param {Date} baseDate - The starting date for the week.
+     */
     // https://stackoverflow.com/questions/57466655/how-to-generate-each-week-list-from-date-range-start-date-and-end-date
     // Used to generate list of dates in a week.
     const getDates = (baseDate) => {
-        // dates[] stores Date objects
         var generatedDates = [];
         var currentDate = new Date(baseDate);
         for (var i = 0; i < 7; i++) {
@@ -36,6 +51,9 @@ function ProdAttendancePage() {
         setDates(generatedDates);
     }
     
+    /**
+     * Sets start date to most recent Sunday.
+     */
     // https://stackoverflow.com/questions/35088088/javascript-for-getting-the-previous-monday?noredirect=1&lq=1
     // Adapted to get most recent Sunday including today.
     const setInitialStartDate = () => {
@@ -44,6 +62,9 @@ function ProdAttendancePage() {
         setStartDate(previousSunday);
     }
     
+    /**
+     * Fetches attendance data for given production from server (uses to update attendance list and production name).
+     */
     const getProdAttendance = async () => {
         const res = await fetch(`http://localhost:3001/productions/${id}/attendance`, {
             method: 'GET',
@@ -62,6 +83,25 @@ function ProdAttendancePage() {
         setProductionName(data.production.name);
     };
 
+    /**
+     * Move one week forward.
+     */
+    const nextWeek = () => {
+        const newStartDate = new Date(startDate);
+        newStartDate.setDate(startDate.getDate()+7);
+        setStartDate(newStartDate);
+    };
+
+    /**
+     * Move one week backward.
+     */
+    const lastWeek = () => {
+        const newStartDate = new Date(startDate);
+        newStartDate.setDate(startDate.getDate()-7);
+        setStartDate(newStartDate);
+    };
+
+    // Remap attendance list gotten from backend to make it easier to access
     const studentsAttendance = attendance.map(user => ({
         name: user.name,
         attendedDates: Object.entries(user.attendedDates)
@@ -69,24 +109,12 @@ function ProdAttendancePage() {
             .map(([date]) => date)
     }));
 
+    // Filter based on input search (ignore case sensitive)
     const filteredStudentsAttendance = studentsAttendance.filter((item) => {
         return searchStudent 
         ? item.name.toLowerCase().includes(searchStudent.toLowerCase()) 
         : true;
     })
-    
-
-    const nextWeek = () => {
-        const newStartDate = new Date(startDate);
-        newStartDate.setDate(startDate.getDate()+7);
-        setStartDate(newStartDate);
-    };
-
-    const lastWeek = () => {
-        const newStartDate = new Date(startDate);
-        newStartDate.setDate(startDate.getDate()-7);
-        setStartDate(newStartDate);
-    };
 
     return (
         <div>

@@ -1,15 +1,26 @@
 "use client"; 
 import { useState, useEffect } from "react";
-import Link from 'next/link';
-
 import Production from "../components/production";
 
+/**
+ * @fileoverview Exports a page of all productions a user is a part of.
+ * Checks login status before fetching and rendering the productions.
+ */
+
+/**
+ * Page component to display the productions a user is part of.
+ * 
+ * @returns {JSX.Element} The page with all the productions the user is part of.
+ */
 export default function Productions() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
     const [productions, setProductions] = useState([]);
 
     useEffect(() => {
+         /**
+         * Checks if the user is logged in.
+         */
         async function checkLoginStatus() {
             try {
                 const response = await fetch("http://localhost:3001/users/status", {
@@ -23,6 +34,9 @@ export default function Productions() {
         }
         checkLoginStatus();
 
+        /**
+         * Fetches list of productions the user is a part of.
+         */
         const fetchProductions = async () => {
             try {
                 const res = await fetch('http://localhost:3001/productions', {

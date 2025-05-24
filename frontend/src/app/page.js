@@ -4,10 +4,23 @@
 import { useState, useEffect } from "react";
 import Link from 'next/link';
 
+/**
+ * @fileoverview Exports a landing view page component. 
+ */
+
+/**
+ * Home page component that is initially seen when app is opened (landing page).
+ * Changes based on auth status.
+ * 
+ * @returns {JSX.Element} The home page.
+ */
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
 
+  /**
+   * Checks user login status and updates logged in state (to update UI).
+   */
   async function checkLoginStatus() {
     try {
         const response = await fetch("http://localhost:3001/users/status", {
@@ -23,6 +36,7 @@ export default function Home() {
     }
   }
 
+  // Check login status on mount
   useEffect(() => {
     checkLoginStatus(); 
   }, []);

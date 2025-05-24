@@ -3,12 +3,19 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Select from 'react-select';
 import Link from 'next/link';
-
-
 import Qrcode from '../../components/qrcode'
-
 import { useRouter } from 'next/navigation'
 
+/**
+ * @fileoverview Individual production page based on id.
+ * DIsplays different content depending on if the user is a student or teacher (i.e. teaachers can access a history page).
+ */
+
+/**
+ * Page component for displaying individual production page
+ * 
+ * @returns {JSX.Element} The individual production page.
+ */
 export default function ProductionPage() {
     const router = useRouter()
     
@@ -30,6 +37,9 @@ export default function ProductionPage() {
         fetchProduction();
     }, [id]);
 
+    /**
+     * Opens a new window to print the production's QR code.
+     */
     const printQR = async () => {
         // code to print specific part of webpage -> https://stackoverflow.com/questions/12997123/print-specific-part-of-webpage
         var prtContent = document.getElementById("qr");
@@ -41,6 +51,9 @@ export default function ProductionPage() {
         WinPrint.close();
     }
 
+    /**
+     * Makes a backend call to delete the production (after confirmation by user)
+     */
     const deleteProduction = async () => {
         try {
             if (confirm('Permanently delete production?')) {
@@ -66,7 +79,9 @@ export default function ProductionPage() {
         }
     }
 
-
+    /**
+     * Sends reminder email to all absent students.
+     */
     const emailNonResponders = async() => {
         try {
             const emailList = absentStudents.map(user => user.email);
@@ -91,6 +106,9 @@ export default function ProductionPage() {
         }
     }
 
+    /**
+     * Sets state data for production based on data fetched from backend (i.e. present students, absent students)
+     */
     const fetchProduction = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/${id}`, {
@@ -124,9 +142,14 @@ export default function ProductionPage() {
         }
     }
 
+    // Wait until async data has loaded 
     if (!production) {
         return <div></div>;
     }
+
+    /**
+     * Marks the logged-in student as present.
+     */
     const markSelfAttendance = async () => {
         try {
             const response = await fetch(`http://localhost:3001/productions/${id}/markselfattended`, {
@@ -148,6 +171,11 @@ export default function ProductionPage() {
         }
     }
 
+    /**
+     * Handles form submission to mark selected students as present.
+     *
+     * @param {React.FormEvent} e - Form submission event.
+     */
     const markStudentsAttendance = async (e) => {
         e.preventDefault();
         try {

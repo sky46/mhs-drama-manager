@@ -3,6 +3,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import Select from 'react-select';
 
+/**
+ * @fileoverview Page where a new production can be created.
+ * Fetches available users and allows form submission to create a production and add users to it.
+ */
+
+/**
+ * Page component for displaying production creation page. 
+ * 
+ * @returns {JSX.Element} The production creation page.
+ */
 export default function newProductionPage() {
     const [domLoaded, setDomLoaded] = useState(false);
     const [teachersOptions, setTeachersOptions] = useState([]);
@@ -10,8 +20,11 @@ export default function newProductionPage() {
     const [teachers, setTeachers] = useState([]);
     const [students, setStudents] = useState([]);
     const [name, setName] = useState('');
-
     const router = useRouter();
+
+    /**
+     * Fetches available users for selection (updates state variables to set them as options).
+     */
     const getAvailableUsers = async () => {
         try {
             const res = await fetch(`http://localhost:3001/productions/new/availableusers`, {
@@ -33,8 +46,14 @@ export default function newProductionPage() {
             console.log(error.message);
         }
     }
+
+    /**
+     * Handles the production creation form submission (redirects to the new production if successful).
+     * @param {React.FormEvent} e - Form submission event.
+     */
     const createProduction = async (e) => {
         e.preventDefault();
+        // Only need to make sure it has a name -> it is fine if no students or teachers (can add later)
         if (name === "") {
             alert("You need to add a name for the production")
         } else {
@@ -58,10 +77,13 @@ export default function newProductionPage() {
             }
         }
     }
+
+    // Run on mount to load available users and confirm DOM loaded
     useEffect(() => {
         setDomLoaded(true);
         getAvailableUsers();
     }, []);
+
     return (
         <div className="flex justify-center sm:justify-start">
             <div className="w-11/12 sm:w-3/4 lg:w-1/2 bg-primary-100 py-8 lg:py-12 px-4 md:px-8 lg:px-12 rounded-md">
